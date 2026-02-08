@@ -20,13 +20,29 @@ import { Section, BlogPost, Resource, ExperienceItem, ResearchPaper, Performance
 import { subscribeToCollection, transformDataForLang } from './src/services/db';
 import { subscribeToAuthChanges } from './src/services/auth';
 import type { User } from 'firebase/auth';
-import { Lock } from 'lucide-react';
+import { Lock, Menu, X, Globe, ArrowUp } from 'lucide-react';
 
 function App() {
   const [currentSection, setCurrentSection] = useState<Section>(Section.HOME);
   const [lang, setLang] = useState<Language>('es');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  // Scroll to top logic
+  useEffect(() => {
+    const handleScroll = () => {
+      // Show button after scrolling past the hero section (1 viewport height)
+      if (window.scrollY > window.innerHeight) {
+        setShowScrollTop(true);
+      } else {
+        setShowScrollTop(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Raw data from Firestore (contains all languages)
   const [rawPosts, setRawPosts] = useState<any[]>([]);
@@ -165,7 +181,7 @@ function App() {
       </main>
 
       {currentSection !== Section.ADMIN && (
-        <footer className="py-12 bg-black text-center border-t border-white/5 relative z-10">
+        <footer id="main-footer" className="py-12 bg-black text-center border-t border-white/5 relative z-10">
           <div className="mb-4 flex items-center justify-center gap-2 opacity-50">
             <div className="h-px w-8 bg-maestro-gold"></div>
             <span className="text-maestro-gold text-xs tracking-widest uppercase">Diego Carrión</span>
@@ -184,6 +200,15 @@ function App() {
           </button>
         </footer>
       )}
+
+      {/* Floating Scroll to Top Button */}
+      <button
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        className={`fixed bottom-8 right-8 z-50 p-3 rounded-full bg-maestro-gold text-maestro-dark shadow-lg transition-all duration-300 transform ${showScrollTop ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'} hover:bg-white hover:scale-110`}
+        aria-label="Scroll to top"
+      >
+        <ArrowUp size={24} />
+      </button>
     </div>
   );
 }

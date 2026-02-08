@@ -21,7 +21,7 @@ export const translations = {
       intro: '"Candidato a PhD en Musicología, explorando la intersección entre la música barroca y las técnicas de dirección contemporáneas."',
       ctaWork: 'Conoce mi trabajo',
       ctaContact: 'Contacto',
-      aboutTitle: 'Sobre el Artista',
+      aboutTitle: 'Sobre Mí',
       aboutHeading: 'Donde la tradición se encuentra con la innovación.',
       aboutText1: 'Mi carrera se define por una dualidad: el rigor del archivo y la vitalidad del escenario. Como director, no solo busco la precisión técnica, sino la autenticidad histórica informada.',
       aboutText2: 'Mi investigación doctoral profundiza en las partituras olvidadas, trayendo a la luz obras maestras que merecen ser escuchadas nuevamente, interpretadas con una sensibilidad moderna.',
@@ -52,7 +52,26 @@ export const translations = {
       statsConcerts: 'Conciertos Dirigidos'
     },
     experience: {
-      title: 'Trayectoria Profesional'
+      title: 'Experiencia Profesional',
+      subtitle: 'Un recorrido por los escenarios y ensambles que han marcado mi carrera.',
+      items: [
+        {
+          id: 1,
+          year: '2023 - Presente',
+          role: 'Directora Principal Invitada',
+          institution: 'Orquesta Filarmónica Nacional',
+          desc: 'Dirección de temporadas regulares y conciertos especiales, con un enfoque en repertorio barroco y contemporáneo.',
+        },
+        {
+          id: 2,
+          year: '2021 - 2023',
+          role: 'Primera Violín',
+          institution: 'Ensemble Barroco Europeo',
+          desc: 'Interpretación de música de cámara barroca con instrumentos de época.',
+        }
+      ],
+      viewDetails: 'Ver Experiencia',
+      viewAll: 'Ver toda la trayectoria'
     },
     research: {
       badge: 'Academia',
@@ -153,7 +172,9 @@ export const translations = {
       statsConcerts: 'Concerts Conducted'
     },
     experience: {
-      title: 'Professional Trajectory'
+      title: 'Professional Trajectory',
+      viewDetails: 'View Experience',
+      viewAll: 'View full history'
     },
     research: {
       badge: 'Academia',
@@ -254,7 +275,9 @@ export const translations = {
       statsConcerts: 'Концертов'
     },
     experience: {
-      title: 'Профессиональный путь'
+      title: 'Профессиональный путь',
+      viewDetails: 'Смотреть опыт',
+      viewAll: 'Посмотреть всю историю'
     },
     research: {
       badge: 'Академия',
@@ -307,110 +330,150 @@ export const translations = {
 };
 
 // Initial Data Functions to support localization
+// Initial Data Functions to support localization
 export const getInitialExperience = (lang: 'es' | 'en' | 'ru'): ExperienceItem[] => {
-    const data = {
-        es: [
-            { id: '1', year: '2023 - Presente', role: 'Investigador Doctoral', institution: 'Universidad de las Artes', description: 'Investigación sobre la evolución de la orquestación en el romanticismo tardío.' },
-            { id: '2', year: '2020 - 2023', role: 'Director Asistente', institution: 'Orquesta Sinfónica Nacional', description: 'Asistencia en ensayos, dirección de conciertos educativos.' },
-            { id: '3', year: '2018 - 2020', role: 'Profesor de Teoría Musical', institution: 'Conservatorio Superior', description: 'Docencia en armonía, contrapunto y análisis musical.' }
-        ],
-        en: [
-            { id: '1', year: '2023 - Present', role: 'Doctoral Researcher', institution: 'University of Arts', description: 'Research on the evolution of orchestration in late Romanticism.' },
-            { id: '2', year: '2020 - 2023', role: 'Assistant Conductor', institution: 'National Symphony Orchestra', description: 'Rehearsal assistance, conducting educational concerts.' },
-            { id: '3', year: '2018 - 2020', role: 'Music Theory Professor', institution: 'Superior Conservatory', description: 'Teaching harmony, counterpoint, and musical analysis.' }
-        ],
-        ru: [
-            { id: '1', year: '2023 - Наст. время', role: 'Докторский исследователь', institution: 'Университет Искусств', description: 'Исследование эволюции оркестровки в позднем романтизме.' },
-            { id: '2', year: '2020 - 2023', role: 'Ассистент дирижера', institution: 'Национальный симфонический оркестр', description: 'Помощь в репетициях, дирижирование образовательными концертами.' },
-            { id: '3', year: '2018 - 2020', role: 'Профессор теории музыки', institution: 'Высшая консерватория', description: 'Преподавание гармонии, полифонии и музыкального анализа.' }
-        ]
-    };
-    return data[lang];
+  const data = {
+    es: [
+      {
+        id: '1',
+        year: '2023 - Presente',
+        role: 'Directora Principal Invitada',
+        institution: 'Orquesta Filarmónica Nacional',
+        description: 'Dirección de temporadas regulares y conciertos especiales, con un enfoque en repertorio barroco y contemporáneo.',
+        tags: ['10+ conciertos por temporada', 'Colaboración con solistas internacionales', 'Programas educativos']
+      },
+      {
+        id: '2',
+        year: '2021 - 2023',
+        role: 'Primera Violín',
+        institution: 'Ensemble Barroco Europeo',
+        description: 'Interpretación de música de cámara barroca con instrumentos de época.',
+        tags: ['Giras por 15 países', '3 grabaciones discográficas', 'Festivales internacionales']
+      }
+    ],
+    en: [
+      {
+        id: '1',
+        year: '2023 - Present',
+        role: 'Principal Guest Conductor',
+        institution: 'National Philharmonic Orchestra',
+        description: 'Conducting regular seasons and special concerts, focusing on baroque and contemporary repertoire.',
+        tags: ['10+ concerts per season', 'Collaboration with international soloists', 'Educational programs']
+      },
+      {
+        id: '2',
+        year: '2021 - 2023',
+        role: 'First Violin',
+        institution: 'European Baroque Ensemble',
+        description: 'Performance of baroque chamber music with period instruments.',
+        tags: ['Tours in 15 countries', '3 discographic recordings', 'International festivals']
+      }
+    ],
+    ru: [
+      {
+        id: '1',
+        year: '2023 - Наст. время',
+        role: 'Главный приглашенный дирижер',
+        institution: 'Национальный филармонический оркестр',
+        description: 'Дирижирование регулярными сезонами и специальными концертами с акцентом на барочный и современный репертуар.',
+        tags: ['10+ концертов в сезон', 'Сотрудничество с международными солистами', 'Образовательные программы']
+      },
+      {
+        id: '2',
+        year: '2021 - 2023',
+        role: 'Первая скрипка',
+        institution: 'Европейский барочный ансамбль',
+        description: 'Исполнение барочной камерной музыки на исторических инструментах.',
+        tags: ['Гастроли в 15 странах', '3 дискографические записи', 'Международные фестивали']
+      }
+    ]
+  };
+  return data[lang];
 };
 
 export const getInitialResearch = (lang: 'es' | 'en' | 'ru'): ResearchPaper[] => {
-    const data = {
-        es: [
-            { id: '1', title: 'La Semiótica del Silencio en Mahler', journal: 'Revista Internacional de Musicología', year: '2024', abstract: 'Análisis sobre cómo Gustav Mahler utiliza el silencio como elemento estructural.' },
-            { id: '2', title: 'Acústica Arquitectónica y Tempo', journal: 'Simposio de Dirección Orquestal', year: '2023', abstract: 'Investigación sobre la reverberación y decisiones agógicas.' },
-            { id: '3', title: 'Rescatando a Compositoras del Siglo XIX', journal: 'Perspectivas Históricas', year: '2022', abstract: 'Estudio de obras orquestales inéditas escritas por mujeres.' }
-        ],
-        en: [
-            { id: '1', title: 'The Semiotics of Silence in Mahler', journal: 'International Musicology Review', year: '2024', abstract: 'Analysis on how Gustav Mahler uses silence as a structural element.' },
-            { id: '2', title: 'Architectural Acoustics and Tempo', journal: 'Conducting Symposium', year: '2023', abstract: 'Research on reverberation and agogic decisions.' },
-            { id: '3', title: 'Rescuing 19th Century Female Composers', journal: 'Historical Perspectives', year: '2022', abstract: 'Study of unpublished orchestral works written by women.' }
-        ],
-        ru: [
-            { id: '1', title: 'Семиотика тишины у Малера', journal: 'Международное музыковедческое обозрение', year: '2024', abstract: 'Анализ использования Густавом Малером тишины как структурного элемента.' },
-            { id: '2', title: 'Архитектурная акустика и темп', journal: 'Симпозиум по дирижированию', year: '2023', abstract: 'Исследование реверберации и агогических решений.' },
-            { id: '3', title: 'Спасение женщин-композиторов XIX века', journal: 'Исторические перспективы', year: '2022', abstract: 'Изучение неопубликованных оркестровых произведений, написанных женщинами.' }
-        ]
-    };
-    return data[lang];
+  const data = {
+    es: [
+      { id: '1', title: 'La Semiótica del Silencio en Mahler', journal: 'Revista Internacional de Musicología', year: '2024', abstract: 'Análisis sobre cómo Gustav Mahler utiliza el silencio como elemento estructural.' },
+      { id: '2', title: 'Acústica Arquitectónica y Tempo', journal: 'Simposio de Dirección Orquestal', year: '2023', abstract: 'Investigación sobre la reverberación y decisiones agógicas.' },
+      { id: '3', title: 'Rescatando a Compositoras del Siglo XIX', journal: 'Perspectivas Históricas', year: '2022', abstract: 'Estudio de obras orquestales inéditas escritas por mujeres.' }
+    ],
+    en: [
+      { id: '1', title: 'The Semiotics of Silence in Mahler', journal: 'International Musicology Review', year: '2024', abstract: 'Analysis on how Gustav Mahler uses silence as a structural element.' },
+      { id: '2', title: 'Architectural Acoustics and Tempo', journal: 'Conducting Symposium', year: '2023', abstract: 'Research on reverberation and agogic decisions.' },
+      { id: '3', title: 'Rescuing 19th Century Female Composers', journal: 'Historical Perspectives', year: '2022', abstract: 'Study of unpublished orchestral works written by women.' }
+    ],
+    ru: [
+      { id: '1', title: 'Семиотика тишины у Малера', journal: 'Международное музыковедческое обозрение', year: '2024', abstract: 'Анализ использования Густавом Малером тишины как структурного элемента.' },
+      { id: '2', title: 'Архитектурная акустика и темп', journal: 'Симпозиум по дирижированию', year: '2023', abstract: 'Исследование реверберации и агогических решений.' },
+      { id: '3', title: 'Спасение женщин-композиторов XIX века', journal: 'Исторические перспективы', year: '2022', abstract: 'Изучение неопубликованных оркестровых произведений, написанных женщинами.' }
+    ]
+  };
+  return data[lang];
 };
 
 export const getInitialPerformances = (lang: 'es' | 'en' | 'ru'): Performance[] => {
-     const base = [
-        { id: '1', date: '15 OCT 2024', title: 'Beethoven Symphony No. 5', location: 'Gran Teatro Nacional', role: 'Guest Conductor', status: 'upcoming', image: 'https://images.unsplash.com/photo-1507838153414-b4b713384ebd?q=80&w=1000&auto=format&fit=crop', description: 'Monumental night exploring destiny.' },
-        { id: '2', date: '02 NOV 2024', title: 'Mozart Requiem', location: 'Catedral Basílica', role: 'Principal Conductor', status: 'upcoming', image: 'https://images.unsplash.com/photo-1548603613-53d452c4362d?q=80&w=1000&auto=format&fit=crop', description: 'Solemn interpretation of the masterpiece.' },
-        { id: '3', date: '10 DIC 2024', title: 'Christmas Gala', location: 'Auditorio Universitario', role: 'Conductor', status: 'upcoming', image: 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?q=80&w=1000&auto=format&fit=crop', description: 'Festive journey through traditional carols.' },
-        { id: '4', date: '20 AGO 2024', title: 'Chamber Music Cycle', location: 'Museo de Arte Moderno', role: 'Pianist & Director', status: 'past', image: 'https://images.unsplash.com/photo-1552422535-c4581dadc6f5?q=80&w=1000&auto=format&fit=crop', description: 'Intimate program focused on French Impressionism.' }
-     ];
-     if(lang === 'es') {
-         return base.map(b => ({...b, title: b.title.replace('Symphony No. 5', 'Sinfonía No. 5').replace('Christmas Gala', 'Gala de Navidad'), role: b.role.replace('Guest Conductor', 'Director Invitado').replace('Principal', 'Titular')})) as any;
-     }
-     if(lang === 'ru') {
-         return base.map(b => ({...b, title: b.title.replace('Symphony No. 5', 'Симфония № 5').replace('Requiem', 'Реквием'), role: 'Дирижер'})) as any;
-     }
-     return base as any;
+  const base = [
+    { id: '1', date: '15 OCT 2024', title: 'Beethoven Symphony No. 5', location: 'Gran Teatro Nacional', role: 'Guest Conductor', status: 'upcoming', image: 'https://images.unsplash.com/photo-1507838153414-b4b713384ebd?q=80&w=1000&auto=format&fit=crop', description: 'Monumental night exploring destiny.' },
+    { id: '2', date: '02 NOV 2024', title: 'Mozart Requiem', location: 'Catedral Basílica', role: 'Principal Conductor', status: 'upcoming', image: 'https://images.unsplash.com/photo-1548603613-53d452c4362d?q=80&w=1000&auto=format&fit=crop', description: 'Solemn interpretation of the masterpiece.' },
+    { id: '3', date: '10 DIC 2024', title: 'Christmas Gala', location: 'Auditorio Universitario', role: 'Conductor', status: 'upcoming', image: 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?q=80&w=1000&auto=format&fit=crop', description: 'Festive journey through traditional carols.' },
+    { id: '4', date: '20 AGO 2024', title: 'Chamber Music Cycle', location: 'Museo de Arte Moderno', role: 'Pianist & Director', status: 'past', image: 'https://images.unsplash.com/photo-1552422535-c4581dadc6f5?q=80&w=1000&auto=format&fit=crop', description: 'Intimate program focused on French Impressionism.' }
+  ];
+  if (lang === 'es') {
+    return base.map(b => ({ ...b, title: b.title.replace('Symphony No. 5', 'Sinfonía No. 5').replace('Christmas Gala', 'Gala de Navidad'), role: b.role.replace('Guest Conductor', 'Director Invitado').replace('Principal', 'Titular') })) as any;
+  }
+  if (lang === 'ru') {
+    return base.map(b => ({ ...b, title: b.title.replace('Symphony No. 5', 'Симфония № 5').replace('Requiem', 'Реквием'), role: 'Дирижер' })) as any;
+  }
+  return base as any;
 };
 
 export const getInitialPosts = (lang: 'es' | 'en' | 'ru'): BlogPost[] => {
-    if (lang === 'en') {
-        return [{
-            id: '1', title: 'The Invisible Baton', date: '12 OCT 2024', preview: 'How non-verbal communication defines the sound of an orchestra before the first note is played.', content: 'Conducting is, in essence, an act of silent communication...', images: ['https://images.unsplash.com/photo-1514117445516-2ec90dd97ee2?q=80&w=1000']
-        }];
-    }
-    if (lang === 'ru') {
-        return [{
-            id: '1', title: 'Невидимая палочка', date: '12 ОКТ 2024', preview: 'Как невербальная коммуникация определяет звучание оркестра до того, как будет сыграна первая нота.', content: 'Дирижирование — это, по сути, акт безмолвной коммуникации...', images: ['https://images.unsplash.com/photo-1514117445516-2ec90dd97ee2?q=80&w=1000']
-        }];
-    }
+  if (lang === 'en') {
     return [{
-        id: '1', title: 'La batuta invisible', date: '12 OCT 2024', preview: 'Cómo la comunicación no verbal define el sonido de una orquesta antes de que se toque la primera nota.', content: 'La dirección orquestal es, en esencia, un acto de comunicación silenciosa...', images: ['https://images.unsplash.com/photo-1514117445516-2ec90dd97ee2?q=80&w=1000']
+      id: '1', title: 'The Invisible Baton', date: '12 OCT 2024', preview: 'How non-verbal communication defines the sound of an orchestra before the first note is played.', content: 'Conducting is, in essence, an act of silent communication...', images: ['https://images.unsplash.com/photo-1514117445516-2ec90dd97ee2?q=80&w=1000']
     }];
+  }
+  if (lang === 'ru') {
+    return [{
+      id: '1', title: 'Невидимая палочка', date: '12 ОКТ 2024', preview: 'Как невербальная коммуникация определяет звучание оркестра до того, как будет сыграна первая нота.', content: 'Дирижирование — это, по сути, акт безмолвной коммуникации...', images: ['https://images.unsplash.com/photo-1514117445516-2ec90dd97ee2?q=80&w=1000']
+    }];
+  }
+  return [{
+    id: '1', title: 'La batuta invisible', date: '12 OCT 2024', preview: 'Cómo la comunicación no verbal define el sonido de una orquesta antes de que se toque la primera nota.', content: 'La dirección orquestal es, en esencia, un acto de comunicación silenciosa...', images: ['https://images.unsplash.com/photo-1514117445516-2ec90dd97ee2?q=80&w=1000']
+  }];
 };
 
 export const getInitialResources = (lang: 'es' | 'en' | 'ru'): Resource[] => {
-    if (lang === 'en') return [{ id: '1', title: 'Structural Analysis: Symphony No. 5', type: 'article', format: 'PDF', size: '2.4 MB', description: 'Detailed breakdown of rhythmic motifs.' }];
-    if (lang === 'ru') return [{ id: '1', title: 'Структурный анализ: Симфония № 5', type: 'article', format: 'PDF', size: '2.4 MB', description: 'Подробный разбор ритмических мотивов.' }];
-    return [{ id: '1', title: 'Análisis Estructural: Sinfonía No. 5', type: 'article', format: 'PDF', size: '2.4 MB', description: 'Desglose detallado de los motivos rítmicos.' }];
+  if (lang === 'en') return [{ id: '1', title: 'Structural Analysis: Symphony No. 5', type: 'article', format: 'PDF', size: '2.4 MB', description: 'Detailed breakdown of rhythmic motifs.' }];
+  if (lang === 'ru') return [{ id: '1', title: 'Структурный анализ: Симфония № 5', type: 'article', format: 'PDF', size: '2.4 MB', description: 'Подробный разбор ритмических мотивов.' }];
+  return [{ id: '1', title: 'Análisis Estructural: Sinfonía No. 5', type: 'article', format: 'PDF', size: '2.4 MB', description: 'Desglose detallado de los motivos rítmicos.' }];
 };
 
 export const getInitialGallery = (lang: 'es' | 'en' | 'ru'): GalleryItem[] => {
-    const base: GalleryItem[] = [
-        { id: '1', type: 'image', src: 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?q=80&w=1000', category: 'Concert', caption: 'Rehearsing the Ninth' },
-        { id: '2', type: 'image', src: 'https://images.unsplash.com/photo-1465847899078-b413929f7120?q=80&w=1000', category: 'Portrait', caption: 'Score study in Vienna' },
-        { id: '3', type: 'image', src: 'https://images.unsplash.com/photo-1511192336575-5a79af67a629?q=80&w=1000', category: 'Detail', caption: 'Strings section' },
-        { id: '4', type: 'image', src: 'https://images.unsplash.com/photo-1507838153414-b4b713384ebd?q=80&w=1000', category: 'Concert', caption: 'Grand National Theater' },
-        { id: '5', type: 'video', src: 'https://www.youtube.com/embed/dQw4w9WgXcQ', thumbnail: 'https://images.unsplash.com/photo-1516280440614-6697288d5d38?q=80&w=1000', category: 'Performance', caption: 'Beethoven Symphony No. 9 - Finale' },
-        { id: '6', type: 'video', src: 'https://www.youtube.com/embed/dQw4w9WgXcQ', thumbnail: 'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?q=80&w=1000', category: 'Masterclass', caption: 'Conducting Masterclass Highlights' }
-    ];
-    
-    // Localization logic for captions/categories
-    if(lang === 'es') {
-        return base.map(i => ({
-            ...i, 
-            category: i.category === 'Concert' ? 'Concierto' : i.category === 'Portrait' ? 'Retrato' : i.category === 'Detail' ? 'Detalle' : i.category === 'Performance' ? 'Actuación' : 'Clase Magistral',
-            caption: i.caption === 'Rehearsing the Ninth' ? 'Ensayando la Novena' : i.caption
-        }));
-    }
-    if(lang === 'ru') {
-        return base.map(i => ({
-            ...i, 
-            category: i.category === 'Concert' ? 'Концерт' : i.category === 'Portrait' ? 'Портрет' : i.category === 'Detail' ? 'Деталь' : i.category === 'Performance' ? 'Выступление' : 'Мастер-класс',
-            caption: 'Описание...'
-        }));
-    }
-    return base;
+  const base: GalleryItem[] = [
+    { id: '1', type: 'image', src: 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?q=80&w=1000', category: 'Concert', caption: 'Rehearsing the Ninth' },
+    { id: '2', type: 'image', src: 'https://images.unsplash.com/photo-1465847899078-b413929f7120?q=80&w=1000', category: 'Portrait', caption: 'Score study in Vienna' },
+    { id: '3', type: 'image', src: 'https://images.unsplash.com/photo-1511192336575-5a79af67a629?q=80&w=1000', category: 'Detail', caption: 'Strings section' },
+    { id: '4', type: 'image', src: 'https://images.unsplash.com/photo-1507838153414-b4b713384ebd?q=80&w=1000', category: 'Concert', caption: 'Grand National Theater' },
+    { id: '5', type: 'video', src: 'https://www.youtube.com/embed/dQw4w9WgXcQ', thumbnail: 'https://images.unsplash.com/photo-1516280440614-6697288d5d38?q=80&w=1000', category: 'Performance', caption: 'Beethoven Symphony No. 9 - Finale' },
+    { id: '6', type: 'video', src: 'https://www.youtube.com/embed/dQw4w9WgXcQ', thumbnail: 'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?q=80&w=1000', category: 'Masterclass', caption: 'Conducting Masterclass Highlights' }
+  ];
+
+  // Localization logic for captions/categories
+  if (lang === 'es') {
+    return base.map(i => ({
+      ...i,
+      category: i.category === 'Concert' ? 'Concierto' : i.category === 'Portrait' ? 'Retrato' : i.category === 'Detail' ? 'Detalle' : i.category === 'Performance' ? 'Actuación' : 'Clase Magistral',
+      caption: i.caption === 'Rehearsing the Ninth' ? 'Ensayando la Novena' : i.caption
+    }));
+  }
+  if (lang === 'ru') {
+    return base.map(i => ({
+      ...i,
+      category: i.category === 'Concert' ? 'Концерт' : i.category === 'Portrait' ? 'Портрет' : i.category === 'Detail' ? 'Деталь' : i.category === 'Performance' ? 'Выступление' : 'Мастер-класс',
+      caption: 'Описание...'
+    }));
+  }
+  return base;
 };

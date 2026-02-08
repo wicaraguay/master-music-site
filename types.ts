@@ -19,6 +19,7 @@ export interface ExperienceItem {
   role: string;
   institution: string;
   description: string;
+  tags?: string[];
 }
 
 export interface Performance {
