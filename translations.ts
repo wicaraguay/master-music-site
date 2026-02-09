@@ -52,8 +52,8 @@ export const translations = {
       statsConcerts: 'Conciertos Dirigidos'
     },
     experience: {
-      title: 'Experiencia Profesional',
-      subtitle: 'Un recorrido por los escenarios y ensambles que han marcado mi carrera.',
+      title: 'Experiencia',
+      subtitle: 'Experiencia Profesional',
       items: [
         {
           id: 1,
@@ -172,7 +172,8 @@ export const translations = {
       statsConcerts: 'Concerts Conducted'
     },
     experience: {
-      title: 'Professional Trajectory',
+      title: 'Experience',
+      subtitle: 'Professional Trajectory',
       viewDetails: 'View Experience',
       viewAll: 'View full history'
     },
@@ -275,7 +276,8 @@ export const translations = {
       statsConcerts: 'Концертов'
     },
     experience: {
-      title: 'Профессиональный путь',
+      title: 'Опыт',
+      subtitle: 'Профессиональный путь',
       viewDetails: 'Смотреть опыт',
       viewAll: 'Посмотреть всю историю'
     },

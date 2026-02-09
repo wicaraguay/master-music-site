@@ -60,15 +60,15 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang }) => {
           <div
             className="absolute inset-0 bg-cover bg-center transition-transform duration-1000"
             style={{
-              backgroundImage: `url('https://images.unsplash.com/photo-1465847899084-d164df4dedc6?q=80&w=2670&auto=format&fit=crop')`,
+              backgroundImage: `url('/images/section-portada.png')`,
               transform: `scale(${1 + offsetY * 0.0002})`,
             }}
           />
 
-          {/* Dramatic Gradient Overlays */}
-          <div className="absolute inset-0 bg-gradient-to-r from-maestro-dark via-maestro-dark/95 to-maestro-dark/60" />
-          <div className="absolute inset-0 bg-gradient-to-b from-maestro-dark/40 via-transparent to-maestro-dark" />
-          <div className="absolute inset-0 bg-gradient-to-t from-maestro-dark via-transparent to-transparent" />
+          {/* Dramatic Gradient Overlays - Even Lighter */}
+          <div className="absolute inset-0 bg-gradient-to-r from-maestro-dark/80 via-maestro-dark/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-b from-maestro-dark/10 via-transparent to-maestro-dark/60" />
+          <div className="absolute inset-0 bg-gradient-to-t from-maestro-dark/20 via-transparent to-transparent" />
 
           {/* Animated Gold Overlay */}
           <div className="absolute inset-0 bg-gradient-to-br from-maestro-gold/10 via-transparent to-transparent animate-pulse-slow" />
@@ -189,9 +189,14 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang }) => {
           </div>
         </div>
 
+        {/* Seamless Transition - Deep Fade to next section (Moved behind content) */}
+        <div className="absolute bottom-0 left-0 w-full h-48 z-[1] pointer-events-none">
+          <div className="absolute inset-0 bg-gradient-to-t from-maestro-dark via-maestro-dark/40 to-transparent backdrop-blur-[1px]" />
+        </div>
+
         {/* Enhanced Scroll Indicator */}
         <div
-          className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-20 flex flex-col items-center gap-2 animate-bounce-slow cursor-pointer group"
+          className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-30 flex flex-col items-center gap-2 animate-bounce-slow cursor-pointer group"
           onClick={() => document.getElementById('about-preview')?.scrollIntoView({ behavior: 'smooth' })}
         >
           <div className="relative">
@@ -206,16 +211,19 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang }) => {
       </section>
 
       {/* ABOUT PREVIEW SECTION - Elegant Introduction */}
-      <section id="about-preview" className="relative py-32 px-6 bg-maestro-dark border-t border-maestro-gold/10 overflow-hidden">
-        {/* Orchestra Background Image - Improved Visibility */}
+      <section id="about-preview" className="relative py-32 px-6 bg-maestro-dark overflow-hidden">
+        {/* Orchestra Background Image - Local section-header2.jpg - Lightened */}
         <div className="absolute inset-0 z-0 select-none pointer-events-none">
           <img
-            src="https://images.unsplash.com/photo-1465847899078-b413929f7120?q=80&w=2000&auto=format&fit=crop"
-            alt="Symphony Orchestra Background"
-            className="w-full h-full object-cover opacity-30 grayscale mix-blend-overlay"
+            src="/images/section-header2.jpg"
+            alt="Fondo Seccíon Sobre Mí"
+            className="w-full h-full object-cover opacity-80 grayscale mix-blend-overlay"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-maestro-dark via-maestro-dark/90 to-maestro-dark/60" />
-          <div className="absolute inset-0 bg-gradient-to-r from-maestro-dark via-transparent to-maestro-dark" />
+          {/* Top Fade to match Hero's Bottom Fade */}
+          <div className="absolute inset-0 bg-gradient-to-b from-maestro-dark via-transparent to-transparent h-48" />
+
+          <div className="absolute inset-0 bg-gradient-to-t from-maestro-dark/60 via-maestro-dark/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-maestro-dark/40 via-transparent to-maestro-dark/40" />
         </div>
 
         {/* Subtle Background Glow */}
@@ -297,29 +305,36 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang }) => {
             </FadeIn>
           </div>
         </div>
+        {/* Seamless transition to next section */}
+        <div className="absolute bottom-0 left-0 w-full h-32 z-20 pointer-events-none">
+          <div className="absolute inset-0 bg-gradient-to-t from-maestro-navy via-maestro-navy/40 to-transparent backdrop-blur-[1px]" />
+        </div>
       </section>
 
 
 
       {/* 3. EXPERIENCE SECTION (Timeline) */}
-      <section id="experience" className="py-24 px-6 bg-maestro-dark relative overflow-hidden">
-        {/* Same Background as Hero Section */}
+      <section id="experience" className="py-24 px-6 bg-maestro-navy relative overflow-hidden">
+        {/* Deep Midnight Aesthetic Background - Subtle Refinement */}
         <div className="absolute inset-0 z-0">
           <div
-            className="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-overlay grayscale"
+            className="absolute inset-0 bg-cover bg-center opacity-75 mix-blend-soft-light grayscale"
             style={{
-              backgroundImage: `url('https://images.unsplash.com/photo-1465847899084-d164df4dedc6?q=80&w=2670&auto=format&fit=crop')`
+              backgroundImage: `url('/images/section-experience.png')`
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-maestro-dark via-maestro-dark/80 to-maestro-dark" />
+          {/* Enhanced Section Blending */}
+          <div className="absolute inset-0 bg-gradient-to-t from-maestro-navy/95 via-maestro-navy/50 to-maestro-navy/30" />
+          <div className="absolute inset-0 bg-gradient-to-b from-maestro-navy via-transparent to-transparent h-64" />
         </div>
 
         <div className="max-w-7xl mx-auto relative z-10">
           <FadeIn>
             <div className="text-center mb-16 space-y-4">
-              <span className="text-maestro-gold uppercase tracking-widest text-sm font-bold">{tExp.title}</span>
-              <h2 className="text-4xl md:text-5xl font-serif text-maestro-light">{tExp.subtitle}</h2>
-              <div className="h-1 w-24 bg-maestro-gold mx-auto rounded-full mt-4" />
+              <h2 className="text-5xl md:text-6xl lg:text-7xl font-serif text-maestro-light leading-tight drop-shadow-2xl">
+                {tExp.subtitle}
+              </h2>
+              <div className="h-1 w-24 bg-gradient-to-r from-transparent via-maestro-gold to-transparent mx-auto rounded-full" />
             </div>
           </FadeIn>
 
@@ -388,21 +403,27 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang }) => {
             )}
           </div>
         </div>
+        {/* Seamless transition to next section (Emerald) */}
+        <div className="absolute bottom-0 left-0 w-full h-32 z-20 pointer-events-none">
+          <div className="absolute inset-0 bg-gradient-to-t from-maestro-emerald via-maestro-emerald/40 to-transparent backdrop-blur-[1px]" />
+        </div>
       </section>
 
-      {/* 4. RESEARCH SECTION */}
-      <section id="research" className="py-24 px-6 bg-maestro-gray border-t border-white/5 relative overflow-hidden">
-        {/* Research Background */}
+      {/* 4. RESEARCH SECTION - Opacity 70% */}
+      <section id="research" className="py-24 px-6 bg-maestro-emerald relative overflow-hidden">
+        {/* Academic Emerald Aesthetic Background - Balanced Clarity */}
         <div className="absolute inset-0 z-0">
           <div
-            className="absolute inset-0 bg-cover bg-center opacity-40 grayscale"
+            className="absolute inset-0 bg-cover bg-center opacity-70 mix-blend-soft-light grayscale"
             style={{
-              backgroundImage: `url('/images/section-search.png')`
+              backgroundImage: `url('/images/section-research.png')`
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-maestro-gray via-maestro-gray/80 to-transparent" />
+          {/* Emerald Vignette and Blending - Balanced */}
+          <div className="absolute inset-0 bg-gradient-to-r from-maestro-emerald/60 via-maestro-emerald/30 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-b from-maestro-navy/40 via-transparent to-transparent h-64 opacity-50" />
+          <div className="absolute inset-0 bg-gradient-to-t from-maestro-dark/50 via-transparent to-transparent h-64" />
         </div>
-
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center relative z-10">
           <FadeIn>
             <div className="space-y-6">
