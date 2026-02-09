@@ -10,15 +10,15 @@ interface ResearchProps {
 }
 
 export const Research: React.FC<ResearchProps> = ({ items, lang }) => {
-  const t = translations[lang].research;
+  const t = translations['es'].research;
 
   return (
     <section className="py-24 px-6 bg-maestro-dark">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-end mb-16 border-b border-white/5 pb-8">
           <div>
-             <span className="text-maestro-gold uppercase tracking-widest text-sm font-bold">{t.badge}</span>
-             <h2 className="text-4xl md:text-5xl font-serif text-maestro-light mt-2">{t.title}</h2>
+            <span className="text-maestro-gold uppercase tracking-widest text-sm font-bold">{t.badge}</span>
+            <h2 className="text-4xl md:text-5xl font-serif text-maestro-light mt-2">{t.title}</h2>
           </div>
           <p className="text-maestro-light/50 max-w-md text-right mt-6 md:mt-0 italic">
             {t.quote}
@@ -35,16 +35,16 @@ export const Research: React.FC<ResearchProps> = ({ items, lang }) => {
                   </div>
                   <span className="text-4xl font-serif text-white/5 group-hover:text-maestro-gold/20 transition-colors">0{idx + 1}</span>
                 </div>
-                
+
                 <h3 className="text-xl font-bold text-maestro-light mb-2 group-hover:text-maestro-gold transition-colors">
                   {paper.title}
                 </h3>
                 <p className="text-sm text-maestro-gold mb-4 font-mono">{paper.journal} — {paper.year}</p>
-                
+
                 <p className="text-maestro-light/60 text-sm leading-relaxed mb-6 flex-grow">
                   {paper.abstract}
                 </p>
-                
+
                 <button className="flex items-center gap-2 text-xs uppercase tracking-widest text-maestro-light hover:text-maestro-gold transition-colors mt-auto">
                   {t.read} <BookOpen size={14} />
                 </button>

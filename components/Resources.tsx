@@ -10,7 +10,7 @@ interface ResourcesProps {
 }
 
 export const Resources: React.FC<ResourcesProps> = ({ resources, lang }) => {
-  const t = translations[lang].resources;
+  const t = translations['es'].resources;
 
   const getIcon = (type: string) => {
     switch (type) {
@@ -24,7 +24,7 @@ export const Resources: React.FC<ResourcesProps> = ({ resources, lang }) => {
   return (
     <section className="py-24 px-6 bg-maestro-dark min-h-screen">
       <div className="max-w-6xl mx-auto">
-        
+
         {/* Header */}
         <div className="text-center mb-16">
           <span className="text-maestro-gold uppercase tracking-widest text-sm font-bold">{t.badge}</span>
@@ -39,17 +39,17 @@ export const Resources: React.FC<ResourcesProps> = ({ resources, lang }) => {
         {/* Public Downloads Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-24">
           {resources.length === 0 && (
-              <div className="col-span-full text-center text-maestro-light/40">
-                  {t.empty}
-              </div>
+            <div className="col-span-full text-center text-maestro-light/40">
+              {t.empty}
+            </div>
           )}
           {resources.map((resource, idx) => (
             <FadeIn key={resource.id} delay={idx * 100}>
               <div className="group bg-white/5 border border-white/10 p-6 hover:border-maestro-gold/50 transition-all duration-300 relative overflow-hidden flex flex-col h-full">
-                
+
                 {/* Type Icon */}
                 <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity transform group-hover:scale-110 duration-500">
-                    {getIcon(resource.type)}
+                  {getIcon(resource.type)}
                 </div>
 
                 <div className="flex items-start justify-between mb-4">
@@ -64,7 +64,7 @@ export const Resources: React.FC<ResourcesProps> = ({ resources, lang }) => {
                 <h3 className="text-xl font-serif text-maestro-light mb-2 group-hover:text-maestro-gold transition-colors">
                   {resource.title}
                 </h3>
-                
+
                 <p className="text-sm text-maestro-light/60 mb-6 font-light leading-relaxed flex-grow">
                   {resource.description}
                 </p>

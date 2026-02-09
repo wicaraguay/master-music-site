@@ -87,20 +87,23 @@ export const subscribeToCollection = (colName: CollectionName, callback: (data: 
 
 // -- DATA TRANSFORMATION HELPERS --
 
-export const transformDataForLang = (data: any[], lang: Language): any[] => {
+/**
+ * Simplificado para el modelo de traducción dinámica.
+ * Ya no necesitamos filtrar por idioma en el servidor o cliente.
+ * El motor de traducción dinámico traducirá el contenido del DOM.
+ */
+export const transformDataForLang = (data: any[], _lang?: Language): any[] => {
     return data.map(item => {
-        // If the item has the language key, return that + id.
-        // If not, maybe it's a shared item (like an image gallery item might be shared except caption).
-
-        if (item[lang]) {
+        // Si el ítem todavía sigue la estructura antigua { es: {...}, en: {...} }
+        // devolvemos la versión en español por defecto.
+        // Si ya ha sido migrado a estructura plana, lo devolvemos tal cual.
+        if (item['es']) {
             return {
-                id: item.id, // Firestore ID
-                ...item[lang],
-                // Start with common fields if any exist and aren't overridden
+                id: item.id,
+                ...item['es'],
                 ...item.common
             };
         }
-        // Fallback or returned as is if it doesn't follow the structure
         return { id: item.id, ...item };
     });
 };

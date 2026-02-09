@@ -13,8 +13,8 @@ interface HomeProps {
 }
 
 export const Home: React.FC<HomeProps> = ({ onNavigate, lang }) => {
-  const t = translations[lang].home;
-  const tExp = translations[lang].experience;
+  const t = translations['es'].home;
+  const tExp = translations['es'].experience;
   const [offsetY, setOffsetY] = useState(0);
   const [experienceItems, setExperienceItems] = useState<ExperienceItem[]>([]);
   const [performanceItems, setPerformanceItems] = useState<Performance[]>([]);
@@ -32,8 +32,8 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang }) => {
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const items = snapshot.docs.map(doc => {
         const data = doc.data();
-        return data[lang] as ExperienceItem; // Get data for current language
-      }).filter(item => item !== undefined); // Filter out undefined if lang missing
+        return (data['es'] || data) as ExperienceItem; // Fallback to flat structure if already simplified
+      }).filter(item => item !== undefined);
 
       // Sort by year (descending logic if possible, or just ID) - For now rely on seed order or add sort field
       // Simple sort by ID for now to match seed order
@@ -48,7 +48,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang }) => {
     });
 
     return () => unsubscribe();
-  }, [lang, tExp.items]);
+  }, [tExp.items]);
 
   // Fetch Performances from Firebase
   useEffect(() => {
@@ -59,12 +59,12 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang }) => {
         ...doc.data()
       }));
 
-      const items = transformDataForLang(rawData, lang) as Performance[];
+      const items = transformDataForLang(rawData, 'es') as Performance[];
       setPerformanceItems(items);
     });
 
     return () => unsubscribe();
-  }, [lang]);
+  }, []);
 
   // MiniCalendar Component Helper
   const MiniCalendar = () => {

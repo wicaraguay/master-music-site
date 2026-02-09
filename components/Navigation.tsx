@@ -23,7 +23,7 @@ export const Navigation: React.FC<NavigationProps> = ({ currentSection, onNaviga
   const [isMobileSubmenuOpen, setIsMobileSubmenuOpen] = useState(true);
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
 
-  const t = translations[lang].nav;
+  const t = translations['es'].nav; // Use Spanish as Source of Truth
 
   useEffect(() => {
     const handleScroll = () => {
@@ -32,6 +32,37 @@ export const Navigation: React.FC<NavigationProps> = ({ currentSection, onNaviga
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Real-time Dynamic Translation Logic
+  const triggerTranslation = (targetLang: Language) => {
+    // Attempt to find the combo and trigger it
+    const attempt = () => {
+      const googleCombo = document.querySelector('.goog-te-combo') as HTMLSelectElement;
+      if (googleCombo) {
+        googleCombo.value = targetLang;
+        googleCombo.dispatchEvent(new Event('change'));
+        console.log(`Translation triggered: ${targetLang}`);
+        return true;
+      }
+      return false;
+    };
+
+    if (!attempt()) {
+      // If failed, retry a few times
+      let retries = 0;
+      const interval = setInterval(() => {
+        retries++;
+        if (attempt() || retries > 10) {
+          clearInterval(interval);
+        }
+      }, 500);
+    }
+  };
+
+  useEffect(() => {
+    // Immediate call (it will retry if script not ready)
+    triggerTranslation(lang);
+  }, [lang]);
 
   const navStructure: NavItem[] = [
     { id: Section.HOME, label: t.home },
@@ -62,8 +93,8 @@ export const Navigation: React.FC<NavigationProps> = ({ currentSection, onNaviga
   return (
     <nav
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-700 border-b border-transparent ${isScrolled
-          ? 'bg-maestro-dark/90 backdrop-blur-xl border-white/5 py-4 shadow-2xl'
-          : 'bg-transparent py-8'
+        ? 'bg-maestro-dark/90 backdrop-blur-xl border-white/5 py-4 shadow-2xl'
+        : 'bg-transparent py-8'
         }`}
     >
       <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
@@ -88,8 +119,8 @@ export const Navigation: React.FC<NavigationProps> = ({ currentSection, onNaviga
                 <div key={item.id} className="relative group">
                   <button
                     className={`flex items-center gap-1 text-[10px] xl:text-xs tracking-[0.2em] uppercase transition-all duration-300 hover:text-maestro-gold drop-shadow-sm ${isTrayectoriaActive
-                        ? 'text-maestro-gold font-bold border-b border-maestro-gold pb-1'
-                        : 'text-maestro-light/90'
+                      ? 'text-maestro-gold font-bold border-b border-maestro-gold pb-1'
+                      : 'text-maestro-light/90'
                       }`}
                   >
                     {item.label}
@@ -120,8 +151,8 @@ export const Navigation: React.FC<NavigationProps> = ({ currentSection, onNaviga
                 key={item.id}
                 onClick={() => handleNavigate(item.id as Section)}
                 className={`text-[10px] xl:text-xs tracking-[0.2em] uppercase transition-all duration-300 hover:text-maestro-gold drop-shadow-sm ${currentSection === item.id
-                    ? 'text-maestro-gold font-bold border-b border-maestro-gold pb-1'
-                    : 'text-maestro-light/90'
+                  ? 'text-maestro-gold font-bold border-b border-maestro-gold pb-1'
+                  : 'text-maestro-light/90'
                   }`}
               >
                 {item.label}
@@ -156,8 +187,8 @@ export const Navigation: React.FC<NavigationProps> = ({ currentSection, onNaviga
           <button
             onClick={() => handleNavigate(Section.ADMIN)}
             className={`text-[10px] xl:text-xs tracking-[0.2em] uppercase transition-all duration-300 hover:text-maestro-gold flex items-center gap-2 border border-white/10 px-3 py-1 rounded-sm ${currentSection === Section.ADMIN
-                ? 'text-maestro-gold border-maestro-gold'
-                : 'text-maestro-light/50'
+              ? 'text-maestro-gold border-maestro-gold'
+              : 'text-maestro-light/50'
               }`}
             title={t.admin}
           >

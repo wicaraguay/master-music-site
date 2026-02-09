@@ -157,14 +157,15 @@ export const Admin: React.FC<AdminProps> = ({
     };
 
     // --- DB HELPERS ---
-    // Saves data under the current language key (e.g., { es: { title: ... }, common: { ... } })
+    // Simplificado para el modelo de traducción dinámica.
+    // Guarda los datos de forma plana (Source of Truth en Español).
     const saveToDb = async (colName: any, id: string | null, data: any, commonData: any = {}) => {
         try {
-            // If we are editing, we merge the specific lang data
+            // Combinamos todo en un objeto plano
             const payload = {
-                [lang]: data,
-                common: commonData
-                // We also flat merge common data for easier querying if needed, but structure is nested
+                ...commonData,
+                ...data,
+                updatedAt: new Date().toISOString()
             };
 
             if (id) {

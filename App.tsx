@@ -91,15 +91,15 @@ function App() {
     return () => unsubs.forEach(unsub => unsub());
   }, []);
 
-  // Transform data when language or raw data changes
+  // Transform data always for 'es' (The engine handles real-time translation for other languages)
   useEffect(() => {
-    setPosts(transformDataForLang(rawPosts, lang));
-    setResources(transformDataForLang(rawResources, lang));
-    setExperience(transformDataForLang(rawExperience, lang));
-    setResearch(transformDataForLang(rawResearch, lang));
-    setPerformances(transformDataForLang(rawPerformances, lang));
-    setGallery(transformDataForLang(rawGallery, lang));
-  }, [lang, rawPosts, rawResources, rawExperience, rawResearch, rawPerformances, rawGallery]);
+    setPosts(transformDataForLang(rawPosts, 'es'));
+    setResources(transformDataForLang(rawResources, 'es'));
+    setExperience(transformDataForLang(rawExperience, 'es'));
+    setResearch(transformDataForLang(rawResearch, 'es'));
+    setPerformances(transformDataForLang(rawPerformances, 'es'));
+    setGallery(transformDataForLang(rawGallery, 'es'));
+  }, [rawPosts, rawResources, rawExperience, rawResearch, rawPerformances, rawGallery]);
 
   // Scroll to top
   useEffect(() => {
@@ -171,7 +171,7 @@ function App() {
             </span>
           </div>
           <button onClick={() => setCurrentSection(Section.HOME)} className="text-xs uppercase tracking-widest text-maestro-light hover:text-maestro-gold transition-colors">
-            {translations[lang].nav.back}
+            {translations['es'].nav.back}
           </button>
         </nav>
       )}
@@ -188,13 +188,13 @@ function App() {
             <div className="h-px w-8 bg-maestro-gold"></div>
           </div>
           <p className="text-maestro-light/30 text-[10px] uppercase tracking-widest mb-6">
-            © {new Date().getFullYear()} {lang === 'es' ? 'Todos los derechos reservados' : lang === 'ru' ? 'Все права защищены' : 'All rights reserved'}.
+            © {new Date().getFullYear()} Todos los derechos reservados.
           </p>
 
           <button
             onClick={() => setCurrentSection(Section.ADMIN)}
             className="text-maestro-light/10 hover:text-maestro-gold transition-colors pb-4"
-            title={translations[lang].nav.admin}
+            title={translations['es'].nav.admin}
           >
             <Lock size={12} />
           </button>
