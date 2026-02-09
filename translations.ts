@@ -8,7 +8,7 @@ export const translations = {
       career: 'Trayectoria',
       experience: 'Experiencia',
       research: 'Investigación',
-      performances: 'Actuaciones',
+      performances: 'Eventos',
       gallery: 'Galería',
       resources: 'Recursos',
       blog: 'Blog',
@@ -32,7 +32,7 @@ export const translations = {
       expDesc: 'Un recorrido profesional desde la docencia en conservatorios hasta la dirección titular.',
       resTitle: 'Investigación',
       resDesc: 'PhD en curso. Recuperación de patrimonio musical y nuevas perspectivas sobre la orquestación.',
-      perfTitle: 'Actuaciones',
+      perfTitle: 'Eventos',
       perfDesc: 'La culminación del trabajo en el escenario. Próximos conciertos y repertorio sinfónico.',
       viewTimeline: 'Ver Cronología',
       readPapers: 'Leer Publicaciones',
@@ -81,7 +81,7 @@ export const translations = {
     },
     performances: {
       titlePrefix: 'Agenda de',
-      titleSuffix: 'Actuaciones',
+      titleSuffix: 'Eventos',
       moreDetails: '* Más detalles próximamente',
       imgCredit: 'Imagen del recinto:'
     },

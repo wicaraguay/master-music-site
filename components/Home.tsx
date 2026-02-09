@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { ChevronDown, ArrowRight, Music2, BookOpen, Briefcase, Calendar } from 'lucide-react';
 import { collection, onSnapshot, query } from 'firebase/firestore';
 import { db } from '../src/firebase';
-import { Section, Language, ExperienceItem } from '../types';
+import { Section, Language, ExperienceItem, Performance } from '../types';
 import { translations } from '../translations';
 import { FadeIn } from './FadeIn';
+import { transformDataForLang } from '../src/services/db';
 
 interface HomeProps {
   onNavigate: (section: Section) => void;
@@ -16,6 +17,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang }) => {
   const tExp = translations[lang].experience;
   const [offsetY, setOffsetY] = useState(0);
   const [experienceItems, setExperienceItems] = useState<ExperienceItem[]>([]);
+  const [performanceItems, setPerformanceItems] = useState<Performance[]>([]);
 
   // Parallax effect logic
   useEffect(() => {
@@ -47,6 +49,137 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang }) => {
 
     return () => unsubscribe();
   }, [lang, tExp.items]);
+
+  // Fetch Performances from Firebase
+  useEffect(() => {
+    const q = query(collection(db, 'performances'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const rawData = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+
+      const items = transformDataForLang(rawData, lang) as Performance[];
+      setPerformanceItems(items);
+    });
+
+    return () => unsubscribe();
+  }, [lang]);
+
+  // MiniCalendar Component Helper
+  const MiniCalendar = () => {
+    const today = new Date();
+    const [currentMonth, setCurrentMonth] = useState(today.getMonth());
+    const [currentYear, setCurrentYear] = useState(today.getFullYear());
+    const [hoveredEvent, setHoveredEvent] = useState<Performance | null>(null);
+
+    const monthNames = lang === 'es' ?
+      ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'] :
+      ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+    const getDaysInMonth = (month: number, year: number) => new Date(year, month + 1, 0).getDate();
+    const getFirstDayOfMonth = (month: number, year: number) => new Date(year, month, 1).getDay();
+
+    const days = [];
+    const daysInMonth = getDaysInMonth(currentMonth, currentYear);
+    const firstDay = getFirstDayOfMonth(currentMonth, currentYear);
+
+    // Empty slots before first day
+    for (let i = 0; i < firstDay; i++) {
+      days.push(null);
+    }
+
+    // Days of the month
+    for (let i = 1; i <= daysInMonth; i++) {
+      days.push(i);
+    }
+
+    const hasEvent = (day: number) => {
+      return performanceItems.some(perf => {
+        const perfDate = new Date(perf.date);
+        return perfDate.getDate() === day && perfDate.getMonth() === currentMonth && perfDate.getFullYear() === currentYear;
+      });
+    };
+
+    const getEventForDay = (day: number) => {
+      return performanceItems.find(perf => {
+        const perfDate = new Date(perf.date);
+        return perfDate.getDate() === day && perfDate.getMonth() === currentMonth && perfDate.getFullYear() === currentYear;
+      });
+    };
+
+    return (
+      <div className="relative max-w-md mx-auto bg-maestro-dark/40 backdrop-blur-md p-8 rounded-2xl border border-white/10 shadow-2xl overflow-visible">
+        <div className="flex justify-between items-center mb-8">
+          <h3 className="text-xl font-serif text-maestro-gold tracking-widest">{monthNames[currentMonth]} {currentYear}</h3>
+          <div className="flex gap-2">
+            <button onClick={() => setCurrentMonth(prev => prev === 0 ? 11 : prev - 1)} className="text-white/40 hover:text-maestro-gold transition-colors">
+              <ChevronDown size={20} className="rotate-90" />
+            </button>
+            <button onClick={() => setCurrentMonth(prev => prev === 11 ? 0 : prev + 1)} className="text-white/40 hover:text-maestro-gold transition-colors">
+              <ChevronDown size={20} className="-rotate-90" />
+            </button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-7 gap-2 text-center text-[10px] uppercase tracking-tighter text-white/40 mb-4 font-bold">
+          {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map(d => <div key={d}>{lang === 'es' ? d : d.substring(0, 1)}</div>)}
+        </div>
+
+        <div className="grid grid-cols-7 gap-y-3 relative">
+          {days.map((day, idx) => {
+            const isToday = day === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear();
+            const event = day ? getEventForDay(day) : null;
+
+            return (
+              <div
+                key={idx}
+                className={`
+                  h-10 flex items-center justify-center text-sm relative cursor-default
+                  ${day ? 'hover:text-maestro-gold transition-colors' : ''}
+                  ${isToday ? 'text-maestro-gold font-bold' : 'text-white/80'}
+                `}
+                onMouseEnter={() => event && setHoveredEvent(event)}
+                onMouseLeave={() => setHoveredEvent(null)}
+              >
+                {day}
+                {event && (
+                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-maestro-gold rounded-full shadow-[0_0_8px_rgba(234,179,8,0.8)] animate-pulse" />
+                )}
+
+                {/* Tooltip Popup */}
+                {hoveredEvent === event && event && day && (
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 pb-4 w-64 z-50 animate-fade-in pointer-events-auto">
+                    <div className="bg-maestro-dark border border-maestro-gold/40 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden">
+                      {(event.images?.[0] || event.image) && (
+                        <div className="h-24 w-full relative">
+                          <img src={event.images?.[0] || event.image} alt={event.title} className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-maestro-dark to-transparent" />
+                        </div>
+                      )}
+                      <div className="p-4">
+                        <div className="absolute top-2 right-2 w-4 h-4 bg-maestro-dark border-r border-b border-maestro-gold/40 rotate-45 -mb-2" />
+                        <span className="text-[10px] uppercase tracking-widest text-maestro-gold font-bold mb-1 block">{event.date}</span>
+                        <h4 className="text-sm font-serif text-white mb-1 leading-tight">{event.title}</h4>
+                        <p className="text-[10px] text-white/50 mb-2">{event.location}</p>
+                        <button
+                          onClick={() => onNavigate(Section.PERFORMANCES)}
+                          className="text-[10px] uppercase tracking-[0.2em] font-bold text-maestro-gold hover:text-white transition-colors flex items-center gap-2 group"
+                        >
+                          {lang === 'es' ? 'Ver Detalles' : 'View Details'}
+                          <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="w-full">
@@ -190,8 +323,8 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang }) => {
         </div>
 
         {/* Seamless Transition - Deep Fade to next section (Moved behind content) */}
-        <div className="absolute bottom-0 left-0 w-full h-48 z-[1] pointer-events-none">
-          <div className="absolute inset-0 bg-gradient-to-t from-maestro-dark via-maestro-dark/40 to-transparent backdrop-blur-[1px]" />
+        <div className="absolute bottom-0 left-0 w-full h-48 z-0 pointer-events-none">
+          <div className="absolute inset-0 bg-gradient-to-t from-maestro-dark via-maestro-dark/40 to-transparent" />
         </div>
 
         {/* Enhanced Scroll Indicator */}
@@ -306,8 +439,8 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang }) => {
           </div>
         </div>
         {/* Seamless transition to next section */}
-        <div className="absolute bottom-0 left-0 w-full h-32 z-20 pointer-events-none">
-          <div className="absolute inset-0 bg-gradient-to-t from-maestro-navy via-maestro-navy/40 to-transparent backdrop-blur-[1px]" />
+        <div className="absolute bottom-0 left-0 w-full h-48 z-0 pointer-events-none">
+          <div className="absolute inset-0 bg-gradient-to-t from-maestro-navy via-maestro-navy/40 to-transparent" />
         </div>
       </section>
 
@@ -403,9 +536,9 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang }) => {
             )}
           </div>
         </div>
-        {/* Seamless transition to next section (Emerald) */}
-        <div className="absolute bottom-0 left-0 w-full h-32 z-20 pointer-events-none">
-          <div className="absolute inset-0 bg-gradient-to-t from-maestro-emerald via-maestro-emerald/40 to-transparent backdrop-blur-[1px]" />
+        {/* Seamless transition to next section (Emerald) - Deep Bridge */}
+        <div className="absolute bottom-0 left-0 w-full h-64 z-0 pointer-events-none">
+          <div className="absolute inset-0 bg-gradient-to-t from-maestro-emerald via-maestro-emerald/60 to-transparent" />
         </div>
       </section>
 
@@ -443,16 +576,54 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang }) => {
         </div>
       </section>
 
-      {/* 5. PERFORMANCES SECTION */}
-      <section id="performances" className="py-24 px-6 bg-maestro-dark border-t border-white/5">
-        <div className="max-w-7xl mx-auto text-center">
-          <FadeIn>
-            <span className="text-maestro-gold uppercase tracking-widest text-sm font-bold block mb-4">{t.perfTitle}</span>
-            <h2 className="text-4xl font-serif text-white mb-8">{t.perfDesc}</h2>
-            <button onClick={() => onNavigate(Section.PERFORMANCES)} className="inline-flex items-center gap-3 px-8 py-3 bg-maestro-gold text-maestro-dark font-bold rounded-full hover:bg-white transition-colors">
-              {t.viewAgenda} <ArrowRight size={16} />
-            </button>
-          </FadeIn>
+      {/* 5. PERFORMANCES SECTION (EVENTOS) - Reimagined with Interactive Calendar */}
+      <section id="performances" className="py-24 px-6 bg-maestro-dark relative overflow-hidden">
+        {/* Cinematic Section Blending */}
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          <div className="absolute inset-0 bg-gradient-to-b from-maestro-emerald/40 via-transparent to-transparent h-48" />
+        </div>
+        {/* Main Content Container - Absolute Clarity Layer */}
+        <div className="relative z-30 max-w-7xl mx-auto px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            {/* LEFT SIDE - Interactive Calendar (Mobile: Second / Desktop: First) */}
+            <div className="order-2 lg:order-1">
+              <FadeIn delay={200}>
+                <div className="relative">
+                  <div className="absolute -inset-4 bg-maestro-gold/5 blur-3xl rounded-full animate-pulse-slow" />
+                  <MiniCalendar />
+                </div>
+              </FadeIn>
+            </div>
+
+            {/* RIGHT SIDE - Content (Mobile: First / Desktop: Second) */}
+            <div className="order-1 lg:order-2">
+              <FadeIn>
+                <div className="text-center lg:text-left space-y-6">
+                  <span className="text-maestro-gold uppercase tracking-[0.3em] text-xs font-bold block mb-2">{t.perfTitle}</span>
+                  <h2 className="text-5xl font-serif text-white leading-tight">
+                    La Magia en <span className="text-maestro-gold italic">el Escenario</span>
+                  </h2>
+                  <p className="text-xl text-white/90 font-serif italic max-w-xl mx-auto lg:mx-0">
+                    {t.perfDesc}
+                  </p>
+                  <div className="pt-8 block">
+                    <button
+                      onClick={() => onNavigate(Section.PERFORMANCES)}
+                      className="group inline-flex items-center gap-4 px-10 py-4 bg-maestro-gold/5 border border-maestro-gold/50 rounded-full text-maestro-gold hover:bg-maestro-gold hover:text-maestro-dark transition-all duration-500 font-bold uppercase tracking-widest text-xs shadow-[0_0_20px_rgba(234,179,8,0.1)]"
+                    >
+                      {t.viewAgenda}
+                      <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform" />
+                    </button>
+                  </div>
+                </div>
+              </FadeIn>
+            </div>
+          </div>
+        </div>
+
+        {/* Seamless transition to next section (Dark-Fixed/Footer) */}
+        <div className="absolute bottom-0 left-0 w-full h-48 z-0 pointer-events-none">
+          <div className="absolute inset-0 bg-gradient-to-t from-maestro-dark via-maestro-dark/60 to-transparent" />
         </div>
       </section>
 
@@ -491,8 +662,8 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang }) => {
             {t.letsTalk}
           </button>
         </FadeIn>
-      </section>
+      </section >
 
-    </div>
+    </div >
   );
 };

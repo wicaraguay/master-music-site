@@ -31,6 +31,7 @@ export interface Performance {
   description: string;
   status: 'upcoming' | 'past';
   image?: string;
+  images?: string[];
 }
 
 export interface ResearchPaper {

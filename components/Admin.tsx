@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { FadeIn } from './FadeIn';
 import {
     Lock, LogOut, FileText, Music, UploadCloud, Trash2, PlusCircle,
-    LayoutDashboard, Image as ImageIcon, X, Briefcase, BookOpen, Calendar, MapPin, Video, PlayCircle, Edit, Save, RotateCcw, Database
+    LayoutDashboard, Image as ImageIcon, X, Briefcase, BookOpen, Calendar, MapPin, Video, PlayCircle, Edit, Save, RotateCcw, Database,
+    ChevronDown, ArrowRight
 } from 'lucide-react';
 import { BlogPost, Resource, ExperienceItem, ResearchPaper, Performance, GalleryItem, Language } from '../types';
 import { addItem, updateItem, deleteItem as deleteDbItem } from '../src/services/db';
@@ -69,7 +70,7 @@ export const Admin: React.FC<AdminProps> = ({
     const [newPerfRole, setNewPerfRole] = useState('');
     const [newPerfDesc, setNewPerfDesc] = useState('');
     const [newPerfStatus, setNewPerfStatus] = useState<'upcoming' | 'past'>('upcoming');
-    const [newPerfImage, setNewPerfImage] = useState('');
+    const [newPerfImages, setNewPerfImages] = useState<string[]>([]);
 
     // Gallery
     const [newGalType, setNewGalType] = useState<'image' | 'video'>('image');
@@ -111,7 +112,7 @@ export const Admin: React.FC<AdminProps> = ({
         // Research
         setNewResPaperTitle(''); setNewResJournal(''); setNewResYear(''); setNewResAbstract('');
         // Perf
-        setNewPerfDate(''); setNewPerfTitle(''); setNewPerfLoc(''); setNewPerfRole(''); setNewPerfDesc(''); setNewPerfImage('');
+        setNewPerfDate(''); setNewPerfTitle(''); setNewPerfLoc(''); setNewPerfRole(''); setNewPerfDesc(''); setNewPerfImages([]);
         // Gal
         setNewGalSrc(''); setNewGalThumbnail(''); setNewGalCat(''); setNewGalCap('');
     };
@@ -258,11 +259,26 @@ export const Admin: React.FC<AdminProps> = ({
     };
 
     // --- PERFORMANCE HANDLERS ---
+    const handlePerfImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setLoading(true);
+        const url = await uploadToStorage(file, `images/performances/${Date.now()}_${file.name}`);
+        if (url) {
+            setNewPerfImages(prev => [...prev, url]);
+        }
+        setLoading(false);
+    };
+
+    const removePerfImage = (index: number) => {
+        setNewPerfImages(prev => prev.filter((_, i) => i !== index));
+    };
+
     const handleSavePerformance = () => {
         if (!newPerfTitle) return;
         saveToDb('performances', editingId,
             { title: newPerfTitle, role: newPerfRole, description: newPerfDesc },
-            { date: newPerfDate, location: newPerfLoc, status: newPerfStatus, image: newPerfImage }
+            { date: newPerfDate, location: newPerfLoc, status: newPerfStatus, images: newPerfImages }
         );
     };
 
@@ -274,7 +290,7 @@ export const Admin: React.FC<AdminProps> = ({
         setNewPerfRole(perf.role);
         setNewPerfDesc(perf.description);
         setNewPerfStatus(perf.status);
-        setNewPerfImage(perf.image || '');
+        setNewPerfImages(perf.images || (perf.image ? [perf.image] : []));
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
@@ -349,6 +365,89 @@ export const Admin: React.FC<AdminProps> = ({
     }
 
     // --- DASHBOARD VIEW ---
+    // --- PERFORMANCE CALENDAR HELPER ---
+    const AdminCalendar = () => {
+        const today = new Date();
+        const [currentMonth, setCurrentMonth] = useState(today.getMonth());
+        const [currentYear, setCurrentYear] = useState(today.getFullYear());
+
+        const monthNames = lang === 'es' ?
+            ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'] :
+            ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+        const getDaysInMonth = (month: number, year: number) => new Date(year, month + 1, 0).getDate();
+        const getFirstDayOfMonth = (month: number, year: number) => new Date(year, month, 1).getDay();
+
+        const days = [];
+        const daysInMonth = getDaysInMonth(currentMonth, currentYear);
+        const firstDay = getFirstDayOfMonth(currentMonth, currentYear);
+
+        for (let i = 0; i < firstDay; i++) days.push(null);
+        for (let i = 1; i <= daysInMonth; i++) days.push(i);
+
+        const getEventsForDay = (day: number) => {
+            return performances.filter(perf => {
+                const perfDate = new Date(perf.date);
+                return perfDate.getDate() === day && perfDate.getMonth() === currentMonth && perfDate.getFullYear() === currentYear;
+            });
+        };
+
+        const onDateSelect = (day: number) => {
+            const date = new Date(currentYear, currentMonth, day);
+            const dayStr = date.getDate().toString().padStart(2, '0');
+            const monthStr = date.toLocaleString(lang === 'es' ? 'es-ES' : 'en-US', { month: 'short' }).replace('.', '');
+            const yearStr = date.getFullYear();
+            setNewPerfDate(`${dayStr} ${monthStr} ${yearStr}`);
+        };
+
+        return (
+            <div className="bg-maestro-dark border border-white/10 p-6 rounded-xl shadow-xl">
+                <div className="flex justify-between items-center mb-6">
+                    <h4 className="text-maestro-gold font-serif tracking-wide">{monthNames[currentMonth]} {currentYear}</h4>
+                    <div className="flex gap-2">
+                        <button onClick={() => setCurrentMonth(prev => prev === 0 ? 11 : prev - 1)} className="p-1 hover:text-maestro-gold transition-colors">
+                            <ChevronDown size={18} className="rotate-90" />
+                        </button>
+                        <button onClick={() => setCurrentMonth(prev => prev === 11 ? 0 : prev + 1)} className="p-1 hover:text-maestro-gold transition-colors">
+                            <ChevronDown size={18} className="-rotate-90" />
+                        </button>
+                    </div>
+                </div>
+                <div className="grid grid-cols-7 gap-1 text-center text-[10px] uppercase text-white/40 mb-2 font-bold">
+                    {['D', 'L', 'M', 'X', 'J', 'V', 'S'].map(d => <div key={d}>{d}</div>)}
+                </div>
+                <div className="grid grid-cols-7 gap-1">
+                    {days.map((day, idx) => {
+                        const dayEvents = day ? getEventsForDay(day) : [];
+                        const isToday = day === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear();
+
+                        return (
+                            <div
+                                key={idx}
+                                onClick={() => day && onDateSelect(day)}
+                                className={`
+                                    h-8 flex flex-col items-center justify-center text-xs rounded-md transition-all
+                                    ${day ? 'hover:bg-maestro-gold/20 cursor-pointer' : ''}
+                                    ${isToday ? 'bg-white/10 text-maestro-gold font-bold border border-maestro-gold/30' : 'text-white/70'}
+                                `}
+                            >
+                                {day}
+                                {dayEvents.length > 0 && (
+                                    <div className="flex gap-0.5 mt-0.5">
+                                        {dayEvents.slice(0, 3).map((_, eIdx) => (
+                                            <div key={eIdx} className="w-1 h-1 bg-maestro-gold rounded-full shadow-[0_0_5px_rgba(234,179,8,0.8)]" />
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })}
+                </div>
+                <p className="text-[9px] text-white/30 mt-4 italic text-center">Tip: Haz clic en un día para seleccionar la fecha</p>
+            </div>
+        );
+    };
+
     return (
         <section className="min-h-screen bg-maestro-dark pt-28 px-6 pb-24">
             <div className="max-w-7xl mx-auto">
@@ -376,7 +475,7 @@ export const Admin: React.FC<AdminProps> = ({
                             { id: 'resources', label: 'Recursos', icon: Music },
                             { id: 'experience', label: 'Experiencia', icon: Briefcase },
                             { id: 'research', label: 'Investigación', icon: BookOpen },
-                            { id: 'performances', label: 'Actuaciones', icon: Calendar },
+                            { id: 'performances', label: 'Eventos', icon: Calendar },
                             { id: 'gallery', label: 'Galería', icon: ImageIcon },
                         ].map(tab => (
                             <button
@@ -563,28 +662,69 @@ export const Admin: React.FC<AdminProps> = ({
                                     </h3>
                                     {editingId && <button onClick={resetForms} className="text-xs text-red-400 flex items-center gap-1 hover:text-red-300"><RotateCcw size={12} /> Cancelar Edición</button>}
                                 </div>
-                                <div className="space-y-4 mb-12 border-b border-white/10 pb-12">
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <input type="text" value={newPerfTitle} onChange={(e) => setNewPerfTitle(e.target.value)} placeholder="Título Concierto" className="w-full bg-maestro-dark border border-white/10 p-3 text-white" />
-                                        <input type="text" value={newPerfDate} onChange={(e) => setNewPerfDate(e.target.value)} placeholder="Fecha (DD MMM YYYY)" className="w-full bg-maestro-dark border border-white/10 p-3 text-white" />
+
+                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12 border-b border-white/10 pb-12">
+                                    {/* Left: Interactive Calendar */}
+                                    <div className="lg:col-span-1">
+                                        <AdminCalendar />
                                     </div>
-                                    <input type="text" value={newPerfImage} onChange={(e) => setNewPerfImage(e.target.value)} placeholder="URL Imagen del Lugar/Evento (Opcional)" className="w-full bg-maestro-dark border border-white/10 p-3 text-white" />
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <input type="text" value={newPerfLoc} onChange={(e) => setNewPerfLoc(e.target.value)} placeholder="Ubicación" className="w-full bg-maestro-dark border border-white/10 p-3 text-white" />
-                                        <input type="text" value={newPerfRole} onChange={(e) => setNewPerfRole(e.target.value)} placeholder="Rol" className="w-full bg-maestro-dark border border-white/10 p-3 text-white" />
+
+                                    {/* Right: The Form */}
+                                    <div className="lg:col-span-2 space-y-4">
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <input type="text" value={newPerfTitle} onChange={(e) => setNewPerfTitle(e.target.value)} placeholder="Título Concierto" className="w-full bg-maestro-dark border border-white/10 p-3 text-white focus:border-maestro-gold outline-none" />
+                                            <input type="text" value={newPerfDate} onChange={(e) => setNewPerfDate(e.target.value)} placeholder="Fecha (DD MMM YYYY)" className="w-full bg-maestro-dark border border-white/10 p-3 text-white focus:border-maestro-gold outline-none" />
+                                        </div>
+                                        <div className="bg-maestro-dark border border-white/10 p-4">
+                                            <label className="block text-[10px] uppercase text-maestro-light/50 mb-3 tracking-widest font-bold">Imágenes del Evento (Información del sitio)</label>
+                                            <div className="flex flex-wrap gap-2 mb-4">
+                                                <label className="flex-grow bg-white/5 border border-dashed border-white/20 p-4 text-maestro-light hover:text-maestro-gold hover:border-maestro-gold/50 cursor-pointer flex flex-col items-center justify-center gap-2 transition-all group">
+                                                    <UploadCloud size={24} className="group-hover:scale-110 transition-transform" />
+                                                    <span className="text-xs uppercase tracking-widest font-bold">Subir Imagen desde Dispositivo</span>
+                                                    <input type="file" accept="image/*" onChange={handlePerfImageUpload} className="hidden" />
+                                                </label>
+                                            </div>
+                                            {newPerfImages.length > 0 && (
+                                                <div className="flex flex-wrap gap-3 p-2 bg-black/20 rounded-lg">
+                                                    {newPerfImages.map((img, idx) => (
+                                                        <div key={idx} className="relative w-24 h-24 group rounded overflow-hidden border border-white/10">
+                                                            <img src={img} alt="preview" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                                <button onClick={() => removePerfImage(idx)} className="bg-red-500 text-white rounded-full p-2 hover:bg-red-400 transition-colors shadow-lg">
+                                                                    <Trash2 size={16} />
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <input type="text" value={newPerfLoc} onChange={(e) => setNewPerfLoc(e.target.value)} placeholder="Ubicación" className="w-full bg-maestro-dark border border-white/10 p-3 text-white focus:border-maestro-gold outline-none" />
+                                            <input type="text" value={newPerfRole} onChange={(e) => setNewPerfRole(e.target.value)} placeholder="Rol" className="w-full bg-maestro-dark border border-white/10 p-3 text-white focus:border-maestro-gold outline-none" />
+                                        </div>
+                                        <textarea value={newPerfDesc} onChange={(e) => setNewPerfDesc(e.target.value)} placeholder="Detalles del programa..." className="w-full bg-maestro-dark border border-white/10 p-3 text-white focus:border-maestro-gold outline-none h-24" />
+                                        <button onClick={handleSavePerformance} className={`w-full md:w-auto px-10 py-3 uppercase tracking-widest text-xs font-bold transition-all shadow-lg ${editingId ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-maestro-gold hover:bg-white text-maestro-dark'}`}>
+                                            {editingId ? 'Guardar Cambios' : 'Añadir Actuación'}
+                                        </button>
                                     </div>
-                                    <textarea value={newPerfDesc} onChange={(e) => setNewPerfDesc(e.target.value)} placeholder="Detalles del programa..." className="w-full bg-maestro-dark border border-white/10 p-3 text-white" />
-                                    <button onClick={handleSavePerformance} className={`w-full md:w-auto px-6 py-2 uppercase tracking-widest text-xs font-bold transition-colors ${editingId ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-maestro-gold hover:bg-white text-maestro-dark'}`}>
-                                        {editingId ? 'Guardar Cambios' : 'Añadir'}
-                                    </button>
                                 </div>
                                 <div className="space-y-4">
+                                    <h4 className="text-maestro-gold uppercase tracking-widest text-xs font-bold mb-4 opacity-70">Listado de Actuaciones</h4>
                                     {performances.map(perf => (
                                         <div key={perf.id} className={`flex justify-between items-center p-4 border transition-all ${editingId === perf.id ? 'bg-maestro-gold/10 border-maestro-gold' : 'bg-maestro-dark border-white/5 hover:border-maestro-gold/30'}`}>
-                                            <div><h4 className="text-maestro-light font-bold">{perf.title}</h4><span className="text-xs text-maestro-light/40">{perf.date} | {perf.location}</span></div>
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-10 h-10 bg-maestro-gold/10 rounded flex items-center justify-center border border-maestro-gold/20">
+                                                    <Calendar size={16} className="text-maestro-gold" />
+                                                </div>
+                                                <div>
+                                                    <h4 className="text-maestro-light font-bold text-sm">{perf.title}</h4>
+                                                    <span className="text-[10px] uppercase tracking-widest text-maestro-light/40">{perf.date} | {perf.location}</span>
+                                                </div>
+                                            </div>
                                             <div className="flex gap-2">
-                                                <button onClick={() => startEditPerformance(perf)} className="text-maestro-light/30 hover:text-blue-400 p-2"><Edit size={18} /></button>
-                                                <button onClick={() => handleDelete('performances', perf.id)} className="text-maestro-light/30 hover:text-red-500 p-2"><Trash2 size={18} /></button>
+                                                <button onClick={() => startEditPerformance(perf)} className="text-maestro-light/30 hover:text-blue-400 p-2 transition-colors"><Edit size={18} /></button>
+                                                <button onClick={() => handleDelete('performances', perf.id)} className="text-maestro-light/30 hover:text-red-500 p-2 transition-colors"><Trash2 size={18} /></button>
                                             </div>
                                         </div>
                                     ))}
