@@ -176,59 +176,12 @@
       animation: bounce-slow 3s ease-in-out infinite;
     }
 
-    /* Google Translate Professional Integration */
-    .goog-te-banner-frame {
-      display: none !important;
-    }
-
-    body {
-      top: 0 !important;
-    }
-
-    .goog-te-menu-value span:nth-child(5) {
-      display: none !important;
-    }
-
-    .goog-te-gadget {
-      color: transparent !important;
-      font-size: 0 !important;
-    }
-
-    .goog-te-gadget .goog-te-combo {
-      display: none !important;
-    }
-
-    #google_translate_element {
-      position: absolute;
-      top: -1000px;
-      left: -1000px;
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .VIpgJd-Zvi9fq-kn3E80-a616D {
-      display: none !important;
-    }
-
     /* Prevent translation of specific elements */
     .notranslate {
       translate: no !important;
     }
   </style>
 
-  <!-- Google Translation Engine initialization -->
-  <script type="text/javascript">
-    function googleTranslateElementInit() {
-      new google.translate.TranslateElement({
-        pageLanguage: 'es',
-        includedLanguages: 'en,ru,es',
-        layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-        autoDisplay: false
-      }, 'google_translate_element');
-    }
-  </script>
-  <script type="text/javascript"
-    src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
   <script type="importmap">
 {
@@ -246,8 +199,6 @@
 
 <body>
   <div id="root"></div>
-  <!-- Hidden element for Google Translate to attach to -->
-  <div id="google_translate_element"></div>
   <script type="module" src="/index.tsx"></script>
 </body>
 
