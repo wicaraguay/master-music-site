@@ -20,7 +20,11 @@ const getColRef = (colName: CollectionName) => collection(db, colName);
 // -- GENERIC CRUD --
 
 export const addItem = async (colName: CollectionName, item: any) => {
-    return await addDoc(getColRef(colName), item);
+    const dataWithTimestamp = {
+        ...item,
+        createdAt: item.createdAt || new Date().toISOString()
+    };
+    return await addDoc(getColRef(colName), dataWithTimestamp);
 };
 
 export const updateItem = async (colName: CollectionName, id: string, data: any) => {
@@ -85,25 +89,37 @@ export const subscribeToCollection = (colName: CollectionName, callback: (data: 
     });
 };
 
-// -- DATA TRANSFORMATION HELPERS --
-
 /**
- * Simplificado para el modelo de traducción dinámica.
- * Ya no necesitamos filtrar por idioma en el servidor o cliente.
- * El motor de traducción dinámico traducirá el contenido del DOM.
+ * Transforma los datos multilingües de la base de datos para mostrarlos en un idioma específico.
+ * Extrae el valor correspondiente (es, en, ru) de cada campo que sea un objeto LocalizedString.
  */
-export const transformDataForLang = (data: any[], _lang?: Language): any[] => {
+export const transformDataForLang = (data: any[], lang: Language = 'es'): any[] => {
+    if (!data) return [];
     return data.map(item => {
-        // Si el ítem todavía sigue la estructura antigua { es: {...}, en: {...} }
-        // devolvemos la versión en español por defecto.
-        // Si ya ha sido migrado a estructura plana, lo devolvemos tal cual.
-        if (item['es']) {
-            return {
-                id: item.id,
-                ...item['es'],
-                ...item.common
-            };
-        }
-        return { id: item.id, ...item };
+        if (!item) return item;
+        const transformed: any = { id: item.id };
+
+        // Recorrer todas las llaves del objeto
+        Object.keys(item).forEach(key => {
+            if (key === 'id') return;
+
+            const value = item[key];
+
+            // Si el valor es un objeto de localización { es, en, ru }
+            if (value && typeof value === 'object' && 'es' in value && 'en' in value && 'ru' in value) {
+                transformed[key] = value[lang] || value['es'] || "";
+                // Si es un campo de fecha, preservar el valor 'es' para lógica de JS (new Date)
+                if (key === 'date') {
+                    transformed['date_raw'] = value['es'];
+                }
+            } else if (typeof value === 'string') {
+                // Si es un string plano (posiblemente guardado antes de la migración o fallo de IA)
+                transformed[key] = value;
+            } else {
+                transformed[key] = value;
+            }
+        });
+
+        return transformed;
     });
 };

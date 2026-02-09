@@ -10,7 +10,7 @@ interface ResearchProps {
 }
 
 export const Research: React.FC<ResearchProps> = ({ items, lang }) => {
-  const t = translations['es'].research;
+  const t = translations[lang].research;
 
   return (
     <section className="py-24 px-6 bg-maestro-dark">

@@ -10,60 +10,20 @@ import { transformDataForLang } from '../src/services/db';
 interface HomeProps {
   onNavigate: (section: Section) => void;
   lang: Language;
+  experienceItems: ExperienceItem[];
+  performanceItems: Performance[];
 }
 
-export const Home: React.FC<HomeProps> = ({ onNavigate, lang }) => {
-  const t = translations['es'].home;
-  const tExp = translations['es'].experience;
+export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, performanceItems }) => {
+  const t = translations[lang].home;
+  const tExp = translations[lang].experience;
   const [offsetY, setOffsetY] = useState(0);
-  const [experienceItems, setExperienceItems] = useState<ExperienceItem[]>([]);
-  const [performanceItems, setPerformanceItems] = useState<Performance[]>([]);
 
   // Parallax effect logic
   useEffect(() => {
     const handleScroll = () => setOffsetY(window.pageYOffset);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // Fetch Experience from Firebase
-  useEffect(() => {
-    const q = query(collection(db, 'experience'));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const items = snapshot.docs.map(doc => {
-        const data = doc.data();
-        return (data['es'] || data) as ExperienceItem; // Fallback to flat structure if already simplified
-      }).filter(item => item !== undefined);
-
-      // Sort by year (descending logic if possible, or just ID) - For now rely on seed order or add sort field
-      // Simple sort by ID for now to match seed order
-      items.sort((a, b) => Number(a.id) - Number(b.id));
-
-      if (items.length > 0) {
-        setExperienceItems(items);
-      } else {
-        // Fallback to static if empty
-        setExperienceItems(tExp.items as unknown as ExperienceItem[]);
-      }
-    });
-
-    return () => unsubscribe();
-  }, [tExp.items]);
-
-  // Fetch Performances from Firebase
-  useEffect(() => {
-    const q = query(collection(db, 'performances'));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const rawData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-
-      const items = transformDataForLang(rawData, 'es') as Performance[];
-      setPerformanceItems(items);
-    });
-
-    return () => unsubscribe();
   }, []);
 
   // MiniCalendar Component Helper
@@ -96,14 +56,14 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang }) => {
 
     const hasEvent = (day: number) => {
       return performanceItems.some(perf => {
-        const perfDate = new Date(perf.date);
+        const perfDate = new Date((perf as any).date_raw || perf.date);
         return perfDate.getDate() === day && perfDate.getMonth() === currentMonth && perfDate.getFullYear() === currentYear;
       });
     };
 
     const getEventForDay = (day: number) => {
       return performanceItems.find(perf => {
-        const perfDate = new Date(perf.date);
+        const perfDate = new Date((perf as any).date_raw || perf.date);
         return perfDate.getDate() === day && perfDate.getMonth() === currentMonth && perfDate.getFullYear() === currentYear;
       });
     };
@@ -408,22 +368,22 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang }) => {
                 {/* Stat 1: Experience */}
                 <div className="bg-maestro-dark/80 backdrop-blur-md border border-maestro-gold/20 p-6 rounded-lg text-left hover:border-maestro-gold/50 transition-colors group h-full">
                   <Music2 className="text-maestro-gold w-8 h-8 mb-4 group-hover:scale-110 transition-transform" />
-                  <h4 className="text-2xl font-bold text-white mb-1">15+ <span className="text-sm font-normal text-maestro-light/60">Años</span></h4>
-                  <p className="text-xs text-maestro-light/50 uppercase tracking-wider">De experiencia musical</p>
+                  <h4 className="text-2xl font-bold text-white mb-1">15+ <span className="text-sm font-normal text-maestro-light/60">{lang === 'es' ? 'Años' : lang === 'en' ? 'Years' : 'Лет'}</span></h4>
+                  <p className="text-xs text-maestro-light/50 uppercase tracking-wider">{lang === 'es' ? 'De experiencia musical' : lang === 'en' ? 'Of musical experience' : 'Музыкального опыта'}</p>
                 </div>
 
                 {/* Stat 2: PhD */}
                 <div className="bg-maestro-dark/80 backdrop-blur-md border border-maestro-gold/20 p-6 rounded-lg text-left hover:border-maestro-gold/50 transition-colors group h-full">
                   <BookOpen className="text-maestro-gold w-8 h-8 mb-4 group-hover:scale-110 transition-transform" />
-                  <h4 className="text-xl font-bold text-white mb-1">PhD <span className="text-sm font-normal text-maestro-light/60">Candidato</span></h4>
-                  <p className="text-xs text-maestro-light/50 uppercase tracking-wider">En Musicología</p>
+                  <h4 className="text-xl font-bold text-white mb-1">PhD <span className="text-sm font-normal text-maestro-light/60">{lang === 'es' ? 'Candidato' : lang === 'en' ? 'Candidate' : 'Кандидат'}</span></h4>
+                  <p className="text-xs text-maestro-light/50 uppercase tracking-wider">{lang === 'es' ? 'En Musicología' : lang === 'en' ? 'In Musicology' : 'В музыковедении'}</p>
                 </div>
 
                 {/* Stat 3: Concerts */}
                 <div className="bg-maestro-dark/80 backdrop-blur-md border border-maestro-gold/20 p-6 rounded-lg text-left hover:border-maestro-gold/50 transition-colors group h-full">
                   <Briefcase className="text-maestro-gold w-8 h-8 mb-4 group-hover:scale-110 transition-transform" />
-                  <h4 className="text-2xl font-bold text-white mb-1">20+ <span className="text-sm font-normal text-maestro-light/60">Conciertos</span></h4>
-                  <p className="text-xs text-maestro-light/50 uppercase tracking-wider">Internacionales</p>
+                  <h4 className="text-2xl font-bold text-white mb-1">20+ <span className="text-sm font-normal text-maestro-light/60">{lang === 'es' ? 'Conciertos' : lang === 'en' ? 'Concerts' : 'Концертов'}</span></h4>
+                  <p className="text-xs text-maestro-light/50 uppercase tracking-wider">{lang === 'es' ? 'Internacionales' : lang === 'en' ? 'International' : 'Международных'}</p>
                 </div>
 
                 {/* Stat 4: Passion */}
@@ -431,8 +391,8 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang }) => {
                   <div className="text-maestro-gold w-8 h-8 mb-4 group-hover:scale-110 transition-transform">
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" /></svg>
                   </div>
-                  <h4 className="text-xl font-bold text-white mb-1">Pasión</h4>
-                  <p className="text-xs text-maestro-light/50 uppercase tracking-wider">Por la enseñanza</p>
+                  <h4 className="text-xl font-bold text-white mb-1">{lang === 'es' ? 'Pasión' : lang === 'en' ? 'Passion' : 'Страсть'}</h4>
+                  <p className="text-xs text-maestro-light/50 uppercase tracking-wider">{lang === 'es' ? 'Por la enseñanza' : lang === 'en' ? 'For teaching' : 'К преподаванию'}</p>
                 </div>
               </div>
             </FadeIn>

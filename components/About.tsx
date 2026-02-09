@@ -8,7 +8,7 @@ interface AboutProps {
 }
 
 export const About: React.FC<AboutProps> = ({ lang }) => {
-  const t = translations['es'].about;
+  const t = translations[lang].about;
 
   return (
     <section className="py-24 px-6 bg-maestro-dark relative">

@@ -12,7 +12,7 @@ interface GalleryProps {
 export const Gallery: React.FC<GalleryProps> = ({ items, lang }) => {
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<'photos' | 'videos'>('photos');
-  const t = translations['es'].gallery;
+  const t = translations[lang].gallery;
 
   // Filter items based on active tab
   const displayedItems = items.filter(item =>
@@ -63,8 +63,8 @@ export const Gallery: React.FC<GalleryProps> = ({ items, lang }) => {
           <button
             onClick={() => setActiveTab('photos')}
             className={`flex items-center gap-2 pb-2 text-sm uppercase tracking-widest transition-all ${activeTab === 'photos'
-                ? 'text-maestro-gold border-b border-maestro-gold'
-                : 'text-maestro-light/50 hover:text-maestro-gold'
+              ? 'text-maestro-gold border-b border-maestro-gold'
+              : 'text-maestro-light/50 hover:text-maestro-gold'
               }`}
           >
             <ImageIcon size={16} /> {t.tabPhotos}
@@ -72,8 +72,8 @@ export const Gallery: React.FC<GalleryProps> = ({ items, lang }) => {
           <button
             onClick={() => setActiveTab('videos')}
             className={`flex items-center gap-2 pb-2 text-sm uppercase tracking-widest transition-all ${activeTab === 'videos'
-                ? 'text-maestro-gold border-b border-maestro-gold'
-                : 'text-maestro-light/50 hover:text-maestro-gold'
+              ? 'text-maestro-gold border-b border-maestro-gold'
+              : 'text-maestro-light/50 hover:text-maestro-gold'
               }`}
           >
             <Video size={16} /> {t.tabVideos}
@@ -127,7 +127,7 @@ export const Gallery: React.FC<GalleryProps> = ({ items, lang }) => {
         {/* Empty State */}
         {displayedItems.length === 0 && (
           <div className="text-center text-maestro-light/30 py-20 italic font-serif text-xl">
-            {activeTab === 'photos' ? 'No hay fotos disponibles.' : 'No hay videos disponibles.'}
+            {activeTab === 'photos' ? t.emptyPhotos : t.emptyVideos}
           </div>
         )}
 

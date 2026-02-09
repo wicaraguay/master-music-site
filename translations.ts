@@ -115,7 +115,9 @@ export const translations = {
       titleSuffix: 'Podio',
       subtitle: 'Una colección de instantes capturados en ensayos, conciertos y viajes de investigación.',
       tabPhotos: 'Fotos',
-      tabVideos: 'Videos'
+      tabVideos: 'Videos',
+      emptyPhotos: 'No hay fotos disponibles.',
+      emptyVideos: 'No hay videos disponibles.'
     },
     contact: {
       title: 'Contacto',
@@ -134,6 +136,238 @@ export const translations = {
       edit: 'Editar',
       delete: 'Eliminar',
       cancel: 'Cancelar'
+    }
+  },
+  en: {
+    nav: {
+      home: 'Home',
+      about: 'About Me',
+      career: 'Career',
+      experience: 'Experience',
+      research: 'Research',
+      performances: 'Agenda',
+      gallery: 'Gallery',
+      resources: 'Resources',
+      blog: 'Blog',
+      contact: 'Contact',
+      admin: 'Login',
+      back: 'Back to Site'
+    },
+    home: {
+      role: 'Violinist | Conductor | Researcher',
+      intro: '"PhD Candidate in Musicology, exploring the intersection of Baroque music and contemporary conducting techniques."',
+      ctaWork: 'See My Work',
+      ctaContact: 'Contact',
+      aboutTitle: 'About Me',
+      aboutHeading: 'Where tradition meets innovation.',
+      aboutText1: 'My career is defined by a duality: the rigor of the archive and the vitality of the stage. As a conductor, I seek not only technical precision but informed historical authenticity.',
+      aboutText2: 'My doctoral research delves into forgotten scores, bringing to light masterpieces that deserve to be heard again, performed with modern sensitivity.',
+      readBio: 'Read Full Biography',
+      focusTitle: 'Professional Outlook',
+      focusHeading: 'Career Path',
+      expTitle: 'Experience',
+      expDesc: 'A professional journey from conservatory teaching to principal conducting.',
+      resTitle: 'Research',
+      resDesc: 'PhD in progress. Recovering musical heritage and new perspectives on orchestration.',
+      perfTitle: 'Events',
+      perfDesc: 'The culmination of work on stage. Upcoming concerts and symphonic repertoire.',
+      viewTimeline: 'View Timeline',
+      readPapers: 'Read Publications',
+      viewAgenda: 'View Agenda',
+      quote: '"Music is not in the notes, but in the silence between them."',
+      collabTitle: 'Interested in a collaboration?',
+      collabText: 'I am available for guest conducting, academic lectures, and musicological consultancy.',
+      letsTalk: 'Let\'s Talk'
+    },
+    about: {
+      bioTitle: 'Biography',
+      bioHeading: 'Passion for Academic and Artistic Excellence',
+      p1: 'Currently pursuing a PhD in Musicology, my work focuses on reviving forgotten 19th-century works and reinterpreting them with modern sensitivity.',
+      p2: 'My journey began at the conservatory at age 6, evolving from solo piano to the conductor\'s podium. I firmly believe a conductor is not just a human metronome, but a channeler of collective orchestral energy and a wordless storyteller.',
+      p3: 'When not researching archives or rehearsing, I dedicate myself to teaching, seeking to inspire the next generation of musicians to find their own voice in a noisy world.',
+      statsYears: 'Years of Study',
+      statsConcerts: 'Concerts Conducted'
+    },
+    experience: {
+      title: 'Experience',
+      subtitle: 'Professional experience',
+      items: [],
+      viewDetails: 'View Experience',
+      viewAll: 'View Full Timeline'
+    },
+    research: {
+      badge: 'Academia',
+      title: 'Research',
+      quote: '"Research is the compass that guides interpretation."',
+      read: 'Read Publication'
+    },
+    performances: {
+      titlePrefix: 'Agenda of',
+      titleSuffix: 'Events',
+      moreDetails: '* More details coming soon',
+      imgCredit: 'Venue image:'
+    },
+    blog: {
+      badge: 'Musical Thought',
+      titlePrefix: 'The Conductor\'s',
+      titleSuffix: 'Journal',
+      subtitle: 'Reflections on interpretation, musicology, and life on the podium.',
+      empty: 'No posts available at the moment.',
+      galleryCount: 'Images in gallery',
+      readMore: 'Read Full Article',
+      galleryTitle: 'Visual Gallery'
+    },
+    resources: {
+      badge: 'Digital Library',
+      titlePrefix: 'Resources &',
+      titleSuffix: 'Scores',
+      subtitle: 'Access critical editions, published research, and exclusive pedagogical material.',
+      empty: 'The library is being updated.',
+      download: 'Download'
+    },
+    gallery: {
+      badge: 'Visual Archive',
+      titlePrefix: 'Moments at the',
+      titleSuffix: 'Podium',
+      subtitle: 'A collection of moments captured in rehearsals, concerts, and research trips.',
+      tabPhotos: 'Photos',
+      tabVideos: 'Videos',
+      emptyPhotos: 'No photos available.',
+      emptyVideos: 'No videos available.'
+    },
+    contact: {
+      title: 'Contact',
+      subtitle: 'For bookings, academic collaborations, or general inquiries.',
+      name: 'Name',
+      email: 'Email',
+      message: 'Message',
+      send: 'Send Message',
+      follow: 'Follow me'
+    },
+    admin: {
+      title: 'Admin Panel',
+      login: 'Login',
+      logout: 'Logout',
+      save: 'Save',
+      edit: 'Edit',
+      delete: 'Delete',
+      cancel: 'Cancel'
+    }
+  },
+  ru: {
+    nav: {
+      home: 'Главная',
+      about: 'Обо мне',
+      career: 'Карьера',
+      experience: 'Опыт',
+      research: 'Исследования',
+      performances: 'События',
+      gallery: 'Галерея',
+      resources: 'Ресурсы',
+      blog: 'Блог',
+      contact: 'Контакты',
+      admin: 'Войти',
+      back: 'Вернуться на сайт'
+    },
+    home: {
+      role: 'Скрипач | Дирижер | Исследователь',
+      intro: '"Кандидат наук (PhD) в области музыковедения, исследующий пересечение барочной музыки и современных техник дирижирования."',
+      ctaWork: 'Мои работы',
+      ctaContact: 'Контакты',
+      aboutTitle: 'Обо мне',
+      aboutHeading: 'Где традиции встречаются с инновациями.',
+      aboutText1: 'Моя карьера определяется двойственностью: строгостью архива и жизненной силой сцены. Как дирижер, я стремлюсь не только к технической точности, но и к обоснованной исторической достоверности.',
+      aboutText2: 'Мое докторское исследование посвящено забытым партитурам, возвращая к жизни шедевры, которые заслуживают того, чтобы быть услышанными снова, исполненные с современной чуткостью.',
+      readBio: 'Читать полную биографию',
+      focusTitle: 'Профессиональный обзор',
+      focusHeading: 'Путь в карьере',
+      expTitle: 'Опыт',
+      expDesc: 'Профессиональный путь от преподавания в консерватории до главного дирижера.',
+      resTitle: 'Исследования',
+      resDesc: 'Докторантура в процессе. Восстановление музыкального наследия и новые перспективы оркестровки.',
+      perfTitle: 'События',
+      perfDesc: 'Кульминация работы на сцене. Предстоящие концерты и симфонический репертуар.',
+      viewTimeline: 'Смотреть хронологию',
+      readPapers: 'Читать публикации',
+      viewAgenda: 'Смотреть афишу',
+      quote: '"Музыка не в нотах, а в тишине между ними."',
+      collabTitle: 'Заинтересованы в сотрудничестве?',
+      collabText: 'Я доступен для приглашенного дирижирования, академических лекций и музыковедческих консультаций.',
+      letsTalk: 'Связаться'
+    },
+    about: {
+      bioTitle: 'Биография',
+      bioHeading: 'Страсть к академическому и художественному совершенству',
+      p1: 'В настоящее время я работаю над докторской диссертацией по музыковедению, возрождая забытые произведения XIX века и переосмысливая их с позиции современной чувствительности.',
+      p2: 'Мой путь начался в консерватории в возрасте 6 лет, пройдя путь от сольного фортепиано до дирижерского подиума. Я твердо верю, что дирижер — это не просто человеческий метроном, а проводник коллективной энергии оркестра и рассказчик историй без слов.',
+      p3: 'Когда я не занимаюсь исследованиями в архивах или репетициями, я посвящаю себя преподаванию, стремясь вдохновить новое поколение музыкантов найти свой собственный голос в шумном мире.',
+      statsYears: 'Лет обучения',
+      statsConcerts: 'Дирижируемых концертов'
+    },
+    experience: {
+      title: 'Опыт',
+      subtitle: 'Профессиональный опыт',
+      items: [],
+      viewDetails: 'Подробнее',
+      viewAll: 'Посмотреть весь путь'
+    },
+    research: {
+      badge: 'Академия',
+      title: 'Исследования',
+      quote: '"Исследование — это компас, который направляет интерпретацию."',
+      read: 'Читать публикацию'
+    },
+    performances: {
+      titlePrefix: 'Афиша',
+      titleSuffix: 'событий',
+      moreDetails: '* Подробности скоро',
+      imgCredit: 'Изображение площадки:'
+    },
+    blog: {
+      badge: 'Музыкальная мысль',
+      titlePrefix: 'Дневник',
+      titleSuffix: 'дирижера',
+      subtitle: 'Размышления об интерпретации, музыковедении и жизни на подиуме.',
+      empty: 'На данный момент публикаций нет.',
+      galleryCount: 'Изображений в галерее',
+      readMore: 'Читать статью полностью',
+      galleryTitle: 'Визуальная галерея'
+    },
+    resources: {
+      badge: 'Цифровая библиотека',
+      titlePrefix: 'Ресурсы и',
+      titleSuffix: 'партитуры',
+      subtitle: 'Доступ к критическим изданиям, опубликованным исследованиям и эксклюзивным педагогическим материалам.',
+      empty: 'Библиотека обновляется.',
+      download: 'Скачать'
+    },
+    gallery: {
+      badge: 'Визуальный архив',
+      titlePrefix: 'Моменты на',
+      titleSuffix: 'подиуме',
+      subtitle: 'Коллекция моментов, запечатленных на репетициях, концертах и в исследовательских поездках.',
+      tabPhotos: 'Фото',
+      tabVideos: 'Видео',
+      emptyPhotos: 'Нет доступных фотографий.',
+      emptyVideos: 'Нет доступных видео.'
+    },
+    contact: {
+      title: 'Контакты',
+      subtitle: 'Для бронирования, академического сотрудничества или общих вопросов.',
+      name: 'Имя',
+      email: 'Email',
+      message: 'Сообщение',
+      send: 'Отправить сообщение',
+      follow: 'Следите за мной'
+    },
+    admin: {
+      title: 'Панель администратора',
+      login: 'Войти',
+      logout: 'Выйти',
+      save: 'Сохранить',
+      edit: 'Редактировать',
+      delete: 'Удалить',
+      cancel: 'Отмена'
     }
   }
 } as const;

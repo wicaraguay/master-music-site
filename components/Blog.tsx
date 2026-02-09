@@ -11,7 +11,7 @@ interface BlogProps {
 
 export const Blog: React.FC<BlogProps> = ({ posts, lang }) => {
     const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
-    const t = translations['es'].blog;
+    const t = translations[lang].blog;
 
     const openPost = (post: BlogPost) => {
         setSelectedPost(post);

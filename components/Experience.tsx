@@ -10,7 +10,7 @@ interface ExperienceProps {
 }
 
 export const Experience: React.FC<ExperienceProps> = ({ items, lang }) => {
-  const t = translations['es'].experience;
+  const t = translations[lang].experience;
 
   return (
     <section className="py-24 px-6 bg-maestro-dark">

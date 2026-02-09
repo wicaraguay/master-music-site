@@ -11,7 +11,7 @@ interface PerformancesProps {
 
 export const Performances: React.FC<PerformancesProps> = ({ items, lang }) => {
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const t = translations['es'].performances;
+  const t = translations[lang].performances;
 
   const toggleExpand = (id: string) => {
     setExpandedId(expandedId === id ? null : id);

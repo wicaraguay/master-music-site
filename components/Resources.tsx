@@ -10,7 +10,7 @@ interface ResourcesProps {
 }
 
 export const Resources: React.FC<ResourcesProps> = ({ resources, lang }) => {
-  const t = translations['es'].resources;
+  const t = translations[lang].resources;
 
   const getIcon = (type: string) => {
     switch (type) {

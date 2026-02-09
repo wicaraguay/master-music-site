@@ -13,22 +13,28 @@ export enum Section {
 
 export type Language = 'es' | 'en' | 'ru';
 
+export interface LocalizedString {
+  es: string;
+  en: string;
+  ru: string;
+}
+
 export interface ExperienceItem {
   id: string;
-  year: string;
-  role: string;
-  institution: string;
-  description: string;
+  year: LocalizedString;
+  role: LocalizedString;
+  institution: LocalizedString;
+  description: LocalizedString;
   tags?: string[];
 }
 
 export interface Performance {
   id: string;
-  date: string;
-  title: string;
-  location: string;
-  role: string;
-  description: string;
+  date: LocalizedString;
+  title: LocalizedString;
+  location: LocalizedString;
+  role: LocalizedString;
+  description: LocalizedString;
   status: 'upcoming' | 'past';
   image?: string;
   images?: string[];
@@ -36,35 +42,35 @@ export interface Performance {
 
 export interface ResearchPaper {
   id: string;
-  title: string;
-  journal: string;
+  title: LocalizedString;
+  journal: string; // Journals usually don't translates their names
   year: string;
-  abstract: string;
+  abstract: LocalizedString;
 }
 
 export interface BlogPost {
   id: string;
-  title: string;
+  title: LocalizedString;
   date: string;
-  preview: string;
-  content: string;
+  preview: LocalizedString;
+  content: LocalizedString;
   images?: string[];
 }
 
 export interface Resource {
   id: string;
-  title: string;
+  title: LocalizedString;
   type: 'score' | 'article' | 'audio';
   format: string;
   size: string;
-  description: string;
+  description: LocalizedString;
 }
 
 export interface GalleryItem {
   id: string;
   type: 'image' | 'video';
-  src: string; // Image URL or Video Embed URL
-  thumbnail?: string; // Only for videos
-  category: string;
-  caption: string;
+  src: string;
+  thumbnail?: string;
+  category: LocalizedString;
+  caption: LocalizedString;
 }

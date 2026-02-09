@@ -91,15 +91,15 @@ function App() {
     return () => unsubs.forEach(unsub => unsub());
   }, []);
 
-  // Transform data always for 'es' (The engine handles real-time translation for other languages)
+  // Transform data based on current language
   useEffect(() => {
-    setPosts(transformDataForLang(rawPosts, 'es'));
-    setResources(transformDataForLang(rawResources, 'es'));
-    setExperience(transformDataForLang(rawExperience, 'es'));
-    setResearch(transformDataForLang(rawResearch, 'es'));
-    setPerformances(transformDataForLang(rawPerformances, 'es'));
-    setGallery(transformDataForLang(rawGallery, 'es'));
-  }, [rawPosts, rawResources, rawExperience, rawResearch, rawPerformances, rawGallery]);
+    setPosts(transformDataForLang(rawPosts, lang));
+    setResources(transformDataForLang(rawResources, lang));
+    setExperience(transformDataForLang(rawExperience, lang));
+    setResearch(transformDataForLang(rawResearch, lang));
+    setPerformances(transformDataForLang(rawPerformances, lang));
+    setGallery(transformDataForLang(rawGallery, lang));
+  }, [rawPosts, rawResources, rawExperience, rawResearch, rawPerformances, rawGallery, lang]);
 
   // Scroll to top
   useEffect(() => {
@@ -109,7 +109,7 @@ function App() {
   const renderSection = () => {
     switch (currentSection) {
       case Section.HOME:
-        return <Home onNavigate={setCurrentSection} lang={lang} />;
+        return <Home onNavigate={setCurrentSection} lang={lang} experienceItems={experience} performanceItems={performances} />;
       case Section.ABOUT:
         return <About lang={lang} />;
       case Section.EXPERIENCE:
@@ -133,12 +133,12 @@ function App() {
             onLogin={setIsAuthenticated}
             userEmail={user?.email}
             lang={lang}
-            posts={posts} setPosts={setPosts}
-            resources={resources} setResources={setResources}
-            experience={experience} setExperience={setExperience}
-            research={research} setResearch={setResearch}
-            performances={performances} setPerformances={setPerformances}
-            gallery={gallery} setGallery={setGallery}
+            posts={rawPosts} setPosts={setRawPosts}
+            resources={rawResources} setResources={setRawResources}
+            experience={rawExperience} setExperience={setRawExperience}
+            research={rawResearch} setResearch={setRawResearch}
+            performances={rawPerformances} setPerformances={setRawPerformances}
+            gallery={rawGallery} setGallery={setRawGallery}
           />
         );
       default:

@@ -9,6 +9,7 @@ import { BlogPost, Resource, ExperienceItem, ResearchPaper, Performance, Gallery
 import { addItem, updateItem, deleteItem as deleteDbItem } from '../src/services/db';
 import { signIn, logout } from '../src/services/auth';
 import { uploadToStorage } from '../src/services/storage';
+import { translateFields } from '../src/services/translationService';
 
 interface AdminProps {
     isAuthenticated: boolean;
@@ -32,6 +33,7 @@ export const Admin: React.FC<AdminProps> = ({
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [translating, setTranslating] = useState(false);
 
     type Tab = 'blog' | 'resources' | 'experience' | 'research' | 'performances' | 'gallery';
     const [activeTab, setActiveTab] = useState<Tab>('blog');
@@ -161,7 +163,7 @@ export const Admin: React.FC<AdminProps> = ({
     // Guarda los datos de forma plana (Source of Truth en Español).
     const saveToDb = async (colName: any, id: string | null, data: any, commonData: any = {}) => {
         try {
-            // Combinamos todo en un objeto plano
+            setLoading(true);
             const payload = {
                 ...commonData,
                 ...data,
@@ -177,6 +179,8 @@ export const Admin: React.FC<AdminProps> = ({
         } catch (err) {
             console.error("Error saving:", err);
             alert("Error al guardar. Revisa la consola.");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -190,72 +194,135 @@ export const Admin: React.FC<AdminProps> = ({
     const handleAddImageUrl = () => { if (currentImageUrl) { setNewPostImages([...newPostImages, currentImageUrl]); setCurrentImageUrl(''); } };
     const removeImage = (index: number) => { setNewPostImages(newPostImages.filter((_, i) => i !== index)); };
 
-    const handleSavePost = () => {
+    const handleSavePost = async () => {
         if (!newPostTitle) return;
-        saveToDb('posts', editingId,
-            { title: newPostTitle, content: newPostContent, images: newPostImages },
-            { date: new Date().toLocaleDateString('es-ES').toUpperCase(), images: newPostImages } // Common data
-        );
+        try {
+            setTranslating(true);
+            const previewText = newPostContent.substring(0, 160).replace(/[#*]/g, '') + '...';
+
+            const translations = await translateFields(
+                { title: newPostTitle, content: newPostContent, preview: previewText },
+                ['title', 'content', 'preview']
+            );
+
+            await saveToDb('posts', editingId,
+                {
+                    title: translations.title,
+                    content: translations.content,
+                    preview: translations.preview
+                },
+                { date: new Date().toLocaleDateString('es-ES').toUpperCase(), images: newPostImages }
+            );
+        } catch (error) {
+            console.error("Error saving post:", error);
+            alert("Error al guardar el artículo.");
+        } finally {
+            setTranslating(false);
+        }
     };
 
-    const startEditPost = (post: BlogPost) => {
+    const startEditPost = (post: any) => {
         setEditingId(post.id);
-        setNewPostTitle(post.title);
-        setNewPostContent(post.content);
+        setNewPostTitle(post.title?.es || post.title || '');
+        setNewPostContent(post.content?.es || post.content || '');
         setNewPostImages(post.images || []);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     // --- RESOURCE HANDLERS ---
-    const handleSaveResource = () => {
+    const handleSaveResource = async () => {
         if (!newResTitle) return;
-        saveToDb('resources', editingId,
-            { title: newResTitle, description: newResDesc },
-            { type: newResType, format: 'PDF', size: '1.2 MB' }
-        );
+        try {
+            setTranslating(true);
+            const translations = await translateFields(
+                { title: newResTitle, description: newResDesc },
+                ['title', 'description']
+            );
+
+            await saveToDb('resources', editingId,
+                { title: translations.title, description: translations.description },
+                { type: newResType, format: 'PDF', size: '1.2 MB' }
+            );
+        } catch (error) {
+            console.error("Error saving resource:", error);
+            alert("Error al guardar el recurso.");
+        } finally {
+            setTranslating(false);
+        }
     };
 
-    const startEditResource = (res: Resource) => {
+    const startEditResource = (res: any) => {
         setEditingId(res.id);
-        setNewResTitle(res.title);
-        setNewResDesc(res.description);
+        setNewResTitle(res.title?.es || res.title || '');
+        setNewResDesc(res.description?.es || res.description || '');
         setNewResType(res.type);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     // --- EXPERIENCE HANDLERS ---
-    const handleSaveExperience = () => {
+    const handleSaveExperience = async () => {
         if (!newExpRole) return;
-        saveToDb('experience', editingId,
-            { role: newExpRole, institution: newExpInst, description: newExpDesc, year: newExpYear },
-            { year: newExpYear }
-        );
+        try {
+            setTranslating(true);
+            const translations = await translateFields(
+                { role: newExpRole, institution: newExpInst, description: newExpDesc, year: newExpYear },
+                ['role', 'institution', 'description', 'year']
+            );
+
+            await saveToDb('experience', editingId,
+                {
+                    role: translations.role,
+                    institution: translations.institution,
+                    description: translations.description,
+                    year: translations.year
+                },
+                { yearRaw: newExpYear } // Keep raw year for sorting if needed
+            );
+        } catch (error) {
+            console.error("Error saving experience:", error);
+            alert("Error al guardar la experiencia.");
+        } finally {
+            setTranslating(false);
+        }
     };
 
-    const startEditExperience = (exp: ExperienceItem) => {
+    const startEditExperience = (exp: any) => {
         setEditingId(exp.id);
-        setNewExpYear(exp.year);
-        setNewExpRole(exp.role);
-        setNewExpInst(exp.institution);
-        setNewExpDesc(exp.description);
+        setNewExpYear(exp.year?.es || exp.year || '');
+        setNewExpRole(exp.role?.es || exp.role || '');
+        setNewExpInst(exp.institution?.es || exp.institution || '');
+        setNewExpDesc(exp.description?.es || exp.description || '');
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     // --- RESEARCH HANDLERS ---
-    const handleSaveResearch = () => {
+    const handleSaveResearch = async () => {
         if (!newResPaperTitle) return;
-        saveToDb('research', editingId,
-            { title: newResPaperTitle, abstract: newResAbstract },
-            { journal: newResJournal, year: newResYear }
-        );
+        try {
+            setTranslating(true);
+            const translations = await translateFields(
+                { title: newResPaperTitle, abstract: newResAbstract },
+                ['title', 'abstract']
+            );
+
+            await saveToDb('research', editingId,
+                { title: translations.title, abstract: translations.abstract },
+                { journal: newResJournal, year: newResYear }
+            );
+        } catch (error) {
+            console.error("Error saving research:", error);
+            alert("Error al guardar la investigación.");
+        } finally {
+            setTranslating(false);
+        }
     };
 
-    const startEditResearch = (res: ResearchPaper) => {
+    const startEditResearch = (res: any) => {
         setEditingId(res.id);
-        setNewResPaperTitle(res.title);
+        setNewResPaperTitle(res.title?.es || res.title || '');
         setNewResJournal(res.journal);
         setNewResYear(res.year);
-        setNewResAbstract(res.abstract);
+        setNewResAbstract(res.abstract?.es || res.abstract || '');
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
@@ -270,71 +337,80 @@ export const Admin: React.FC<AdminProps> = ({
         }
         setLoading(false);
     };
-
     const removePerfImage = (index: number) => {
         setNewPerfImages(prev => prev.filter((_, i) => i !== index));
     };
 
-    const handleSavePerformance = () => {
+    const handleSavePerformance = async () => {
         if (!newPerfTitle) return;
-        saveToDb('performances', editingId,
-            { title: newPerfTitle, role: newPerfRole, description: newPerfDesc },
-            { date: newPerfDate, location: newPerfLoc, status: newPerfStatus, images: newPerfImages }
-        );
+        try {
+            setTranslating(true);
+            const translations = await translateFields(
+                { title: newPerfTitle, description: newPerfDesc, location: newPerfLoc, role: newPerfRole, date: newPerfDate },
+                ['title', 'description', 'location', 'role', 'date']
+            );
+
+            await saveToDb('performances', editingId,
+                {
+                    title: translations.title,
+                    description: translations.description,
+                    location: translations.location,
+                    role: translations.role,
+                    date: translations.date
+                },
+                { status: newPerfStatus, images: newPerfImages }
+            );
+        } catch (error) {
+            console.error("Error saving performance:", error);
+            alert("Error al guardar el evento.");
+        } finally {
+            setTranslating(false);
+        }
     };
 
-    const startEditPerformance = (perf: Performance) => {
+    const startEditPerformance = (perf: any) => {
         setEditingId(perf.id);
-        setNewPerfDate(perf.date);
-        setNewPerfTitle(perf.title);
-        setNewPerfLoc(perf.location);
-        setNewPerfRole(perf.role);
-        setNewPerfDesc(perf.description);
+        setNewPerfDate(perf.date?.es || perf.date || '');
+        setNewPerfTitle(perf.title?.es || perf.title || '');
+        setNewPerfLoc(perf.location?.es || perf.location || '');
+        setNewPerfRole(perf.role?.es || perf.role || '');
+        setNewPerfDesc(perf.description?.es || perf.description || '');
         setNewPerfStatus(perf.status);
-        setNewPerfImages(perf.images || (perf.image ? [perf.image] : []));
+        setNewPerfImages(perf.images || []);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
 
 
     // --- GALLERY HANDLERS ---
-    const handleSaveGallery = () => {
+    const handleSaveGallery = async () => {
         if (!newGalSrc) return;
+        try {
+            setTranslating(true);
+            const translations = await translateFields(
+                { caption: newGalCap, category: newGalCat },
+                ['caption', 'category']
+            );
 
-        let finalSrc = newGalSrc.trim();
-        let finalThumb = newGalThumbnail.trim();
-
-        if (newGalType === 'video') {
-            const regExp = /^(?:https?:\/\/)?(?:www\.|m\.|music\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})(?:[\?&].*)?$/;
-            const match = finalSrc.match(regExp);
-
-            if (match && match[1]) {
-                const videoId = match[1];
-                finalSrc = `https://www.youtube.com/embed/${videoId}?rel=0`;
-                if (!finalThumb) {
-                    finalThumb = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-                }
-            } else if (!finalSrc.includes('embed')) {
-                if (!editingId) {
-                    window.alert("Enlace de YouTube no válido o formato desconocido.");
-                    return;
-                }
-            }
+            await saveToDb('gallery', editingId,
+                { caption: translations.caption, category: translations.category },
+                { type: newGalType, src: newGalSrc, thumbnail: newGalThumbnail }
+            );
+        } catch (error) {
+            console.error("Error saving gallery item:", error);
+            alert("Error al guardar el elemento de galería.");
+        } finally {
+            setTranslating(false);
         }
-
-        saveToDb('gallery', editingId,
-            { caption: newGalCap, category: newGalCat },
-            { type: newGalType, src: finalSrc, thumbnail: finalThumb }
-        );
     };
 
-    const startEditGallery = (item: GalleryItem) => {
+    const startEditGallery = (item: any) => {
         setEditingId(item.id);
         setNewGalType(item.type);
         setNewGalSrc(item.src);
         setNewGalThumbnail(item.thumbnail || '');
-        setNewGalCat(item.category);
-        setNewGalCap(item.caption);
+        setNewGalCat(item.category?.es || item.category || '');
+        setNewGalCap(item.caption?.es || item.caption || '');
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
@@ -388,7 +464,7 @@ export const Admin: React.FC<AdminProps> = ({
 
         const getEventsForDay = (day: number) => {
             return performances.filter(perf => {
-                const perfDate = new Date(perf.date);
+                const perfDate = new Date((perf.date as any)?.es || perf.date);
                 return perfDate.getDate() === day && perfDate.getMonth() === currentMonth && perfDate.getFullYear() === currentYear;
             });
         };
@@ -506,37 +582,22 @@ export const Admin: React.FC<AdminProps> = ({
                                 <div className="space-y-4 mb-12 border-b border-white/10 pb-12">
                                     <input type="text" value={newPostTitle} onChange={(e) => setNewPostTitle(e.target.value)} placeholder="Título..." className="w-full bg-maestro-dark border border-white/10 p-3 text-white focus:border-maestro-gold outline-none" />
 
-                                    <div className="bg-maestro-dark border border-white/10 p-4">
-                                        <label className="block text-xs uppercase text-maestro-light/50 mb-2">Imágenes del artículo</label>
-                                        <div className="flex flex-wrap gap-2 mb-4">
-                                            <input type="text" value={currentImageUrl} onChange={(e) => setCurrentImageUrl(e.target.value)} placeholder="Pegar URL de imagen..." className="flex-grow bg-white/5 border border-white/10 p-2 text-white text-sm" />
-                                            <button onClick={handleAddImageUrl} className="bg-white/10 text-maestro-light px-4 py-2 text-xs uppercase hover:bg-maestro-gold">Link</button>
-                                            <label className="bg-white/10 text-maestro-light px-4 py-2 text-xs uppercase hover:bg-maestro-gold cursor-pointer flex items-center gap-2">
-                                                <UploadCloud size={14} /> Subir
-                                                <input type="file" accept="image/*" onChange={handleBlogImageUpload} className="hidden" />
-                                            </label>
+                                    {translating && (
+                                        <div className="flex items-center gap-3 text-maestro-gold text-sm animate-pulse bg-maestro-gold/10 p-3 border border-maestro-gold/20">
+                                            <Database size={16} className="animate-spin" />
+                                            <span>Gemini está traduciendo tu contenido al Inglés y Ruso...</span>
                                         </div>
-                                        {newPostImages.length > 0 && (
-                                            <div className="flex flex-wrap gap-3">
-                                                {newPostImages.map((img, idx) => (
-                                                    <div key={idx} className="relative w-20 h-20 group">
-                                                        <img src={img} alt="preview" className="w-full h-full object-cover border border-white/10" />
-                                                        <button onClick={() => removeImage(idx)} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"><X size={12} /></button>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
+                                    )}
                                     <textarea rows={6} value={newPostContent} onChange={(e) => setNewPostContent(e.target.value)} placeholder="Contenido..." className="w-full bg-maestro-dark border border-white/10 p-3 text-white focus:border-maestro-gold outline-none" />
-                                    <button onClick={handleSavePost} className={`w-full md:w-auto px-6 py-2 uppercase tracking-widest text-xs font-bold transition-colors ${editingId ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-maestro-gold hover:bg-white text-maestro-dark'}`}>
-                                        {editingId ? 'Guardar Cambios' : 'Publicar'}
+                                    <button disabled={translating || loading} onClick={handleSavePost} className={`w-full md:w-auto px-6 py-2 uppercase tracking-widest text-xs font-bold transition-colors ${(translating || loading) ? 'bg-gray-600 cursor-not-allowed' : (editingId ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-maestro-gold hover:bg-white text-maestro-dark')}`}>
+                                        {translating ? 'Traduciendo...' : (loading ? 'Guardando...' : (editingId ? 'Guardar Cambios' : 'Publicar'))}
                                     </button>
                                 </div>
                                 {/* List */}
                                 <div className="space-y-4">
                                     {posts.map(post => (
                                         <div key={post.id} className={`flex justify-between items-center p-4 border transition-all ${editingId === post.id ? 'bg-maestro-gold/10 border-maestro-gold' : 'bg-maestro-dark border-white/5 hover:border-maestro-gold/30'}`}>
-                                            <div><h4 className="text-maestro-light font-bold">{post.title}</h4><span className="text-xs text-maestro-light/40">{post.date}</span></div>
+                                            <div><h4 className="text-maestro-light font-bold">{(post.title as any)?.es || post.title}</h4><span className="text-xs text-maestro-light/40">{post.date}</span></div>
                                             <div className="flex gap-2">
                                                 <button onClick={() => startEditPost(post)} className="text-maestro-light/30 hover:text-blue-400 p-2"><Edit size={18} /></button>
                                                 <button onClick={() => handleDelete('posts', post.id)} className="text-maestro-light/30 hover:text-red-500 p-2"><Trash2 size={18} /></button>
@@ -565,14 +626,20 @@ export const Admin: React.FC<AdminProps> = ({
                                         </select>
                                     </div>
                                     <textarea value={newResDesc} onChange={(e) => setNewResDesc(e.target.value)} placeholder="Descripción..." className="w-full bg-maestro-dark border border-white/10 p-3 text-white" />
-                                    <button onClick={handleSaveResource} className={`w-full md:w-auto px-6 py-2 uppercase tracking-widest text-xs font-bold transition-colors ${editingId ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-maestro-gold hover:bg-white text-maestro-dark'}`}>
-                                        {editingId ? 'Guardar Cambios' : 'Añadir'}
+                                    {translating && (
+                                        <div className="flex items-center gap-3 text-maestro-gold text-sm animate-pulse mb-4">
+                                            <Database size={16} className="animate-spin" />
+                                            <span>Traduciendo recurso...</span>
+                                        </div>
+                                    )}
+                                    <button disabled={translating || loading} onClick={handleSaveResource} className={`w-full md:w-auto px-6 py-2 uppercase tracking-widest text-xs font-bold transition-colors ${(translating || loading) ? 'bg-gray-600 cursor-not-allowed' : (editingId ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-maestro-gold hover:bg-white text-maestro-dark')}`}>
+                                        {translating ? 'Traduciendo...' : (loading ? 'Guardando...' : (editingId ? 'Guardar Cambios' : 'Añadir'))}
                                     </button>
                                 </div>
                                 <div className="space-y-4">
                                     {resources.map(res => (
                                         <div key={res.id} className={`flex justify-between items-center p-4 border transition-all ${editingId === res.id ? 'bg-maestro-gold/10 border-maestro-gold' : 'bg-maestro-dark border-white/5 hover:border-maestro-gold/30'}`}>
-                                            <div><h4 className="text-maestro-light font-bold">{res.title}</h4><span className="text-xs text-maestro-light/40">{res.type}</span></div>
+                                            <div><h4 className="text-maestro-light font-bold">{(res.title as any)?.es || res.title}</h4><span className="text-xs text-maestro-light/40">{res.type}</span></div>
                                             <div className="flex gap-2">
                                                 <button onClick={() => startEditResource(res)} className="text-maestro-light/30 hover:text-blue-400 p-2"><Edit size={18} /></button>
                                                 <button onClick={() => handleDelete('resources', res.id)} className="text-maestro-light/30 hover:text-red-500 p-2"><Trash2 size={18} /></button>
@@ -600,14 +667,20 @@ export const Admin: React.FC<AdminProps> = ({
                                     </div>
                                     <input type="text" value={newExpInst} onChange={(e) => setNewExpInst(e.target.value)} placeholder="Institución" className="w-full bg-maestro-dark border border-white/10 p-3 text-white" />
                                     <textarea value={newExpDesc} onChange={(e) => setNewExpDesc(e.target.value)} placeholder="Descripción..." className="w-full bg-maestro-dark border border-white/10 p-3 text-white" />
-                                    <button onClick={handleSaveExperience} className={`w-full md:w-auto px-6 py-2 uppercase tracking-widest text-xs font-bold transition-colors ${editingId ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-maestro-gold hover:bg-white text-maestro-dark'}`}>
-                                        {editingId ? 'Guardar Cambios' : 'Añadir'}
+                                    {translating && (
+                                        <div className="flex items-center gap-3 text-maestro-gold text-sm animate-pulse mb-4">
+                                            <Database size={16} className="animate-spin" />
+                                            <span>Traduciendo experiencia...</span>
+                                        </div>
+                                    )}
+                                    <button disabled={translating || loading} onClick={handleSaveExperience} className={`w-full md:w-auto px-6 py-2 uppercase tracking-widest text-xs font-bold transition-colors ${(translating || loading) ? 'bg-gray-600 cursor-not-allowed' : (editingId ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-maestro-gold hover:bg-white text-maestro-dark')}`}>
+                                        {translating ? 'Traduciendo...' : (loading ? 'Guardando...' : (editingId ? 'Guardar Cambios' : 'Añadir'))}
                                     </button>
                                 </div>
                                 <div className="space-y-4">
                                     {experience.map(exp => (
                                         <div key={exp.id} className={`flex justify-between items-center p-4 border transition-all ${editingId === exp.id ? 'bg-maestro-gold/10 border-maestro-gold' : 'bg-maestro-dark border-white/5 hover:border-maestro-gold/30'}`}>
-                                            <div><h4 className="text-maestro-light font-bold">{exp.role}</h4><span className="text-xs text-maestro-light/40">{exp.institution} | {exp.year}</span></div>
+                                            <div><h4 className="text-maestro-light font-bold">{(exp.role as any)?.es || exp.role}</h4><span className="text-xs text-maestro-light/40">{(exp.year as any)?.es || exp.year}</span></div>
                                             <div className="flex gap-2">
                                                 <button onClick={() => startEditExperience(exp)} className="text-maestro-light/30 hover:text-blue-400 p-2"><Edit size={18} /></button>
                                                 <button onClick={() => handleDelete('experience', exp.id)} className="text-maestro-light/30 hover:text-red-500 p-2"><Trash2 size={18} /></button>
@@ -635,14 +708,20 @@ export const Admin: React.FC<AdminProps> = ({
                                     </div>
                                     <input type="text" value={newResJournal} onChange={(e) => setNewResJournal(e.target.value)} placeholder="Revista / Journal" className="w-full bg-maestro-dark border border-white/10 p-3 text-white" />
                                     <textarea value={newResAbstract} onChange={(e) => setNewResAbstract(e.target.value)} placeholder="Abstract..." className="w-full bg-maestro-dark border border-white/10 p-3 text-white" />
-                                    <button onClick={handleSaveResearch} className={`w-full md:w-auto px-6 py-2 uppercase tracking-widest text-xs font-bold transition-colors ${editingId ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-maestro-gold hover:bg-white text-maestro-dark'}`}>
-                                        {editingId ? 'Guardar Cambios' : 'Añadir'}
+                                    {translating && (
+                                        <div className="flex items-center gap-3 text-maestro-gold text-sm animate-pulse mb-4">
+                                            <Database size={16} className="animate-spin" />
+                                            <span>Traduciendo investigación...</span>
+                                        </div>
+                                    )}
+                                    <button disabled={translating || loading} onClick={handleSaveResearch} className={`w-full md:w-auto px-6 py-2 uppercase tracking-widest text-xs font-bold transition-colors ${(translating || loading) ? 'bg-gray-600 cursor-not-allowed' : (editingId ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-maestro-gold hover:bg-white text-maestro-dark')}`}>
+                                        {translating ? 'Traduciendo...' : (loading ? 'Guardando...' : (editingId ? 'Guardar Cambios' : 'Añadir'))}
                                     </button>
                                 </div>
                                 <div className="space-y-4">
                                     {research.map(res => (
                                         <div key={res.id} className={`flex justify-between items-center p-4 border transition-all ${editingId === res.id ? 'bg-maestro-gold/10 border-maestro-gold' : 'bg-maestro-dark border-white/5 hover:border-maestro-gold/30'}`}>
-                                            <div><h4 className="text-maestro-light font-bold">{res.title}</h4><span className="text-xs text-maestro-light/40">{res.journal}</span></div>
+                                            <div><h4 className="text-maestro-light font-bold">{(res.title as any)?.es || res.title}</h4><span className="text-xs text-maestro-light/40">{res.year}</span></div>
                                             <div className="flex gap-2">
                                                 <button onClick={() => startEditResearch(res)} className="text-maestro-light/30 hover:text-blue-400 p-2"><Edit size={18} /></button>
                                                 <button onClick={() => handleDelete('research', res.id)} className="text-maestro-light/30 hover:text-red-500 p-2"><Trash2 size={18} /></button>
@@ -705,8 +784,14 @@ export const Admin: React.FC<AdminProps> = ({
                                             <input type="text" value={newPerfRole} onChange={(e) => setNewPerfRole(e.target.value)} placeholder="Rol" className="w-full bg-maestro-dark border border-white/10 p-3 text-white focus:border-maestro-gold outline-none" />
                                         </div>
                                         <textarea value={newPerfDesc} onChange={(e) => setNewPerfDesc(e.target.value)} placeholder="Detalles del programa..." className="w-full bg-maestro-dark border border-white/10 p-3 text-white focus:border-maestro-gold outline-none h-24" />
-                                        <button onClick={handleSavePerformance} className={`w-full md:w-auto px-10 py-3 uppercase tracking-widest text-xs font-bold transition-all shadow-lg ${editingId ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-maestro-gold hover:bg-white text-maestro-dark'}`}>
-                                            {editingId ? 'Guardar Cambios' : 'Añadir Actuación'}
+                                        {translating && (
+                                            <div className="flex items-center gap-3 text-maestro-gold text-sm animate-pulse mb-4">
+                                                <Database size={16} className="animate-spin" />
+                                                <span>Traduciendo evento...</span>
+                                            </div>
+                                        )}
+                                        <button disabled={translating || loading} onClick={handleSavePerformance} className={`w-full md:w-auto px-6 py-2 uppercase tracking-widest text-xs font-bold transition-colors ${(translating || loading) ? 'bg-gray-600 cursor-not-allowed' : (editingId ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-maestro-gold hover:bg-white text-maestro-dark')}`}>
+                                            {translating ? 'Traduciendo...' : (loading ? 'Guardando...' : (editingId ? 'Guardar Cambios' : 'Programar'))}
                                         </button>
                                     </div>
                                 </div>
@@ -719,8 +804,8 @@ export const Admin: React.FC<AdminProps> = ({
                                                     <Calendar size={16} className="text-maestro-gold" />
                                                 </div>
                                                 <div>
-                                                    <h4 className="text-maestro-light font-bold text-sm">{perf.title}</h4>
-                                                    <span className="text-[10px] uppercase tracking-widest text-maestro-light/40">{perf.date} | {perf.location}</span>
+                                                    <h4 className="text-maestro-light font-bold text-sm">{(perf.title as any)?.es || perf.title}</h4>
+                                                    <span className="text-[10px] uppercase tracking-widest text-maestro-light/40">{(perf.date as any)?.es || perf.date} | {(perf.location as any)?.es || perf.location}</span>
                                                 </div>
                                             </div>
                                             <div className="flex gap-2">
@@ -793,28 +878,28 @@ export const Admin: React.FC<AdminProps> = ({
                                         <input type="text" value={newGalCat} onChange={(e) => setNewGalCat(e.target.value)} placeholder="Categoría (ej: Concierto)" className="w-full bg-maestro-dark border border-white/10 p-3 text-white" />
                                         <input type="text" value={newGalCap} onChange={(e) => setNewGalCap(e.target.value)} placeholder="Pie de foto" className="w-full bg-maestro-dark border border-white/10 p-3 text-white" />
                                     </div>
-                                    <button onClick={handleSaveGallery} className={`w-full md:w-auto px-6 py-2 uppercase tracking-widest text-xs font-bold transition-colors ${editingId ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-maestro-gold hover:bg-white text-maestro-dark'}`}>
-                                        {editingId ? 'Guardar Cambios' : (newGalType === 'image' ? 'Subir Foto' : 'Subir Video')}
+                                    {translating && (
+                                        <div className="flex items-center gap-3 text-maestro-gold text-sm animate-pulse mb-4">
+                                            <Database size={16} className="animate-spin" />
+                                            <span>Traduciendo pie de foto...</span>
+                                        </div>
+                                    )}
+                                    <button disabled={translating || loading} onClick={handleSaveGallery} className={`w-full md:w-auto px-6 py-2 uppercase tracking-widest text-xs font-bold transition-colors ${(translating || loading) ? 'bg-gray-600 cursor-not-allowed' : (editingId ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-maestro-gold hover:bg-white text-maestro-dark')}`}>
+                                        {translating ? 'Traduciendo...' : (loading ? 'Guardando...' : (editingId ? 'Guardar Cambios' : 'Añadir'))}
                                     </button>
                                 </div>
 
                                 {/* Gallery Grid Preview */}
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                     {gallery.map(item => (
-                                        <div key={item.id} className={`relative group border transition-all ${editingId === item.id ? 'border-maestro-gold' : 'border-transparent'}`}>
-                                            <img src={item.type === 'video' ? (item.thumbnail || item.src) : item.src} alt={item.caption} className="w-full h-32 object-cover border border-white/10" />
-                                            {item.type === 'video' && (
-                                                <div className="absolute top-2 right-2 bg-black/50 p-1 rounded-full border border-white/20">
-                                                    <PlayCircle size={12} className="text-white" />
-                                                </div>
-                                            )}
-                                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-center items-center text-center p-2">
-                                                <p className="text-[10px] text-white truncate w-full mb-1">{item.caption}</p>
-                                                <span className="text-[9px] uppercase tracking-widest text-maestro-gold mb-2">{item.type === 'image' ? 'Foto' : 'Video'}</span>
-                                                <div className="flex gap-2">
-                                                    <button onClick={() => startEditGallery(item)} className="text-blue-400 hover:text-blue-200 bg-white/10 p-2 rounded-full"><Edit size={16} /></button>
-                                                    <button onClick={() => handleDelete('gallery', item.id)} className="text-red-400 hover:text-red-200 bg-white/10 p-2 rounded-full"><Trash2 size={16} /></button>
-                                                </div>
+                                        <div key={item.id} className={`relative aspect-video group border ${editingId === item.id ? 'border-maestro-gold' : 'border-white/5'}`}>
+                                            <img src={item.type === 'video' ? item.thumbnail : item.src} alt="Gallery" className="w-full h-full object-cover" />
+                                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                                <button onClick={() => startEditGallery(item)} className="p-2 bg-maestro-gold text-maestro-dark rounded-full"><Edit size={16} /></button>
+                                                <button onClick={() => handleDelete('gallery', item.id)} className="p-2 bg-red-500 text-white rounded-full"><Trash2 size={16} /></button>
+                                            </div>
+                                            <div className="absolute bottom-0 left-0 w-full bg-black/80 p-2 text-[10px] text-white/70 truncate">
+                                                {(item.caption as any)?.es || item.caption}
                                             </div>
                                         </div>
                                     ))}

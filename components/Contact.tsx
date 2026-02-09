@@ -9,7 +9,7 @@ interface ContactProps {
 }
 
 export const Contact: React.FC<ContactProps> = ({ lang }) => {
-    const t = translations['es'].contact;
+    const t = translations[lang].contact;
 
     return (
         <section className="py-24 px-6 bg-maestro-dark border-t border-white/5">
