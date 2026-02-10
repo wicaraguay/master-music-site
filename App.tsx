@@ -20,7 +20,7 @@ import { Section, BlogPost, Resource, ExperienceItem, ResearchPaper, Performance
 import { subscribeToCollection, transformDataForLang } from './src/services/db';
 import { subscribeToAuthChanges } from './src/services/auth';
 import type { User } from 'firebase/auth';
-import { Lock, Menu, X, Globe, ArrowUp } from 'lucide-react';
+import { Terminal, Menu, X, Globe, ArrowUp, Instagram, Linkedin, Youtube, Facebook, Send, MessageCircle } from 'lucide-react';
 
 function App() {
   const [currentSection, setCurrentSection] = useState<Section>(Section.HOME);
@@ -180,24 +180,70 @@ function App() {
         {renderSection()}
       </main>
 
+      {/* 5. FOOTER SECTION */}
       {currentSection !== Section.ADMIN && (
-        <footer id="main-footer" className="py-12 bg-black text-center border-t border-white/5 relative z-10">
-          <div className="mb-4 flex items-center justify-center gap-2 opacity-50">
-            <div className="h-px w-8 bg-maestro-gold"></div>
-            <span className="text-maestro-gold text-xs tracking-widest uppercase">Diego Carrión</span>
-            <div className="h-px w-8 bg-maestro-gold"></div>
+        <footer id="main-footer" className="relative py-48 bg-black overflow-hidden border-t border-white/5">
+          {/* Background Image with Cinematic Overlays */}
+          <div className="absolute inset-0 z-0 select-none pointer-events-none">
+            <div
+              className="absolute inset-0 bg-cover bg-center opacity-20 grayscale mix-blend-soft-light transition-transform duration-[20000ms] hover:scale-110"
+              style={{ backgroundImage: "url('/images/section-footer.jpg')" }}
+            />
+            {/* Gradient Mask for a "Final Fade" */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black/80" />
           </div>
-          <p className="text-maestro-light/30 text-[10px] uppercase tracking-widest mb-6">
-            © {new Date().getFullYear()} Todos los derechos reservados.
-          </p>
 
-          <button
-            onClick={() => setCurrentSection(Section.ADMIN)}
-            className="text-maestro-light/10 hover:text-maestro-gold transition-colors pb-4"
-            title={translations['es'].nav.admin}
-          >
-            <Lock size={12} />
-          </button>
+          <div className="relative z-10 max-w-7xl mx-auto px-6 text-center">
+            {/* Elegant Divider */}
+            <div className="mb-8 flex items-center justify-center gap-4">
+              <div className="h-px w-12 bg-gradient-to-r from-transparent to-maestro-gold/40" />
+              <span className="text-maestro-gold text-2xl tracking-[0.4em] uppercase font-serif italic">Diego Carrión</span>
+              <div className="h-px w-12 bg-gradient-to-l from-transparent to-maestro-gold/40" />
+            </div>
+
+            {/* Social Media Links */}
+            <div className="flex justify-center flex-wrap gap-8 mb-12">
+              <a href="#" target="_blank" rel="noopener noreferrer" className="text-maestro-gold/50 hover:text-maestro-gold hover:scale-125 transition-all duration-300" aria-label="Instagram">
+                <Instagram size={24} />
+              </a>
+              <a href="#" target="_blank" rel="noopener noreferrer" className="text-maestro-gold/50 hover:text-maestro-gold hover:scale-125 transition-all duration-300" aria-label="LinkedIn">
+                <Linkedin size={24} />
+              </a>
+              <a href="#" target="_blank" rel="noopener noreferrer" className="text-maestro-gold/50 hover:text-maestro-gold hover:scale-125 transition-all duration-300" aria-label="YouTube">
+                <Youtube size={24} />
+              </a>
+              <a href="#" target="_blank" rel="noopener noreferrer" className="text-maestro-gold/50 hover:text-maestro-gold hover:scale-125 transition-all duration-300" aria-label="Facebook">
+                <Facebook size={24} />
+              </a>
+              <a href="#" target="_blank" rel="noopener noreferrer" className="text-maestro-gold/50 hover:text-maestro-gold hover:scale-125 transition-all duration-300" aria-label="Telegram">
+                <Send size={24} />
+              </a>
+              <a href="#" target="_blank" rel="noopener noreferrer" className="text-maestro-gold/50 hover:text-maestro-gold hover:scale-125 transition-all duration-300" aria-label="IMO">
+                <MessageCircle size={24} />
+              </a>
+            </div>
+
+            {/* Copyright & Info */}
+            <div className="space-y-3">
+              <p className="text-maestro-light/50 text-[11px] uppercase tracking-[0.4em] font-light">
+                © {new Date().getFullYear()} — <span className="text-maestro-gold/80 italic font-serif">Director & Musicólogo</span>
+              </p>
+              <p className="text-maestro-light/30 text-[9px] uppercase tracking-[0.3em] font-serif">
+                {lang === 'es' ? 'Todos los derechos reservados' : 'All rights reserved'}
+              </p>
+            </div>
+
+            {/* Developer Identity Icon & Credit */}
+            <div className="mt-8 flex flex-col items-center gap-4">
+              <div className="text-maestro-gold/80 filter drop-shadow-[0_0_8px_rgba(212,175,55,0.4)]">
+                <Terminal size={14} />
+              </div>
+
+              <p className="text-[8px] uppercase tracking-[0.4em] text-maestro-light/40 font-sans">
+                Diseño y Desarrollo por <span className="text-maestro-light/70">Willan Caraguay</span> <span className="mx-2 text-maestro-gold/40">•</span> <span className="text-maestro-gold/70 italic">Willy Tech</span>
+              </p>
+            </div>
+          </div>
         </footer>
       )}
 

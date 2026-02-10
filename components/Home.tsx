@@ -620,7 +620,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
         {/* Cinematic Background Image Layer */}
         <div className="absolute inset-0 z-0 select-none pointer-events-none">
           <div
-            className="absolute inset-0 bg-cover bg-center opacity-30 grayscale mix-blend-soft-light transition-transform duration-[10000ms] hover:scale-110"
+            className="absolute inset-0 bg-cover bg-center opacity-45 grayscale mix-blend-soft-light transition-transform duration-[10000ms] hover:scale-110"
             style={{ backgroundImage: "url('/images/section-avaliable.png')" }}
           />
           {/* Section Transition Overlays */}
@@ -641,7 +641,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
               <div className="h-0.5 w-16 bg-gradient-to-r from-transparent via-maestro-gold/50 to-transparent mx-auto" />
             </div>
 
-            <p className="text-maestro-light/60 max-w-xl mx-auto font-light leading-relaxed font-serif italic text-lg">
+            <p className="text-maestro-light/80 max-w-xl mx-auto font-light leading-relaxed font-serif italic text-lg">
               {t.collabText}
             </p>
 
