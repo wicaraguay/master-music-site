@@ -595,11 +595,11 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
       </section>
 
       {/* 4. PARALLAX QUOTE */}
-      <section className="relative py-40 flex items-center justify-center overflow-hidden">
+      <section className="relative py-80 flex items-center justify-center overflow-hidden">
         {/* Parallax Background */}
-        <div className="absolute inset-0 bg-fixed bg-cover bg-center bg-no-repeat grayscale"
-          style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1507838153414-b4b713384ebd?q=80&w=2670&auto=format&fit=crop")' }}>
-          <div className="absolute inset-0 bg-maestro-dark/80"></div>
+        <div className="absolute inset-0 bg-fixed bg-cover bg-center bg-no-repeat grayscale grayscale-0 transition-all duration-1000"
+          style={{ backgroundImage: 'url("/images/section-text.png")' }}>
+          <div className="absolute inset-0 bg-maestro-dark/85"></div>
         </div>
 
         <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
@@ -616,20 +616,50 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
       </section>
 
       {/* 5. LATEST UPDATE / FOOTER-ISH SECTION */}
-      <section className="py-24 px-6 bg-maestro-dark flex flex-col items-center justify-center text-center">
-        <FadeIn>
-          <h3 className="text-maestro-light text-2xl font-serif mb-6">{t.collabTitle}</h3>
-          <p className="text-white/50 max-w-xl mx-auto mb-10 font-light">
-            {t.collabText}
-          </p>
-          <button
-            onClick={() => onNavigate(Section.CONTACT)}
-            className="text-maestro-gold border border-maestro-gold px-8 py-3 hover:bg-maestro-gold hover:text-maestro-dark transition-all duration-300 uppercase tracking-widest text-xs font-bold"
-          >
-            {t.letsTalk}
-          </button>
-        </FadeIn>
-      </section >
+      <section className="relative py-64 px-6 bg-maestro-dark overflow-hidden">
+        {/* Cinematic Background Image Layer */}
+        <div className="absolute inset-0 z-0 select-none pointer-events-none">
+          <div
+            className="absolute inset-0 bg-cover bg-center opacity-30 grayscale mix-blend-soft-light transition-transform duration-[10000ms] hover:scale-110"
+            style={{ backgroundImage: "url('/images/section-avaliable.png')" }}
+          />
+          {/* Section Transition Overlays */}
+          <div className="absolute inset-0 bg-gradient-to-b from-maestro-dark via-transparent to-maestro-dark" />
+          <div className="absolute inset-0 bg-gradient-to-r from-maestro-dark/60 via-transparent to-maestro-dark/60" />
+
+          {/* Existing Glow & Grid Layers */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-4xl bg-maestro-gold/5 blur-[120px] rounded-full" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[length:32px_32px] opacity-20" />
+        </div>
+
+        <div className="max-w-4xl mx-auto relative z-10 text-center space-y-8">
+          <FadeIn>
+            <div className="space-y-4">
+              <h3 className="text-maestro-light text-4xl md:text-5xl font-serif">
+                {t.collabTitle}
+              </h3>
+              <div className="h-0.5 w-16 bg-gradient-to-r from-transparent via-maestro-gold/50 to-transparent mx-auto" />
+            </div>
+
+            <p className="text-maestro-light/60 max-w-xl mx-auto font-light leading-relaxed font-serif italic text-lg">
+              {t.collabText}
+            </p>
+
+            <div className="pt-6">
+              <button
+                onClick={() => onNavigate(Section.CONTACT)}
+                className="group relative inline-flex items-center gap-3 px-10 py-4 overflow-hidden rounded-full border border-maestro-gold/40 hover:border-maestro-gold transition-all duration-500"
+              >
+                <span className="relative z-10 text-maestro-gold uppercase tracking-[0.3em] text-xs font-bold group-hover:text-white transition-colors">
+                  {t.letsTalk}
+                </span>
+                <ArrowRight size={16} className="relative z-10 text-maestro-gold group-hover:text-white group-hover:translate-x-1 transition-all" />
+                <div className="absolute inset-0 bg-maestro-gold transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left -z-10" />
+              </button>
+            </div>
+          </FadeIn>
+        </div>
+      </section>
 
     </div >
   );
