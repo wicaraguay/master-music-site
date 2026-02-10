@@ -282,11 +282,6 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
           </div>
         </div>
 
-        {/* Seamless Transition - Deep Fade to next section (Moved behind content) */}
-        <div className="absolute bottom-0 left-0 w-full h-48 z-0 pointer-events-none">
-          <div className="absolute inset-0 bg-gradient-to-t from-maestro-dark via-maestro-dark/40 to-transparent" />
-        </div>
-
         {/* Enhanced Scroll Indicator */}
         <div
           className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-30 flex flex-col items-center gap-2 animate-bounce-slow cursor-pointer group"
@@ -400,7 +395,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
         </div>
         {/* Seamless transition to next section */}
         <div className="absolute bottom-0 left-0 w-full h-48 z-0 pointer-events-none">
-          <div className="absolute inset-0 bg-gradient-to-t from-maestro-navy via-maestro-navy/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-maestro-dark via-maestro-dark/40 to-transparent" />
         </div>
       </section>
 
@@ -413,12 +408,14 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
           <div
             className="absolute inset-0 bg-cover bg-center opacity-75 mix-blend-soft-light grayscale"
             style={{
-              backgroundImage: `url('/images/section-experience.png')`
+              backgroundImage: `url('/images/section-experience.png')`,
+              WebkitMaskImage: 'linear-gradient(to top, transparent 0%, black 20%, black 80%, transparent 100%)',
+              maskImage: 'linear-gradient(to top, transparent 0%, black 20%, black 80%, transparent 100%)'
             }}
           />
           {/* Enhanced Section Blending */}
           <div className="absolute inset-0 bg-gradient-to-t from-maestro-navy/95 via-maestro-navy/50 to-maestro-navy/30" />
-          <div className="absolute inset-0 bg-gradient-to-b from-maestro-navy via-transparent to-transparent h-64" />
+          <div className="absolute inset-0 bg-gradient-to-b from-maestro-dark via-transparent to-transparent h-64" />
         </div>
 
         <div className="max-w-7xl mx-auto relative z-10">
@@ -496,26 +493,28 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
             )}
           </div>
         </div>
-        {/* Seamless transition to next section (Emerald) - Deep Bridge */}
-        <div className="absolute bottom-0 left-0 w-full h-64 z-0 pointer-events-none">
-          <div className="absolute inset-0 bg-gradient-to-t from-maestro-emerald via-maestro-emerald/60 to-transparent" />
-        </div>
+        {/* Seamless transition to next section (Emerald) - Cinematic Bridge */}
+        <div className="absolute bottom-0 left-0 w-full h-40 bg-gradient-to-b from-transparent to-maestro-dark pointer-events-none" />
       </section>
 
       {/* 4. RESEARCH SECTION - Opacity 70% */}
-      <section id="research" className="py-24 px-6 bg-maestro-emerald relative overflow-hidden">
+      <section id="research" className="py-60 px-6 bg-maestro-emerald relative overflow-hidden">
         {/* Academic Emerald Aesthetic Background - Balanced Clarity */}
         <div className="absolute inset-0 z-0">
           <div
             className="absolute inset-0 bg-cover bg-center opacity-70 mix-blend-soft-light grayscale"
             style={{
-              backgroundImage: `url('/images/section-research.png')`
+              backgroundImage: `url('/images/section-research.png')`,
+              WebkitMaskImage: 'linear-gradient(to top, transparent 0%, black 20%, black 80%, transparent 100%)',
+              maskImage: 'linear-gradient(to top, transparent 0%, black 20%, black 80%, transparent 100%)'
             }}
           />
-          {/* Emerald Vignette and Blending - Balanced */}
+          {/* Cinematic Vignette and Blending - Balanced */}
           <div className="absolute inset-0 bg-gradient-to-r from-maestro-emerald/60 via-maestro-emerald/30 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-b from-maestro-navy/40 via-transparent to-transparent h-64 opacity-50" />
-          <div className="absolute inset-0 bg-gradient-to-t from-maestro-dark/50 via-transparent to-transparent h-64" />
+          <div className="absolute inset-0 bg-gradient-to-b from-maestro-dark via-transparent to-transparent h-64 opacity-50" />
+
+          {/* Color Bridge: Transition to Black */}
+          <div className="absolute bottom-0 left-0 w-full h-64 bg-gradient-to-b from-transparent to-maestro-dark z-10" />
         </div>
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center relative z-10">
           <FadeIn>
@@ -536,11 +535,19 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
         </div>
       </section>
 
-      {/* 5. PERFORMANCES SECTION (EVENTOS) - Reimagined with Interactive Calendar */}
-      <section id="performances" className="py-24 px-6 bg-maestro-dark relative overflow-hidden">
+      <section id="performances" className="py-24 px-6 bg-maestro-wine relative overflow-hidden">
         {/* Cinematic Section Blending */}
         <div className="absolute inset-0 z-0 pointer-events-none">
-          <div className="absolute inset-0 bg-gradient-to-b from-maestro-emerald/40 via-transparent to-transparent h-48" />
+          {/* Background Image with Wine Overlay */}
+          <div
+            className="absolute inset-0 bg-cover bg-center opacity-45 mix-blend-overlay grayscale hover:grayscale-0 transition-all duration-1000"
+            style={{
+              backgroundImage: "url('/images/section-events.png')",
+              WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%)',
+              maskImage: 'linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%)'
+            }}
+          />
+          {/* No top gradient needed here as the bridge is established in the previous section */}
         </div>
         {/* Main Content Container - Absolute Clarity Layer */}
         <div className="relative z-30 max-w-7xl mx-auto px-6">
@@ -583,7 +590,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
 
         {/* Seamless transition to next section (Dark-Fixed/Footer) */}
         <div className="absolute bottom-0 left-0 w-full h-48 z-0 pointer-events-none">
-          <div className="absolute inset-0 bg-gradient-to-t from-maestro-dark via-maestro-dark/60 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-maestro-dark via-maestro-dark/40 to-transparent" />
         </div>
       </section>
 
