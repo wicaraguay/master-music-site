@@ -65,9 +65,10 @@ export const Resources: React.FC<ResourcesProps> = ({ resources, lang }) => {
                   {resource.title}
                 </h3>
 
-                <p className="text-sm text-maestro-light/60 mb-6 font-light leading-relaxed flex-grow">
-                  {resource.description}
-                </p>
+                <p
+                  className="blog-content text-sm text-maestro-light/60 mb-6 font-light leading-relaxed flex-grow"
+                  dangerouslySetInnerHTML={{ __html: resource.description }}
+                />
 
                 <div className="flex items-center justify-between pt-4 border-t border-white/5 mt-auto">
                   <span className="text-xs text-maestro-light/40">{resource.size}</span>

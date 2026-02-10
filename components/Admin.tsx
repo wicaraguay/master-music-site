@@ -10,6 +10,7 @@ import { addItem, updateItem, deleteItem as deleteDbItem } from '../src/services
 import { signIn, logout } from '../src/services/auth';
 import { uploadToStorage } from '../src/services/storage';
 import { translateFields } from '../src/services/translationService';
+import { RichTextEditor } from './RichTextEditor';
 
 interface AdminProps {
     isAuthenticated: boolean;
@@ -198,7 +199,9 @@ export const Admin: React.FC<AdminProps> = ({
         if (!newPostTitle) return;
         try {
             setTranslating(true);
-            const previewText = newPostContent.substring(0, 160).replace(/[#*]/g, '') + '...';
+            // Limpiar HTML del contenido para el preview
+            const cleanText = newPostContent.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+            const previewText = cleanText.substring(0, 160) + '...';
 
             const translations = await translateFields(
                 { title: newPostTitle, content: newPostContent, preview: previewText },
@@ -588,7 +591,12 @@ export const Admin: React.FC<AdminProps> = ({
                                             <span>Gemini está traduciendo tu contenido al Inglés y Ruso...</span>
                                         </div>
                                     )}
-                                    <textarea rows={6} value={newPostContent} onChange={(e) => setNewPostContent(e.target.value)} placeholder="Contenido..." className="w-full bg-maestro-dark border border-white/10 p-3 text-white focus:border-maestro-gold outline-none" />
+                                    <RichTextEditor
+                                        value={newPostContent}
+                                        onChange={setNewPostContent}
+                                        placeholder="Contenido del artículo..."
+                                        minHeight="300px"
+                                    />
                                     <button disabled={translating || loading} onClick={handleSavePost} className={`w-full md:w-auto px-6 py-2 uppercase tracking-widest text-xs font-bold transition-colors ${(translating || loading) ? 'bg-gray-600 cursor-not-allowed' : (editingId ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-maestro-gold hover:bg-white text-maestro-dark')}`}>
                                         {translating ? 'Traduciendo...' : (loading ? 'Guardando...' : (editingId ? 'Guardar Cambios' : 'Publicar'))}
                                     </button>
@@ -625,7 +633,12 @@ export const Admin: React.FC<AdminProps> = ({
                                             <option value="score">Partitura</option><option value="article">Artículo</option><option value="audio">Audio</option>
                                         </select>
                                     </div>
-                                    <textarea value={newResDesc} onChange={(e) => setNewResDesc(e.target.value)} placeholder="Descripción..." className="w-full bg-maestro-dark border border-white/10 p-3 text-white" />
+                                    <RichTextEditor
+                                        value={newResDesc}
+                                        onChange={setNewResDesc}
+                                        placeholder="Descripción del recurso..."
+                                        minHeight="200px"
+                                    />
                                     {translating && (
                                         <div className="flex items-center gap-3 text-maestro-gold text-sm animate-pulse mb-4">
                                             <Database size={16} className="animate-spin" />
@@ -666,7 +679,12 @@ export const Admin: React.FC<AdminProps> = ({
                                         <input type="text" value={newExpRole} onChange={(e) => setNewExpRole(e.target.value)} placeholder="Rol (ej: Director)" className="w-full bg-maestro-dark border border-white/10 p-3 text-white" />
                                     </div>
                                     <input type="text" value={newExpInst} onChange={(e) => setNewExpInst(e.target.value)} placeholder="Institución" className="w-full bg-maestro-dark border border-white/10 p-3 text-white" />
-                                    <textarea value={newExpDesc} onChange={(e) => setNewExpDesc(e.target.value)} placeholder="Descripción..." className="w-full bg-maestro-dark border border-white/10 p-3 text-white" />
+                                    <RichTextEditor
+                                        value={newExpDesc}
+                                        onChange={setNewExpDesc}
+                                        placeholder="Descripción de la experiencia..."
+                                        minHeight="200px"
+                                    />
                                     {translating && (
                                         <div className="flex items-center gap-3 text-maestro-gold text-sm animate-pulse mb-4">
                                             <Database size={16} className="animate-spin" />
@@ -707,7 +725,12 @@ export const Admin: React.FC<AdminProps> = ({
                                         <input type="text" value={newResYear} onChange={(e) => setNewResYear(e.target.value)} placeholder="Año" className="w-full bg-maestro-dark border border-white/10 p-3 text-white" />
                                     </div>
                                     <input type="text" value={newResJournal} onChange={(e) => setNewResJournal(e.target.value)} placeholder="Revista / Journal" className="w-full bg-maestro-dark border border-white/10 p-3 text-white" />
-                                    <textarea value={newResAbstract} onChange={(e) => setNewResAbstract(e.target.value)} placeholder="Abstract..." className="w-full bg-maestro-dark border border-white/10 p-3 text-white" />
+                                    <RichTextEditor
+                                        value={newResAbstract}
+                                        onChange={setNewResAbstract}
+                                        placeholder="Abstract de la investigación..."
+                                        minHeight="250px"
+                                    />
                                     {translating && (
                                         <div className="flex items-center gap-3 text-maestro-gold text-sm animate-pulse mb-4">
                                             <Database size={16} className="animate-spin" />
@@ -783,7 +806,12 @@ export const Admin: React.FC<AdminProps> = ({
                                             <input type="text" value={newPerfLoc} onChange={(e) => setNewPerfLoc(e.target.value)} placeholder="Ubicación" className="w-full bg-maestro-dark border border-white/10 p-3 text-white focus:border-maestro-gold outline-none" />
                                             <input type="text" value={newPerfRole} onChange={(e) => setNewPerfRole(e.target.value)} placeholder="Rol" className="w-full bg-maestro-dark border border-white/10 p-3 text-white focus:border-maestro-gold outline-none" />
                                         </div>
-                                        <textarea value={newPerfDesc} onChange={(e) => setNewPerfDesc(e.target.value)} placeholder="Detalles del programa..." className="w-full bg-maestro-dark border border-white/10 p-3 text-white focus:border-maestro-gold outline-none h-24" />
+                                        <RichTextEditor
+                                            value={newPerfDesc}
+                                            onChange={setNewPerfDesc}
+                                            placeholder="Detalles del programa musical..."
+                                            minHeight="150px"
+                                        />
                                         {translating && (
                                             <div className="flex items-center gap-3 text-maestro-gold text-sm animate-pulse mb-4">
                                                 <Database size={16} className="animate-spin" />

@@ -116,9 +116,10 @@ export const Blog: React.FC<BlogProps> = ({ posts, lang }) => {
                             </div>
 
                             {/* Main Text Content */}
-                            <div className="text-maestro-light/80 font-light leading-loose text-lg whitespace-pre-line max-w-3xl">
-                                {selectedPost.content}
-                            </div>
+                            <div
+                                className="blog-content text-maestro-light/80 font-light leading-loose text-lg max-w-3xl"
+                                dangerouslySetInnerHTML={{ __html: selectedPost.content }}
+                            />
 
                             {/* Image Gallery Grid */}
                             {selectedPost.images && selectedPost.images.length > 0 && (

@@ -38,9 +38,10 @@ export const Experience: React.FC<ExperienceProps> = ({ items, lang }) => {
                   <Briefcase size={16} /> {exp.institution}
                 </h4>
 
-                <p className="text-maestro-light/60 font-light leading-relaxed">
-                  {exp.description}
-                </p>
+                <p
+                  className="blog-content text-maestro-light/60 font-light leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: exp.description }}
+                />
               </div>
             </FadeIn>
           ))}

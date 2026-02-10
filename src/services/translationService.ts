@@ -77,6 +77,19 @@ export const translateFields = async <T extends Record<string, any>>(
     // 2. Construir prompt único para todos los campos
     const prompt = `
     Traduce los siguientes campos del español al inglés y ruso.
+    
+    
+    CRÍTICO - REGLAS PARA HTML:
+    - Si el texto contiene etiquetas HTML (como <p>, <strong>, <a>, <h1>, <span>, etc.), DEBES preservarlas EXACTAMENTE como están.
+    - PRESERVA TODOS los atributos HTML (class, style, href, etc.) sin modificarlos.
+    - PRESERVA TODOS los estilos inline (style="font-family: ...", style="color: ...", etc.) sin modificarlos.
+    - SOLO traduce el CONTENIDO TEXTUAL dentro de las etiquetas, NO traduzcas ni modifiques las etiquetas HTML mismas.
+    - Mantén la estructura HTML completamente intacta.
+    - Ejemplos: 
+      * "<p>Hola <strong>mundo</strong></p>" → {"en": "<p>Hello <strong>world</strong></p>", "ru": "<p>Привет <strong>мир</strong></p>"}
+      * "<span style='font-family: Georgia'>Texto</span>" → {"en": "<span style='font-family: Georgia'>Text</span>", "ru": "<span style='font-family: Georgia'>Текст</span>"}
+    
+    
     IMPORTANTE: Responde ÚNICAMENTE con un objeto JSON válido donde las llaves sean los identificadores proporcionados.
     
     Contexto: Portafolio profesional de un Director de Orquesta. Tono formal.

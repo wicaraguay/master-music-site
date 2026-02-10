@@ -1,0 +1,266 @@
+/* Custom Rich Text Editor Styles for Maestro Portfolio Admin */
+
+.rich-text-editor {
+    width: 100%;
+    background-color: #0a0a0a;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: border-color 0.3s ease;
+}
+
+.rich-text-editor:focus-within {
+    border-color: #eab308;
+}
+
+/* Toolbar */
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 8px;
+    background-color: #0a0a0a;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.toolbar-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 6px;
+    background-color: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: 2px;
+}
+
+.toolbar-btn:hover {
+    background-color: rgba(234, 179, 8, 0.1);
+    border-color: #eab308;
+    color: #eab308;
+}
+
+.toolbar-btn:active {
+    transform: scale(0.95);
+}
+
+.toolbar-divider {
+    width: 1px;
+    height: 32px;
+    background-color: rgba(255, 255, 255, 0.1);
+    margin: 0 4px;
+}
+
+/* Font Selector */
+.toolbar-select {
+    height: 32px;
+    padding: 0 8px;
+    background-color: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: 2px;
+    font-size: 12px;
+    outline: none;
+}
+
+.toolbar-select:hover {
+    background-color: rgba(234, 179, 8, 0.1);
+    border-color: #eab308;
+    color: #eab308;
+}
+
+.toolbar-select:focus {
+    border-color: #eab308;
+    color: white;
+}
+
+.toolbar-select option {
+    background-color: #0a0a0a;
+    color: white;
+    padding: 8px;
+}
+
+/* Editor Content */
+.editor-content {
+    padding: 12px;
+    color: white;
+    font-size: 14px;
+    line-height: 1.6;
+    outline: none;
+    overflow-y: auto;
+    max-height: 600px;
+}
+
+.editor-content:empty:before {
+    content: attr(data-placeholder);
+    color: rgba(255, 255, 255, 0.3);
+    font-style: italic;
+    pointer-events: none;
+}
+
+/* Content Formatting */
+.editor-content h1,
+.editor-content h2,
+.editor-content h3 {
+    color: #eab308;
+    font-family: serif;
+    margin: 16px 0 8px 0;
+    font-weight: bold;
+}
+
+.editor-content h1 {
+    font-size: 2em;
+}
+
+.editor-content h2 {
+    font-size: 1.5em;
+}
+
+.editor-content h3 {
+    font-size: 1.17em;
+}
+
+.editor-content p {
+    margin: 8px 0;
+}
+
+.editor-content a {
+    color: #eab308;
+    text-decoration: underline;
+}
+
+.editor-content a:hover {
+    color: white;
+}
+
+.editor-content strong {
+    font-weight: bold;
+    color: white;
+}
+
+.editor-content em {
+    font-style: italic;
+}
+
+.editor-content u {
+    text-decoration: underline;
+}
+
+.editor-content ul,
+.editor-content ol {
+    padding-left: 2em;
+    margin: 8px 0;
+}
+
+.editor-content ul {
+    list-style-type: disc;
+}
+
+.editor-content ol {
+    list-style-type: decimal;
+}
+
+.editor-content li {
+    margin: 4px 0;
+}
+
+/* Scrollbar */
+.editor-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.editor-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.editor-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.editor-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(234, 179, 8, 0.5);
+}
+
+/* ========================================
+   Blog Content Styles (Frontend Display)
+   ======================================== */
+
+.blog-content h1,
+.blog-content h2,
+.blog-content h3 {
+    color: #eab308;
+    font-family: serif;
+    margin: 24px 0 16px 0;
+    font-weight: bold;
+    line-height: 1.3;
+}
+
+.blog-content h1 {
+    font-size: 2.5em;
+    border-bottom: 2px solid rgba(234, 179, 8, 0.3);
+    padding-bottom: 12px;
+}
+
+.blog-content h2 {
+    font-size: 2em;
+}
+
+.blog-content h3 {
+    font-size: 1.5em;
+}
+
+.blog-content p {
+    margin: 16px 0;
+    line-height: 1.8;
+}
+
+.blog-content a {
+    color: #eab308;
+    text-decoration: underline;
+    transition: color 0.3s ease;
+}
+
+.blog-content a:hover {
+    color: white;
+}
+
+.blog-content strong {
+    font-weight: bold;
+    color: white;
+}
+
+.blog-content em {
+    font-style: italic;
+}
+
+.blog-content u {
+    text-decoration: underline;
+}
+
+.blog-content ul,
+.blog-content ol {
+    padding-left: 2.5em;
+    margin: 16px 0;
+}
+
+.blog-content ul {
+    list-style-type: disc;
+}
+
+.blog-content ol {
+    list-style-type: decimal;
+}
+
+.blog-content li {
+    margin: 8px 0;
+    line-height: 1.6;
+}
+
+.blog-content li::marker {
+    color: #eab308;
+}

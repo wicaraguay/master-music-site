@@ -103,7 +103,10 @@ export const Performances: React.FC<PerformancesProps> = ({ items, lang }) => {
                       <div className="pt-6 flex gap-4">
                         <Music className="text-maestro-gold flex-shrink-0 mt-1" size={20} />
                         <div>
-                          <p className="mb-4">{event.description}</p>
+                          <p
+                            className="blog-content mb-4"
+                            dangerouslySetInnerHTML={{ __html: event.description }}
+                          />
 
                           {/* Event Images Gallery */}
                           {event.images && event.images.length > 0 && (

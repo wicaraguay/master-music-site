@@ -41,9 +41,10 @@ export const Research: React.FC<ResearchProps> = ({ items, lang }) => {
                 </h3>
                 <p className="text-sm text-maestro-gold mb-4 font-mono">{paper.journal} — {paper.year}</p>
 
-                <p className="text-maestro-light/60 text-sm leading-relaxed mb-6 flex-grow">
-                  {paper.abstract}
-                </p>
+                <p
+                  className="blog-content text-maestro-light/60 text-sm leading-relaxed mb-6 flex-grow"
+                  dangerouslySetInnerHTML={{ __html: paper.abstract }}
+                />
 
                 <button className="flex items-center gap-2 text-xs uppercase tracking-widest text-maestro-light hover:text-maestro-gold transition-colors mt-auto">
                   {t.read} <BookOpen size={14} />
