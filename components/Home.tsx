@@ -299,7 +299,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
       </section>
 
       {/* ABOUT PREVIEW SECTION - Elegant Introduction */}
-      <section id="about-preview" className="relative py-32 px-6 bg-maestro-dark overflow-hidden">
+      <section id="about-preview" className="relative py-80 px-6 bg-maestro-dark overflow-hidden">
         {/* Orchestra Background Image - Local section-header2.jpg - Lightened */}
         <div className="absolute inset-0 z-0 select-none pointer-events-none">
           <img
@@ -498,7 +498,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
       </section>
 
       {/* 4. RESEARCH SECTION - Opacity 70% */}
-      <section id="research" className="py-60 px-6 bg-maestro-emerald relative overflow-hidden">
+      <section id="research" className="py-80 px-6 bg-maestro-emerald relative overflow-hidden">
         {/* Academic Emerald Aesthetic Background - Balanced Clarity */}
         <div className="absolute inset-0 z-0">
           <div
@@ -535,7 +535,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
         </div>
       </section>
 
-      <section id="performances" className="py-24 px-6 bg-maestro-wine relative overflow-hidden">
+      <section id="performances" className="py-80 px-6 bg-maestro-wine relative overflow-hidden">
         {/* Cinematic Section Blending */}
         <div className="absolute inset-0 z-0 pointer-events-none">
           {/* Background Image with Wine Overlay */}
