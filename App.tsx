@@ -167,7 +167,7 @@ function App() {
               <span className="font-serif font-bold text-maestro-gold text-lg">DC</span>
             </div>
             <span className="text-xl font-serif font-bold tracking-wide text-maestro-light">
-              DIEGO <span className="text-maestro-gold">CARRIÓN</span>
+              DIEGO <span className="text-maestro-gold">CARRIÓN GRANDA</span>
             </span>
           </div>
           <button onClick={() => setCurrentSection(Section.HOME)} className="text-xs uppercase tracking-widest text-maestro-light hover:text-maestro-gold transition-colors">
@@ -197,7 +197,7 @@ function App() {
             {/* Elegant Divider */}
             <div className="mb-8 flex items-center justify-center gap-4">
               <div className="h-px w-12 bg-gradient-to-r from-transparent to-maestro-gold/40" />
-              <span className="text-maestro-gold text-2xl tracking-[0.4em] uppercase font-serif italic">Diego Carrión</span>
+              <span className="text-maestro-gold text-2xl tracking-[0.4em] uppercase font-serif italic">Diego Carrión Granda</span>
               <div className="h-px w-12 bg-gradient-to-l from-transparent to-maestro-gold/40" />
             </div>
 

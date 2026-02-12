@@ -197,13 +197,13 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
 
                 {/* Main Title - Single Line Impact */}
                 <div className="relative">
-                  <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl 2xl:text-[9rem] font-serif leading-none drop-shadow-2xl tracking-tight whitespace-nowrap">
+                  <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-[6.5rem] font-serif leading-none drop-shadow-2xl tracking-tight lg:whitespace-nowrap">
                     <span className="inline-block text-maestro-light animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
                       Diego
                     </span>
                     <span className="inline-block w-3 md:w-5"></span>
                     <span className="inline-block text-maestro-gold italic animate-fade-in-up hover:scale-105 transition-transform duration-300 cursor-default pb-2" style={{ animationDelay: '0.3s' }}>
-                      Carrión
+                      Carrión Granda
                     </span>
                   </h1>
                 </div>
@@ -246,17 +246,17 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
             <div className="relative order-1 lg:order-2 flex justify-center lg:justify-end">
               <FadeIn delay={200}>
                 {/* Main Photo Container */}
-                <div className="relative group w-56 sm:w-64 md:w-72 lg:w-64 xl:w-72 2xl:w-80">
+                <div className="relative group w-56 sm:w-64 md:w-72 lg:w-68 xl:w-76 2xl:w-[24rem]">
                   {/* Glow Effect Behind */}
                   <div className="absolute -inset-3 md:-inset-4 bg-gradient-to-br from-maestro-gold/30 via-maestro-gold/10 to-transparent blur-2xl md:blur-3xl opacity-50 group-hover:opacity-80 transition-opacity duration-700" />
 
                   {/* Photo Frame */}
-                  <div className="relative aspect-[2/3] overflow-hidden">
+                  <div className="relative overflow-hidden rounded-sm">
                     {/* The Main Photo */}
                     <img
-                      src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1974&auto=format&fit=crop"
-                      alt="Diego Carrión - Director y Musicólogo"
-                      className="w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000 shadow-2xl"
+                      src="/images/diego-home.webp"
+                      alt="Diego Carrión Granda - Director y Musicólogo"
+                      className="w-full h-auto object-contain group-hover:scale-105 transition-all duration-1000 shadow-2xl"
                     />
 
                     {/* Gradient Overlays on Photo */}

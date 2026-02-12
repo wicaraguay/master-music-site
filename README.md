@@ -10,7 +10,7 @@
 
 ## 🚀 Visión del Proyecto / Project Vision
 
-Este proyecto es una plataforma integral diseñada para el maestro de música **Diego Carrión**. Combina un portafolio público de alto impacto visual con un sistema de gestión administrativa (Admin Panel) robusto, permitiendo la actualización en tiempo real de eventos, publicaciones, recursos académicos y galerías multimedia.
+Este proyecto es una plataforma integral diseñada para el maestro de música **Diego Carrión Granda**. Combina un portafolio público de alto impacto visual con un sistema de gestión administrativa (Admin Panel) robusto, permitiendo la actualización en tiempo real de eventos, publicaciones, recursos académicos y galerías multimedia.
 
 ## 🧠 Desarrollo Impulsado por LLMs / LLM-Driven Development
 
