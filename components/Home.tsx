@@ -273,7 +273,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
 
                   {/* Floating Name Tag - Hidden on mobile */}
                   <div className="absolute -bottom-3 md:-bottom-4 -right-3 md:-right-4 bg-maestro-dark/90 backdrop-blur-sm border border-maestro-gold/30 px-3 md:px-4 py-1.5 md:py-2 hidden md:block">
-                    <p className="text-maestro-gold text-[10px] md:text-xs font-bold tracking-widest uppercase">Director</p>
+                    <p className="text-maestro-gold text-[10px] md:text-xs font-bold tracking-widest uppercase">{t.conductorTag}</p>
                   </div>
                 </div>
               </FadeIn>

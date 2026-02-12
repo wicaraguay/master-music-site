@@ -25,6 +25,7 @@ export const translations = {
     home: {
       role: 'Violinista | Director de Orquesta | Investigador',
       intro: '"Director de Ópera y Orquesta Sinfónica. Candidato a Doctorado en Artes, con énfasis en dirección sinfónica y coral."',
+      conductorTag: 'Director',
       ctaWork: 'Conoce mi trabajo',
       ctaContact: 'Contacto',
       aboutTitle: 'Sobre Mí',
@@ -156,6 +157,7 @@ export const translations = {
     home: {
       role: 'Violinist | Conductor | Researcher',
       intro: '"Opera and Symphony Orchestra Conductor. PhD Candidate in Arts, with emphasis on symphonic and choral conducting."',
+      conductorTag: 'Conductor',
       ctaWork: 'See My Work',
       ctaContact: 'Contact',
       aboutTitle: 'About Me',
@@ -272,6 +274,7 @@ export const translations = {
     home: {
       role: 'Скрипач | Дирижер | Исследователь',
       intro: '"Оперный и симфонический дирижер. Докторант в области искусств со специализацией в симфоническом и хоровом дирижировании."',
+      conductorTag: 'Дирижер',
       ctaWork: 'Мои работы',
       ctaContact: 'Контакты',
       aboutTitle: 'Обо мне',
