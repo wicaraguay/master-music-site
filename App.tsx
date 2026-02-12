@@ -187,7 +187,7 @@ function App() {
           <div className="absolute inset-0 z-0 select-none pointer-events-none">
             <div
               className="absolute inset-0 bg-cover bg-center opacity-20 grayscale mix-blend-soft-light transition-transform duration-[20000ms] hover:scale-110"
-              style={{ backgroundImage: "url('/images/section-footer.jpg')" }}
+              style={{ backgroundImage: "url('/images/section-footer.webp')" }}
             />
             {/* Gradient Mask for a "Final Fade" */}
             <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black/80" />

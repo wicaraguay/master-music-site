@@ -153,7 +153,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
           <div
             className="absolute inset-0 bg-cover bg-center transition-transform duration-1000"
             style={{
-              backgroundImage: `url('/images/section-portada.png')`,
+              backgroundImage: `url('/images/section-portada.webp')`,
               transform: `scale(${1 + offsetY * 0.0002})`,
             }}
           />
@@ -303,7 +303,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
         {/* Orchestra Background Image - Local section-header2.jpg - Lightened */}
         <div className="absolute inset-0 z-0 select-none pointer-events-none">
           <img
-            src="/images/section-header2.jpg"
+            src="/images/section-header2.webp"
             alt="Fondo Seccíon Sobre Mí"
             className="w-full h-full object-cover opacity-80 grayscale mix-blend-overlay"
           />
@@ -408,7 +408,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
           <div
             className="absolute inset-0 bg-cover bg-center opacity-75 mix-blend-soft-light grayscale"
             style={{
-              backgroundImage: `url('/images/section-experience.png')`,
+              backgroundImage: `url('/images/section-experience.webp')`,
               WebkitMaskImage: 'linear-gradient(to top, transparent 0%, black 20%, black 80%, transparent 100%)',
               maskImage: 'linear-gradient(to top, transparent 0%, black 20%, black 80%, transparent 100%)'
             }}
@@ -504,7 +504,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
           <div
             className="absolute inset-0 bg-cover bg-center opacity-70 mix-blend-soft-light grayscale"
             style={{
-              backgroundImage: `url('/images/section-research.png')`,
+              backgroundImage: `url('/images/section-research.webp')`,
               WebkitMaskImage: 'linear-gradient(to top, transparent 0%, black 20%, black 80%, transparent 100%)',
               maskImage: 'linear-gradient(to top, transparent 0%, black 20%, black 80%, transparent 100%)'
             }}
@@ -542,7 +542,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
           <div
             className="absolute inset-0 bg-cover bg-center opacity-45 mix-blend-overlay grayscale hover:grayscale-0 transition-all duration-1000"
             style={{
-              backgroundImage: "url('/images/section-events.png')",
+              backgroundImage: "url('/images/section-events.webp')",
               WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%)',
               maskImage: 'linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%)'
             }}
@@ -598,7 +598,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
       <section className="relative py-80 flex items-center justify-center overflow-hidden">
         {/* Parallax Background */}
         <div className="absolute inset-0 bg-fixed bg-cover bg-center bg-no-repeat grayscale grayscale-0 transition-all duration-1000"
-          style={{ backgroundImage: 'url("/images/section-text.png")' }}>
+          style={{ backgroundImage: 'url("/images/section-text.webp")' }}>
           <div className="absolute inset-0 bg-maestro-dark/85"></div>
         </div>
 
@@ -621,7 +621,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
         <div className="absolute inset-0 z-0 select-none pointer-events-none">
           <div
             className="absolute inset-0 bg-cover bg-center opacity-45 grayscale mix-blend-soft-light transition-transform duration-[10000ms] hover:scale-110"
-            style={{ backgroundImage: "url('/images/section-avaliable.png')" }}
+            style={{ backgroundImage: "url('/images/section-avaliable.webp')" }}
           />
           {/* Section Transition Overlays */}
           <div className="absolute inset-0 bg-gradient-to-b from-maestro-dark via-transparent to-maestro-dark" />
