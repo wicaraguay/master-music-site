@@ -188,7 +188,7 @@ export const Navigation: React.FC<NavigationProps> = ({ currentSection, onNaviga
 
         {/* Menu Panel (Right side) */}
         <div
-          className={`absolute top-0 right-0 h-full w-[55%] sm:w-[30%] bg-maestro-dark/95 backdrop-blur-2xl border-l border-white/5 shadow-2xl transition-transform duration-700 cubic-bezier(0.7, 0, 0.3, 1) ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
+          className={`absolute top-0 right-0 h-full w-[65%] sm:w-[40%] bg-maestro-dark/95 backdrop-blur-2xl border-l border-white/5 shadow-2xl transition-transform duration-700 cubic-bezier(0.7, 0, 0.3, 1) ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
         >
           <div className="relative h-full flex flex-col">
             {/* Header in Overlay */}
@@ -318,15 +318,11 @@ export const Navigation: React.FC<NavigationProps> = ({ currentSection, onNaviga
                   transitionDelay: `${(navStructure.length + 4) * 100}ms`
                 }}
               >
-                <div className="flex flex-col items-center gap-4 mb-6">
+                <div className="flex flex-col items-center gap-4">
                   <div className="h-px w-8 bg-maestro-gold/30" />
                   <span className="text-[9px] uppercase tracking-[0.3em] text-maestro-light/20">
                     Diego Carrión Granda
                   </span>
-                </div>
-
-                <div className="text-[9px] uppercase tracking-[0.15em] text-maestro-light/30">
-                  © {new Date().getFullYear()} Diego Carrión
                 </div>
               </div>
             </div>
