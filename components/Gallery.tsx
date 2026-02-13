@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { FadeIn } from './FadeIn';
 import { GalleryItem, Language } from '../types';
 import { translations } from '../translations';
 import { X, ChevronLeft, ChevronRight, ZoomIn, PlayCircle, Image as ImageIcon, Video } from 'lucide-react';
+
+import { getYouTubeEmbedUrl, getYouTubeThumbnailUrl } from '../src/utils/video';
 
 interface GalleryProps {
   items: GalleryItem[];
@@ -44,8 +47,17 @@ export const Gallery: React.FC<GalleryProps> = ({ items, lang }) => {
   };
 
   return (
-    <section className="py-24 px-6 bg-maestro-dark min-h-screen">
-      <div className="max-w-7xl mx-auto">
+    <section className="relative py-24 px-6 bg-maestro-dark min-h-screen overflow-hidden">
+      {/* Background Image requested by user - Adjusted for more clarity */}
+      <div
+        className="absolute inset-0 z-0 bg-cover bg-center bg-fixed opacity-60"
+        style={{ backgroundImage: 'url("/images/pagination-gallery.webp")' }}
+      />
+      {/* Delicate gradient overlays to ensure readability */}
+      <div className="absolute inset-0 z-0 bg-gradient-to-b from-maestro-dark/80 via-transparent to-maestro-dark/80" />
+      <div className="absolute inset-0 z-0 bg-black/20" />
+
+      <div className="max-w-7xl mx-auto relative z-10">
 
         {/* Header */}
         <div className="text-center mb-12">
@@ -80,18 +92,18 @@ export const Gallery: React.FC<GalleryProps> = ({ items, lang }) => {
           </button>
         </div>
 
-        {/* Masonry Grid */}
-        <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
+        {/* Grid Layout (Garantiza 3 por fila en escritorio) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {displayedItems.map((item, index) => (
             <FadeIn key={item.id} delay={index * 50}>
               <div
-                className="group relative cursor-pointer break-inside-avoid overflow-hidden rounded-sm bg-maestro-gray"
+                className="group relative cursor-pointer overflow-hidden rounded-sm bg-maestro-gray aspect-video"
                 onClick={() => openLightbox(index)}
               >
                 {/* Media Preview */}
                 <div className="relative">
                   <img
-                    src={item.type === 'video' ? (item.thumbnail || item.src) : item.src}
+                    src={item.type === 'video' ? (item.thumbnail || getYouTubeThumbnailUrl(item.src)) : item.src}
                     alt={item.caption}
                     className="w-full h-auto object-cover transition-all duration-1000 transform group-hover:scale-110 grayscale hover:grayscale-0"
                     loading="lazy"
@@ -131,17 +143,12 @@ export const Gallery: React.FC<GalleryProps> = ({ items, lang }) => {
           </div>
         )}
 
-        {/* Lightbox Modal */}
-        {selectedImageIndex !== null && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-md animate-[fadeIn_0.3s_ease-out]">
-
-            {/* Close Button */}
-            <button
-              onClick={closeLightbox}
-              className="absolute top-6 right-6 text-white/50 hover:text-maestro-gold transition-colors z-50"
-            >
-              <X size={40} />
-            </button>
+        {/* Lightbox Modal - Using Portal to ensure it renders above the Navigation bar */}
+        {selectedImageIndex !== null && createPortal(
+          <div
+            className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/98 backdrop-blur-xl animate-[fadeIn_0.3s_ease-out]"
+            style={{ zIndex: 99999 }}
+          >
 
             {/* Navigation Buttons */}
             {displayedItems.length > 1 && (
@@ -150,20 +157,20 @@ export const Gallery: React.FC<GalleryProps> = ({ items, lang }) => {
                   onClick={prevImage}
                   className="absolute left-4 md:left-8 text-white/30 hover:text-white transition-colors p-4 z-50 hidden md:block"
                 >
-                  <ChevronLeft size={48} />
+                  <ChevronLeft size={64} />
                 </button>
 
                 <button
                   onClick={nextImage}
                   className="absolute right-4 md:right-8 text-white/30 hover:text-white transition-colors p-4 z-50 hidden md:block"
                 >
-                  <ChevronRight size={48} />
+                  <ChevronRight size={64} />
                 </button>
               </>
             )}
 
             {/* Main Media Container */}
-            <div className="relative max-w-6xl w-full max-h-[90vh] p-4 flex flex-col items-center" onClick={(e) => e.stopPropagation()}>
+            <div className="relative max-w-5xl w-full max-h-[90vh] p-6 flex flex-col items-center" onClick={(e) => e.stopPropagation()}>
 
               {displayedItems[selectedImageIndex].type === 'image' ? (
                 <img
@@ -172,38 +179,53 @@ export const Gallery: React.FC<GalleryProps> = ({ items, lang }) => {
                   className="max-h-[80vh] w-auto object-contain shadow-2xl border border-white/5"
                 />
               ) : (
-                <div className="w-full aspect-video max-w-4xl bg-black border border-white/10 shadow-2xl">
+                <div className="w-full aspect-video max-w-3xl bg-black border border-white/10 shadow-2xl overflow-hidden rounded-lg">
                   <iframe
                     width="100%"
                     height="100%"
-                    src={displayedItems[selectedImageIndex].src}
+                    src={getYouTubeEmbedUrl(displayedItems[selectedImageIndex].src)}
                     title={displayedItems[selectedImageIndex].caption}
                     frameBorder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     referrerPolicy="strict-origin-when-cross-origin"
                     allowFullScreen
+                    className="w-full h-full"
                   ></iframe>
                 </div>
               )}
 
-              <div className="mt-6 text-center">
-                <span className="text-maestro-gold text-xs uppercase tracking-widest font-bold block mb-1">
+              <div className="mt-8 text-center max-w-2xl px-4">
+                <span className="text-maestro-gold text-xs uppercase tracking-[0.3em] font-bold block mb-2">
                   {displayedItems[selectedImageIndex].category}
                 </span>
-                <p className="text-white/80 font-serif text-lg md:text-2xl">
+                <h3 className="text-white/95 font-serif text-xl md:text-3xl leading-snug drop-shadow-md">
                   {displayedItems[selectedImageIndex].caption}
-                </p>
-                <p className="text-white/30 text-xs mt-2">
-                  {selectedImageIndex + 1} / {displayedItems.length}
-                </p>
+                </h3>
+                <div className="mt-4 flex items-center justify-center gap-3">
+                  <div className="h-px w-8 bg-maestro-gold/30" />
+                  <p className="text-white/40 text-xs tracking-widest font-bold">
+                    {selectedImageIndex + 1} / {displayedItems.length}
+                  </p>
+                  <div className="h-px w-8 bg-maestro-gold/30" />
+                </div>
               </div>
             </div>
 
             {/* Mobile Navigation Overlay (Click sides to navigate) */}
-            <div className="absolute inset-y-0 left-0 w-1/4 z-40 md:hidden" onClick={prevImage} />
-            <div className="absolute inset-y-0 right-0 w-1/4 z-40 md:hidden" onClick={nextImage} />
+            <div className="absolute inset-y-0 left-0 w-1/4 z-[99998] md:hidden cursor-pointer" onClick={prevImage} />
+            <div className="absolute inset-y-0 right-0 w-1/4 z-[99998] md:hidden cursor-pointer" onClick={nextImage} />
 
-          </div>
+            {/* Close Button - Positioned absolutely inside the body-level portal for maximum clickability */}
+            <button
+              onClick={closeLightbox}
+              className="fixed top-8 right-8 text-white/50 hover:text-maestro-gold hover:scale-110 transition-all duration-300 p-4 hover:bg-white/5 rounded-full cursor-pointer z-[99999]"
+              style={{ zIndex: 100000, pointerEvents: 'auto' }}
+              aria-label="Close gallery"
+            >
+              <X size={48} strokeWidth={1.5} />
+            </button>
+          </div>,
+          document.body
         )}
 
       </div>

@@ -363,7 +363,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
                 {/* Stat 1: Experience */}
                 <div className="bg-maestro-dark/80 backdrop-blur-md border border-maestro-gold/20 p-6 rounded-lg text-left hover:border-maestro-gold/50 transition-colors group h-full">
                   <Music2 className="text-maestro-gold w-8 h-8 mb-4 group-hover:scale-110 transition-transform" />
-                  <h4 className="text-2xl font-bold text-white mb-1">15+ <span className="text-sm font-normal text-maestro-light/60">{lang === 'es' ? 'Años' : lang === 'en' ? 'Years' : 'Лет'}</span></h4>
+                  <h4 className="text-2xl font-bold text-white mb-1">20+ <span className="text-sm font-normal text-maestro-light/60">{lang === 'es' ? 'Años' : lang === 'en' ? 'Years' : 'Лет'}</span></h4>
                   <p className="text-xs text-maestro-light/50 uppercase tracking-wider">{lang === 'es' ? 'De experiencia musical' : lang === 'en' ? 'Of musical experience' : 'Музыкального опыта'}</p>
                 </div>
 
@@ -377,7 +377,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
                 {/* Stat 3: Concerts */}
                 <div className="bg-maestro-dark/80 backdrop-blur-md border border-maestro-gold/20 p-6 rounded-lg text-left hover:border-maestro-gold/50 transition-colors group h-full">
                   <Briefcase className="text-maestro-gold w-8 h-8 mb-4 group-hover:scale-110 transition-transform" />
-                  <h4 className="text-2xl font-bold text-white mb-1">20+ <span className="text-sm font-normal text-maestro-light/60">{lang === 'es' ? 'Conciertos' : lang === 'en' ? 'Concerts' : 'Концертов'}</span></h4>
+                  <h4 className="text-2xl font-bold text-white mb-1">25+ <span className="text-sm font-normal text-maestro-light/60">{lang === 'es' ? 'Conciertos' : lang === 'en' ? 'Concerts' : 'Концертов'}</span></h4>
                   <p className="text-xs text-maestro-light/50 uppercase tracking-wider">{lang === 'es' ? 'Internacionales' : lang === 'en' ? 'International' : 'Международных'}</p>
                 </div>
 

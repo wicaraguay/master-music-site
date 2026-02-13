@@ -11,6 +11,7 @@ import { signIn, logout } from '../src/services/auth';
 import { uploadToStorage } from '../src/services/storage';
 import { translateFields } from '../src/services/translationService';
 import { RichTextEditor } from './RichTextEditor';
+import { getYouTubeEmbedUrl, getYouTubeThumbnailUrl } from '../src/utils/video';
 
 interface AdminProps {
     isAuthenticated: boolean;
@@ -397,7 +398,11 @@ export const Admin: React.FC<AdminProps> = ({
 
             await saveToDb('gallery', editingId,
                 { caption: translations.caption, category: translations.category },
-                { type: newGalType, src: newGalSrc, thumbnail: newGalThumbnail }
+                {
+                    type: newGalType,
+                    src: newGalType === 'video' ? getYouTubeEmbedUrl(newGalSrc) : newGalSrc,
+                    thumbnail: newGalType === 'video' ? (newGalThumbnail || getYouTubeThumbnailUrl(newGalSrc)) : newGalThumbnail
+                }
             );
         } catch (error) {
             console.error("Error saving gallery item:", error);
@@ -921,7 +926,13 @@ export const Admin: React.FC<AdminProps> = ({
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                     {gallery.map(item => (
                                         <div key={item.id} className={`relative aspect-video group border ${editingId === item.id ? 'border-maestro-gold' : 'border-white/5'}`}>
-                                            <img src={item.type === 'video' ? item.thumbnail : item.src} alt="Gallery" className="w-full h-full object-cover" />
+                                            <img src={item.type === 'video' ? (item.thumbnail || getYouTubeThumbnailUrl(item.src)) : item.src} alt="Gallery" className="w-full h-full object-cover" />
+
+                                            {/* Type Badge */}
+                                            <div className={`absolute top-2 left-2 px-2 py-0.5 text-[8px] font-bold uppercase tracking-widest rounded-sm ${item.type === 'video' ? 'bg-red-600 text-white' : 'bg-maestro-gold text-maestro-dark'}`}>
+                                                {item.type === 'video' ? 'Video' : 'Foto'}
+                                            </div>
+
                                             <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                                                 <button onClick={() => startEditGallery(item)} className="p-2 bg-maestro-gold text-maestro-dark rounded-full"><Edit size={16} /></button>
                                                 <button onClick={() => handleDelete('gallery', item.id)} className="p-2 bg-red-500 text-white rounded-full"><Trash2 size={16} /></button>

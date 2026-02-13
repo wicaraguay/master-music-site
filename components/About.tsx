@@ -45,7 +45,7 @@ export const About: React.FC<AboutProps> = ({ lang }) => {
 
           <div className="grid grid-cols-2 gap-8 pt-6 border-t border-maestro-light/10">
             <div>
-              <span className="block text-4xl font-serif text-maestro-gold">15+</span>
+              <span className="block text-4xl font-serif text-maestro-gold">20+</span>
               <span className="text-sm text-maestro-light/50 uppercase tracking-widest">{t.statsYears}</span>
             </div>
             <div>
