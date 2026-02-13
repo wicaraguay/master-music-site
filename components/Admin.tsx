@@ -12,6 +12,7 @@ import { uploadToStorage } from '../src/services/storage';
 import { translateFields } from '../src/services/translationService';
 import { RichTextEditor } from './RichTextEditor';
 import { getYouTubeEmbedUrl, getYouTubeThumbnailUrl } from '../src/utils/video';
+import { compressImage } from '../src/utils/image';
 
 interface AdminProps {
     isAuthenticated: boolean;
@@ -36,6 +37,7 @@ export const Admin: React.FC<AdminProps> = ({
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [translating, setTranslating] = useState(false);
+    const [compressing, setCompressing] = useState(false);
 
     type Tab = 'blog' | 'resources' | 'experience' | 'research' | 'performances' | 'gallery';
     const [activeTab, setActiveTab] = useState<Tab>('blog');
@@ -128,15 +130,25 @@ export const Admin: React.FC<AdminProps> = ({
 
     // Helper for File Upload to Storage - Single Setter
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, setter: (value: string) => void, storagePath: string) => {
-        const file = e.target.files?.[0];
+        let file = e.target.files?.[0];
         if (file) {
             try {
                 setLoading(true);
+
+                // Compress if image
+                if (file.type.startsWith('image/')) {
+                    setCompressing(true);
+                    const compressed = await compressImage(file);
+                    file = compressed as File;
+                    setCompressing(false);
+                }
+
                 const downloadURL = await uploadToStorage(file, storagePath);
                 setter(downloadURL);
             } catch (error) {
                 console.error('Error uploading file:', error);
                 alert('Error al subir archivo. Intenta de nuevo.');
+                setCompressing(false);
             } finally {
                 setLoading(false);
             }
@@ -145,15 +157,25 @@ export const Admin: React.FC<AdminProps> = ({
 
     // Specific Handler for Blog Image Upload (Appends to array)
     const handleBlogImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
+        let file = e.target.files?.[0];
         if (file) {
             try {
                 setLoading(true);
+
+                // Compress if image
+                if (file.type.startsWith('image/')) {
+                    setCompressing(true);
+                    const compressed = await compressImage(file);
+                    file = compressed as File;
+                    setCompressing(false);
+                }
+
                 const downloadURL = await uploadToStorage(file, 'images/blog/');
                 setNewPostImages(prev => [...prev, downloadURL]);
             } catch (error) {
                 console.error('Error uploading image:', error);
                 alert('Error al subir imagen. Intenta de nuevo.');
+                setCompressing(false);
             } finally {
                 setLoading(false);
             }
@@ -332,14 +354,30 @@ export const Admin: React.FC<AdminProps> = ({
 
     // --- PERFORMANCE HANDLERS ---
     const handlePerfImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
+        let file = e.target.files?.[0];
         if (!file) return;
-        setLoading(true);
-        const url = await uploadToStorage(file, `images/performances/${Date.now()}_${file.name}`);
-        if (url) {
-            setNewPerfImages(prev => [...prev, url]);
+        try {
+            setLoading(true);
+
+            // Compress if image
+            if (file.type.startsWith('image/')) {
+                setCompressing(true);
+                const compressed = await compressImage(file);
+                file = compressed as File;
+                setCompressing(false);
+            }
+
+            const url = await uploadToStorage(file, `images/performances/${Date.now()}_${file.name}`);
+            if (url) {
+                setNewPerfImages(prev => [...prev, url]);
+            }
+        } catch (error) {
+            console.error('Error uploading performance image:', error);
+            alert('Error al subir imagen.');
+            setCompressing(false);
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
     const removePerfImage = (index: number) => {
         setNewPerfImages(prev => prev.filter((_, i) => i !== index));
@@ -596,6 +634,12 @@ export const Admin: React.FC<AdminProps> = ({
                                             <span>Gemini está traduciendo tu contenido al Inglés y Ruso...</span>
                                         </div>
                                     )}
+                                    {compressing && (
+                                        <div className="flex items-center gap-3 text-maestro-gold text-sm animate-pulse bg-maestro-gold/10 p-3 border border-maestro-gold/20">
+                                            <ImageIcon size={16} className="animate-pulse" />
+                                            <span>Optimizando imagen para la web...</span>
+                                        </div>
+                                    )}
                                     <RichTextEditor
                                         value={newPostContent}
                                         onChange={setNewPostContent}
@@ -792,6 +836,12 @@ export const Admin: React.FC<AdminProps> = ({
                                                     <input type="file" accept="image/*" onChange={handlePerfImageUpload} className="hidden" />
                                                 </label>
                                             </div>
+                                            {compressing && (
+                                                <div className="flex items-center gap-3 text-maestro-gold text-xs animate-pulse bg-maestro-gold/10 p-2 border border-maestro-gold/20 mb-4">
+                                                    <ImageIcon size={14} />
+                                                    <span>Optimizando imagen...</span>
+                                                </div>
+                                            )}
                                             {newPerfImages.length > 0 && (
                                                 <div className="flex flex-wrap gap-3 p-2 bg-black/20 rounded-lg">
                                                     {newPerfImages.map((img, idx) => (
