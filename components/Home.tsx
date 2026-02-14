@@ -33,9 +33,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
     const [currentYear, setCurrentYear] = useState(today.getFullYear());
     const [hoveredEvent, setHoveredEvent] = useState<Performance | null>(null);
 
-    const monthNames = lang === 'es' ?
-      ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'] :
-      ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const monthNames = translations[lang].calendar.months;
 
     const getDaysInMonth = (month: number, year: number) => new Date(year, month + 1, 0).getDate();
     const getFirstDayOfMonth = (month: number, year: number) => new Date(year, month, 1).getDay();
@@ -83,7 +81,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
         </div>
 
         <div className="grid grid-cols-7 gap-2 text-center text-[10px] uppercase tracking-tighter text-white/40 mb-4 font-bold">
-          {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map(d => <div key={d}>{lang === 'es' ? d : d.substring(0, 1)}</div>)}
+          {translations[lang].calendar.days.map(d => <div key={d}>{d}</div>)}
         </div>
 
         <div className="grid grid-cols-7 gap-y-3 relative">
@@ -126,7 +124,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
                           onClick={() => onNavigate(Section.PERFORMANCES)}
                           className="text-[10px] uppercase tracking-[0.2em] font-bold text-maestro-gold hover:text-white transition-colors flex items-center gap-2 group"
                         >
-                          {lang === 'es' ? 'Ver Detalles' : 'View Details'}
+                          {translations[lang].calendar.viewDetails}
                           <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
                         </button>
                       </div>
@@ -328,10 +326,10 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
             </div>
           </FadeIn>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            {/* Left Column: Bio & Text */}
+          <div className="max-w-4xl mx-auto">
+            {/* Centered Bio & Text */}
             <FadeIn delay={100}>
-              <div className="text-center lg:text-left space-y-8">
+              <div className="text-center space-y-8">
                 <h3 className="text-3xl md:text-4xl font-serif text-maestro-light/90 leading-tight">
                   {t.aboutHeading}
                 </h3>
@@ -342,7 +340,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
                 </div>
 
                 {/* Read More Button */}
-                <div className="pt-4 relative z-10 flex justify-center lg:justify-start">
+                <div className="pt-4 relative z-10 flex justify-center">
                   <button
                     onClick={() => onNavigate(Section.ABOUT)}
                     className="group relative inline-flex items-center gap-3 px-8 py-3 overflow-hidden rounded-full border border-maestro-gold/30 hover:border-maestro-gold/60 transition-all duration-300"
@@ -357,31 +355,27 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
               </div>
             </FadeIn>
 
-            {/* Right Column: Stats Grid */}
+            {/* Right Column: Stats Grid - Commented out for now
             <FadeIn delay={200} className="relative z-10">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                {/* Stat 1: Experience */}
                 <div className="bg-maestro-dark/80 backdrop-blur-md border border-maestro-gold/20 p-6 rounded-lg text-left hover:border-maestro-gold/50 transition-colors group h-full">
                   <Music2 className="text-maestro-gold w-8 h-8 mb-4 group-hover:scale-110 transition-transform" />
                   <h4 className="text-2xl font-bold text-white mb-1">20+ <span className="text-sm font-normal text-maestro-light/60">{lang === 'es' ? 'Años' : lang === 'en' ? 'Years' : 'Лет'}</span></h4>
                   <p className="text-xs text-maestro-light/50 uppercase tracking-wider">{lang === 'es' ? 'De experiencia musical' : lang === 'en' ? 'Of musical experience' : 'Музыкального опыта'}</p>
                 </div>
 
-                {/* Stat 2: PhD */}
                 <div className="bg-maestro-dark/80 backdrop-blur-md border border-maestro-gold/20 p-6 rounded-lg text-left hover:border-maestro-gold/50 transition-colors group h-full">
                   <BookOpen className="text-maestro-gold w-8 h-8 mb-4 group-hover:scale-110 transition-transform" />
                   <h4 className="text-xl font-bold text-white mb-1">PhD <span className="text-sm font-normal text-maestro-light/60">{lang === 'es' ? 'Candidato' : lang === 'en' ? 'Candidate' : 'Кандидат'}</span></h4>
                   <p className="text-xs text-maestro-light/50 uppercase tracking-wider">{lang === 'es' ? 'En Musicología' : lang === 'en' ? 'In Musicology' : 'В музыковедении'}</p>
                 </div>
 
-                {/* Stat 3: Concerts */}
                 <div className="bg-maestro-dark/80 backdrop-blur-md border border-maestro-gold/20 p-6 rounded-lg text-left hover:border-maestro-gold/50 transition-colors group h-full">
                   <Briefcase className="text-maestro-gold w-8 h-8 mb-4 group-hover:scale-110 transition-transform" />
                   <h4 className="text-2xl font-bold text-white mb-1">25+ <span className="text-sm font-normal text-maestro-light/60">{lang === 'es' ? 'Conciertos' : lang === 'en' ? 'Concerts' : 'Концертов'}</span></h4>
                   <p className="text-xs text-maestro-light/50 uppercase tracking-wider">{lang === 'es' ? 'Internacionales' : lang === 'en' ? 'International' : 'Международных'}</p>
                 </div>
 
-                {/* Stat 4: Passion */}
                 <div className="bg-maestro-dark/80 backdrop-blur-md border border-maestro-gold/20 p-6 rounded-lg text-left hover:border-maestro-gold/50 transition-colors group h-full">
                   <div className="text-maestro-gold w-8 h-8 mb-4 group-hover:scale-110 transition-transform">
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" /></svg>
@@ -391,6 +385,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
                 </div>
               </div>
             </FadeIn>
+            */}
           </div>
         </div>
         {/* Seamless transition to next section */}
@@ -401,10 +396,9 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
 
 
 
-      {/* 3. EXPERIENCE SECTION (Timeline) */}
+      {/* 3. EXPERIENCE SECTION (Timeline ) - Commented out for now
       <section id="experience" className="py-24 px-6 bg-maestro-navy relative overflow-hidden">
-        {/* Deep Midnight Aesthetic Background - Subtle Refinement */}
-        <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0  z-0">
           <div
             className="absolute inset-0 bg-cover bg-center opacity-75 mix-blend-soft-light grayscale"
             style={{
@@ -413,7 +407,6 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
               maskImage: 'linear-gradient(to top, transparent 0%, black 20%, black 80%, transparent 100%)'
             }}
           />
-          {/* Enhanced Section Blending */}
           <div className="absolute inset-0 bg-gradient-to-t from-maestro-navy/95 via-maestro-navy/50 to-maestro-navy/30" />
           <div className="absolute inset-0 bg-gradient-to-b from-maestro-dark via-transparent to-transparent h-64" />
         </div>
@@ -429,19 +422,15 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
           </FadeIn>
 
           <div className="relative">
-            {/* Vertical Line */}
             <div className="absolute left-0 md:left-1/2 transform md:-translate-x-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-maestro-gold/30 to-transparent"></div>
 
             <div className="space-y-6">
               {experienceItems.slice(0, 4).map((item: ExperienceItem, index: number) => (
                 <FadeIn key={index} delay={index * 100}>
                   <div className={`flex flex-col md:flex-row gap-8 ${index % 2 === 0 ? 'md:flex-row-reverse' : ''} relative`}>
-                    {/* Timeline Dot */}
                     <div className="absolute left-[-5px] md:left-1/2 transform md:-translate-x-1/2 w-3 h-3 bg-maestro-gold rounded-full border-4 border-maestro-dark z-10 mt-6"></div>
 
-                    {/* Content Side */}
                     <div className="md:w-1/2 flex justify-start md:justify-end pl-8 md:pl-0 md:pr-12">
-                      {/* Card */}
                       <div className={`bg-maestro-dark/80 backdrop-blur-sm border border-maestro-gold/30 p-8 rounded-xl hover:border-maestro-gold/60 hover:shadow-[0_10px_40px_-10px_rgba(212,175,55,0.2)] hover:-translate-y-1 transition-all duration-500 w-full max-w-xl group relative overflow-hidden text-left`}>
                         <div className="absolute top-0 right-0 p-4 opacity-10">
                           <Music2 size={40} className="text-maestro-gold" />
@@ -469,7 +458,6 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
                       </div>
                     </div>
 
-                    {/* Empty Side for alignment (Desktop only) */}
                     <div className="md:w-1/2 hidden md:block"></div>
                   </div>
                 </FadeIn>
@@ -493,13 +481,12 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
             )}
           </div>
         </div>
-        {/* Seamless transition to next section (Emerald) - Cinematic Bridge */}
         <div className="absolute bottom-0 left-0 w-full h-40 bg-gradient-to-b from-transparent to-maestro-dark pointer-events-none" />
       </section>
+      */}
 
-      {/* 4. RESEARCH SECTION - Opacity 70% */}
+      {/* 4. RESEARCH SECTION - Opacity 70% - Commented out for now
       <section id="research" className="py-80 px-6 bg-maestro-emerald relative overflow-hidden">
-        {/* Academic Emerald Aesthetic Background - Balanced Clarity */}
         <div className="absolute inset-0 z-0">
           <div
             className="absolute inset-0 bg-cover bg-center opacity-70 mix-blend-soft-light grayscale"
@@ -509,11 +496,9 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
               maskImage: 'linear-gradient(to top, transparent 0%, black 20%, black 80%, transparent 100%)'
             }}
           />
-          {/* Cinematic Vignette and Blending - Balanced */}
           <div className="absolute inset-0 bg-gradient-to-r from-maestro-emerald/60 via-maestro-emerald/30 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-b from-maestro-dark via-transparent to-transparent h-64 opacity-50" />
 
-          {/* Color Bridge: Transition to Black */}
           <div className="absolute bottom-0 left-0 w-full h-64 bg-gradient-to-b from-transparent to-maestro-dark z-10" />
         </div>
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center relative z-10">
@@ -534,6 +519,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
           </FadeIn>
         </div>
       </section>
+      */}
 
       <section id="performances" className="py-80 px-6 bg-maestro-wine relative overflow-hidden">
         {/* Cinematic Section Blending */}
@@ -568,7 +554,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
                 <div className="text-center lg:text-left space-y-6">
                   <span className="text-maestro-gold uppercase tracking-[0.3em] text-xs font-bold block mb-2">{t.perfTitle}</span>
                   <h2 className="text-5xl font-serif text-white leading-tight">
-                    La Magia en <span className="text-maestro-gold italic">el Escenario</span>
+                    {t.perfHeading1} <span className="text-maestro-gold italic">{t.perfHeading2}</span>
                   </h2>
                   <p className="text-xl text-white/90 font-serif italic max-w-xl mx-auto lg:mx-0">
                     {t.perfDesc}

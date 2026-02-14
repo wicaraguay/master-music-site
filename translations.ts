@@ -24,13 +24,13 @@ export const translations = {
     },
     home: {
       role: 'Violinista | Director de Orquesta | Investigador',
-      intro: '"Director de Ópera y Orquesta Sinfónica. Candidato a Doctorado en Artes, con énfasis en dirección sinfónica y coral."',
+      intro: '"Director de Ópera y Orquesta Sinfónica."',
       conductorTag: 'Director',
       ctaWork: 'Conoce mi trabajo',
       ctaContact: 'Contacto',
       aboutTitle: 'Sobre Mí',
-      aboutHeading: 'Donde la tradición se encuentra con la innovación.',
-      aboutText1: 'Mi carrera se define por una dualidad: el rigor del archivo y la vitalidad del escenario. Como director, no solo busco la precisión técnica, sino la autenticidad histórica informada.',
+      aboutHeading: 'No soy perfecto, pero sí perfectible.',
+      aboutText1: 'Mi carrera se define por una dualidad: cuando dirijo una ópera o un concierto sinfónico, cada ensayo es una pequeña conversación. Una obra de Bach, Haydn, Bethoveen, Liszt, Salgado la hemos escuchado mil veces, pero cada orquesta es distinta, cada función tiene su propia energía.',
       aboutText2: 'Mi investigación doctoral profundiza en las partituras olvidadas, trayendo a la luz obras maestras que merecen ser escuchadas nuevamente, interpretadas con una sensibilidad moderna.',
       readBio: 'Leer Biografía Completa',
       focusTitle: 'Panorama Profesional',
@@ -40,13 +40,15 @@ export const translations = {
       resTitle: 'Investigación',
       resDesc: 'PhD en curso. Recuperación de patrimonio musical y nuevas perspectivas sobre la orquestación.',
       perfTitle: 'Eventos',
-      perfDesc: 'La culminación del trabajo en el escenario. Próximos conciertos y repertorio sinfónico.',
+      perfHeading1: 'La Magia en',
+      perfHeading2: 'el Escenario',
+      perfDesc: 'Próximos conciertos y repertorio sinfónico.',
       viewTimeline: 'Ver Cronología',
       readPapers: 'Leer Publicaciones',
       viewAgenda: 'Ver Agenda',
-      quote: '"La música no está en las notas, sino en el silencio entre ellas."',
+      quote: '"En una ópera, la poesía por fuerza ha de ser hija obediente de la música."',
       collabTitle: '¿Interesado en una colaboración?',
-      collabText: 'Estoy disponible para conciertos invitados, conferencias académicas y consultoría musicológica.',
+      collabText: 'Estoy disponible para una invitación para dirigir conciertos, conferencias, masterclass, consultoría.',
       letsTalk: 'Hablemos'
     },
     about: {
@@ -137,6 +139,11 @@ export const translations = {
       edit: 'Editar',
       delete: 'Eliminar',
       cancel: 'Cancelar'
+    },
+    calendar: {
+      months: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+      days: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
+      viewDetails: 'Ver Detalles'
     }
   },
   en: {
@@ -156,13 +163,13 @@ export const translations = {
     },
     home: {
       role: 'Violinist | Conductor | Researcher',
-      intro: '"Opera and Symphony Orchestra Conductor. PhD Candidate in Arts, with emphasis on symphonic and choral conducting."',
+      intro: '"Opera and Symphony Orchestra Conductor."',
       conductorTag: 'Conductor',
       ctaWork: 'See My Work',
       ctaContact: 'Contact',
       aboutTitle: 'About Me',
-      aboutHeading: 'Where tradition meets innovation.',
-      aboutText1: 'My career is defined by a duality: the rigor of the archive and the vitality of the stage. As a conductor, I seek not only technical precision but informed historical authenticity.',
+      aboutHeading: 'I am not perfect, but I am perfectible.',
+      aboutText1: 'My career is defined by a duality: when I conduct an opera or a symphonic concert, every rehearsal is a small conversation. We have heard a work by Bach, Haydn, Beethoven, Liszt, or Salgado a thousand times, but every orchestra is different, and every performance has its own energy.',
       aboutText2: 'My doctoral research delves into forgotten scores, bringing to light masterpieces that deserve to be heard again, performed with modern sensitivity.',
       readBio: 'Read Full Biography',
       focusTitle: 'Professional Outlook',
@@ -172,13 +179,15 @@ export const translations = {
       resTitle: 'Research',
       resDesc: 'PhD in progress. Recovering musical heritage and new perspectives on orchestration.',
       perfTitle: 'Events',
-      perfDesc: 'The culmination of work on stage. Upcoming concerts and symphonic repertoire.',
+      perfHeading1: 'The Magic on',
+      perfHeading2: 'Stage',
+      perfDesc: 'Upcoming concerts and symphonic repertoire.',
       viewTimeline: 'View Timeline',
       readPapers: 'Read Publications',
       viewAgenda: 'View Agenda',
-      quote: '"Music is not in the notes, but in the silence between them."',
+      quote: '"In an opera, it is absolutely imperative that poetry be the obedient daughter of music."',
       collabTitle: 'Interested in a collaboration?',
-      collabText: 'I am available for guest conducting, academic lectures, and musicological consultancy.',
+      collabText: 'I am available for guest conducting, lectures, masterclasses, and consultancy.',
       letsTalk: 'Let\'s Talk'
     },
     about: {
@@ -254,6 +263,11 @@ export const translations = {
       edit: 'Edit',
       delete: 'Delete',
       cancel: 'Cancel'
+    },
+    calendar: {
+      months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+      days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+      viewDetails: 'View Details'
     }
   },
   ru: {
@@ -273,13 +287,13 @@ export const translations = {
     },
     home: {
       role: 'Скрипач | Дирижер | Исследователь',
-      intro: '"Оперный и симфонический дирижер. Докторант в области искусств со специализацией в симфоническом и хоровом дирижировании."',
+      intro: '"Оперный и симфонический дирижер."',
       conductorTag: 'Дирижер',
       ctaWork: 'Мои работы',
       ctaContact: 'Контакты',
       aboutTitle: 'Обо мне',
-      aboutHeading: 'Где традиции встречаются с инновациями.',
-      aboutText1: 'Моя карьера определяется двойственностью: строгостью архива и жизненной силой сцены. Как дирижер, я стремлюсь не только к технической точности, но и к обоснованной исторической достоверности.',
+      aboutHeading: 'Я не совершенен, но я совершенствуем.',
+      aboutText1: 'Моя карьера определяется двойственностью: когда я дирижирую оперой или симфоническим концертом, каждая репетиция — это небольшой разговор. Мы тысячу раз слышали произведения Баха, Гайдна, Бетховена, Листа, Сальгадо, но каждый оркестр индивидуален, у каждого выступления своя энергия.',
       aboutText2: 'Мое докторское исследование посвящено забытым партитурам, возвращая к жизни шедевры, которые заслуживают того, чтобы быть услышанными снова, исполненные с современной чуткостью.',
       readBio: 'Читать полную биографию',
       focusTitle: 'Профессиональный обзор',
@@ -289,13 +303,15 @@ export const translations = {
       resTitle: 'Исследования',
       resDesc: 'Докторантура в процессе. Восстановление музыкального наследия и новые перспективы оркестровки.',
       perfTitle: 'События',
-      perfDesc: 'Кульминация работы на сцене. Предстоящие концерты и симфонический репертуар.',
+      perfHeading1: 'Магия на',
+      perfHeading2: 'сцене',
+      perfDesc: 'Предстоящие концерты и симфонический репертуар.',
       viewTimeline: 'Смотреть хронологию',
       readPapers: 'Читать публикации',
       viewAgenda: 'Смотреть афишу',
-      quote: '"Музыка не в нотах, а в тишине между ними."',
+      quote: '"В опере поэзия непременно должна быть послушной дочерью музыки."',
       collabTitle: 'Заинтересованы в сотрудничестве?',
-      collabText: 'Я доступен для приглашенного дирижирования, академических лекций и музыковедческих консультаций.',
+      collabText: 'Я доступен для предложений по дирижированию, лекций, мастер-классов и консультаций.',
       letsTalk: 'Связаться'
     },
     about: {
@@ -371,6 +387,11 @@ export const translations = {
       edit: 'Редактировать',
       delete: 'Удалить',
       cancel: 'Отмена'
+    },
+    calendar: {
+      months: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
+      days: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+      viewDetails: 'Подробнее'
     }
   }
 } as const;
