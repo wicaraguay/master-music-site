@@ -228,7 +228,7 @@ export const Gallery: React.FC<GalleryProps> = ({ items, lang }) => {
                   ></iframe>
                 </div>
               ) : (
-                <div className="w-full aspect-video md:aspect-[3/1] bg-black/40 border border-white/10 shadow-2xl overflow-hidden rounded-lg flex items-center justify-center">
+                <div className="w-full h-[166px] md:h-[200px] bg-black/40 border border-white/10 shadow-2xl overflow-hidden rounded-lg flex items-center justify-center">
                   <iframe
                     width="100%"
                     height="100%"

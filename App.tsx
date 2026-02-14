@@ -122,8 +122,8 @@ function App() {
         return <Blog posts={posts} lang={lang} />;
       case Section.GALLERY:
         return <Gallery items={gallery} lang={lang} />;
-      case Section.RESOURCES:
-        return <Resources resources={resources} lang={lang} />;
+      // case Section.RESOURCES:
+      //   return <Resources resources={resources} lang={lang} />;
       case Section.CONTACT:
         return <Contact lang={lang} />;
       case Section.ADMIN:

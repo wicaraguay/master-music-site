@@ -602,7 +602,7 @@ export const Admin: React.FC<AdminProps> = ({
                     <div className="lg:col-span-1 space-y-2">
                         {[
                             { id: 'blog', label: 'Blog', icon: FileText },
-                            { id: 'resources', label: 'Recursos', icon: Music },
+                            // { id: 'resources', label: 'Recursos', icon: Music },
                             { id: 'experience', label: 'Experiencia', icon: Briefcase },
                             { id: 'research', label: 'Investigación', icon: BookOpen },
                             { id: 'performances', label: 'Eventos', icon: Calendar },
@@ -673,7 +673,7 @@ export const Admin: React.FC<AdminProps> = ({
                         )}
 
                         {/* 2. RESOURCES MANAGEMENT */}
-                        {activeTab === 'resources' && (
+                        {/* {activeTab === 'resources' && (
                             <FadeIn>
                                 <div className="flex justify-between items-center mb-6">
                                     <h3 className="text-xl font-serif text-maestro-light flex items-center gap-2">
@@ -717,7 +717,7 @@ export const Admin: React.FC<AdminProps> = ({
                                     ))}
                                 </div>
                             </FadeIn>
-                        )}
+                        )} */}
 
                         {/* 3. EXPERIENCE MANAGEMENT */}
                         {activeTab === 'experience' && (
@@ -971,7 +971,7 @@ export const Admin: React.FC<AdminProps> = ({
                                     {newGalType === 'audio' && newGalSrc && (
                                         <div className="mt-4 p-4 bg-black/20 border border-white/5 rounded-sm">
                                             <p className="text-[10px] uppercase text-maestro-gold mb-2 tracking-widest font-bold">Previsualización de Audio:</p>
-                                            <div className="w-full aspect-[3/1] md:aspect-[4/1] bg-black/40 overflow-hidden rounded-sm">
+                                            <div className="w-full h-[166px] bg-black/40 overflow-hidden rounded-sm">
                                                 <iframe
                                                     width="100%"
                                                     height="100%"

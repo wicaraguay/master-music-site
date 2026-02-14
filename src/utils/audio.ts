@@ -37,8 +37,8 @@ export const getSoundCloudEmbedUrl = (url: string): string => {
     }
 
     // 5. Construcción del widget oficial
-    // Usamos visual=true por defecto, pero se puede ajustar si se prefiere el modo compacto
-    return `https://w.soundcloud.com/player/?url=${encodeURIComponent(cleanUrl)}&color=%23eab308&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false&visual=true`;
+    // Usamos visual=false para el modo clásico (onda visible y arte cuadrado)
+    return `https://w.soundcloud.com/player/?url=${encodeURIComponent(cleanUrl)}&color=%23eab308&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false&visual=false`;
 };
 
 /**

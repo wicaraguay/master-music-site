@@ -47,11 +47,11 @@ export const Navigation: React.FC<NavigationProps> = ({ currentSection, onNaviga
       children: [
         { id: Section.EXPERIENCE, label: t.experience },
         { id: Section.RESEARCH, label: t.research },
-        { id: Section.PERFORMANCES, label: t.performances },
       ]
     },
+    { id: Section.PERFORMANCES, label: t.performances },
     { id: Section.GALLERY, label: t.gallery },
-    { id: Section.RESOURCES, label: t.resources },
+    // { id: Section.RESOURCES, label: t.resources },
     { id: Section.BLOG, label: t.blog },
     { id: Section.CONTACT, label: t.contact },
   ];
@@ -61,14 +61,14 @@ export const Navigation: React.FC<NavigationProps> = ({ currentSection, onNaviga
     setIsMobileMenuOpen(false);
   };
 
-  const isTrayectoriaActive = [Section.EXPERIENCE, Section.RESEARCH, Section.PERFORMANCES].includes(currentSection);
+  const isTrayectoriaActive = [Section.EXPERIENCE, Section.RESEARCH].includes(currentSection);
 
   return (
     <>
       <nav
         className={`fixed top-0 left-0 w-full z-50 transition-all duration-700 border-b border-transparent ${isScrolled
-            ? 'bg-maestro-dark/90 backdrop-blur-xl border-white/5 py-4 shadow-2xl'
-            : 'bg-transparent py-8'
+          ? 'bg-maestro-dark/90 backdrop-blur-xl border-white/5 py-4 shadow-2xl'
+          : 'bg-transparent py-8'
           } `}
       >
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
@@ -93,8 +93,8 @@ export const Navigation: React.FC<NavigationProps> = ({ currentSection, onNaviga
                   <div key={item.id} className="relative group">
                     <button
                       className={`flex items-center gap-1 text-[10px] xl:text-xs tracking-[0.2em] uppercase transition-all duration-300 hover:text-maestro-gold drop-shadow-sm ${isTrayectoriaActive
-                          ? 'text-maestro-gold font-bold border-b border-maestro-gold pb-1'
-                          : 'text-maestro-light/90'
+                        ? 'text-maestro-gold font-bold border-b border-maestro-gold pb-1'
+                        : 'text-maestro-light/90'
                         } `}
                     >
                       {item.label}
@@ -125,8 +125,8 @@ export const Navigation: React.FC<NavigationProps> = ({ currentSection, onNaviga
                   key={item.id}
                   onClick={() => handleNavigate(item.id as Section)}
                   className={`text-[10px] xl:text-xs tracking-[0.2em] uppercase transition-all duration-300 hover:text-maestro-gold drop-shadow-sm ${currentSection === item.id
-                      ? 'text-maestro-gold font-bold border-b border-maestro-gold pb-1'
-                      : 'text-maestro-light/90'
+                    ? 'text-maestro-gold font-bold border-b border-maestro-gold pb-1'
+                    : 'text-maestro-light/90'
                     } `}
                 >
                   {item.label}
@@ -161,8 +161,8 @@ export const Navigation: React.FC<NavigationProps> = ({ currentSection, onNaviga
             <button
               onClick={() => handleNavigate(Section.ADMIN)}
               className={`text-[10px] xl:text-xs tracking-[0.2em] uppercase transition-all duration-300 hover:text-maestro-gold flex items-center gap-2 border border-white/10 px-3 py-1 rounded-sm ${currentSection === Section.ADMIN
-                  ? 'text-maestro-gold border-maestro-gold'
-                  : 'text-maestro-light/50'
+                ? 'text-maestro-gold border-maestro-gold'
+                : 'text-maestro-light/50'
                 } `}
               title={t.admin}
             >
