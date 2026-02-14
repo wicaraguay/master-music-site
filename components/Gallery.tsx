@@ -3,9 +3,10 @@ import { createPortal } from 'react-dom';
 import { FadeIn } from './FadeIn';
 import { GalleryItem, Language } from '../types';
 import { translations } from '../translations';
-import { X, ChevronLeft, ChevronRight, ZoomIn, PlayCircle, Image as ImageIcon, Video } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, ZoomIn, PlayCircle, Image as ImageIcon, Video, Music, ChevronDown, ArrowRight } from 'lucide-react';
 
 import { getYouTubeEmbedUrl, getYouTubeThumbnailUrl } from '../src/utils/video';
+import { getSoundCloudEmbedUrl } from '../src/utils/audio';
 
 interface GalleryProps {
   items: GalleryItem[];
@@ -14,26 +15,33 @@ interface GalleryProps {
 
 export const Gallery: React.FC<GalleryProps> = ({ items, lang }) => {
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
-  const [activeTab, setActiveTab] = useState<'photos' | 'videos'>('photos');
+  const [activeTab, setActiveTab] = useState<'photos' | 'videos' | 'audio'>('photos');
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const t = translations[lang].gallery;
 
   // Filter items based on active tab
-  const displayedItems = items.filter(item =>
-    activeTab === 'photos' ? item.type === 'image' : item.type === 'video'
-  );
+  const displayedItems = items.filter(item => {
+    if (activeTab === 'photos') return item.type === 'image';
+    if (activeTab === 'videos') return item.type === 'video';
+    if (activeTab === 'audio') return item.type === 'audio';
+    return false;
+  });
 
   const openLightbox = (index: number) => {
     setSelectedImageIndex(index);
+    setIsDescriptionExpanded(false);
     document.body.style.overflow = 'hidden';
   };
 
   const closeLightbox = () => {
     setSelectedImageIndex(null);
+    setIsDescriptionExpanded(false);
     document.body.style.overflow = 'auto';
   };
 
   const nextImage = (e: React.MouseEvent) => {
     e.stopPropagation();
+    setIsDescriptionExpanded(false);
     if (selectedImageIndex !== null) {
       setSelectedImageIndex((selectedImageIndex + 1) % displayedItems.length);
     }
@@ -41,6 +49,7 @@ export const Gallery: React.FC<GalleryProps> = ({ items, lang }) => {
 
   const prevImage = (e: React.MouseEvent) => {
     e.stopPropagation();
+    setIsDescriptionExpanded(false);
     if (selectedImageIndex !== null) {
       setSelectedImageIndex((selectedImageIndex - 1 + displayedItems.length) % displayedItems.length);
     }
@@ -71,10 +80,10 @@ export const Gallery: React.FC<GalleryProps> = ({ items, lang }) => {
         </div>
 
         {/* Tabs */}
-        <div className="flex justify-center mb-16 gap-8">
+        <div className="flex flex-wrap justify-center mb-16 gap-4 md:gap-8">
           <button
             onClick={() => setActiveTab('photos')}
-            className={`flex items-center gap-2 pb-2 text-sm uppercase tracking-widest transition-all ${activeTab === 'photos'
+            className={`flex items-center gap-2 pb-2 text-xs md:text-sm uppercase tracking-widest transition-all ${activeTab === 'photos'
               ? 'text-maestro-gold border-b border-maestro-gold'
               : 'text-maestro-light/50 hover:text-maestro-gold'
               }`}
@@ -83,12 +92,21 @@ export const Gallery: React.FC<GalleryProps> = ({ items, lang }) => {
           </button>
           <button
             onClick={() => setActiveTab('videos')}
-            className={`flex items-center gap-2 pb-2 text-sm uppercase tracking-widest transition-all ${activeTab === 'videos'
+            className={`flex items-center gap-2 pb-2 text-xs md:text-sm uppercase tracking-widest transition-all ${activeTab === 'videos'
               ? 'text-maestro-gold border-b border-maestro-gold'
               : 'text-maestro-light/50 hover:text-maestro-gold'
               }`}
           >
             <Video size={16} /> {t.tabVideos}
+          </button>
+          <button
+            onClick={() => setActiveTab('audio')}
+            className={`flex items-center gap-2 pb-2 text-xs md:text-sm uppercase tracking-widest transition-all ${activeTab === 'audio'
+              ? 'text-maestro-gold border-b border-maestro-gold'
+              : 'text-maestro-light/50 hover:text-maestro-gold'
+              }`}
+          >
+            <Music size={16} /> {(t as any).tabAudio}
           </button>
         </div>
 
@@ -101,34 +119,50 @@ export const Gallery: React.FC<GalleryProps> = ({ items, lang }) => {
                 onClick={() => openLightbox(index)}
               >
                 {/* Media Preview */}
-                <div className="relative">
+                <div className="relative h-full">
                   <img
-                    src={item.type === 'video' ? (item.thumbnail || getYouTubeThumbnailUrl(item.src)) : item.src}
-                    alt={item.caption}
-                    className="w-full h-auto object-cover transition-all duration-1000 transform group-hover:scale-110 grayscale hover:grayscale-0"
+                    src={
+                      item.type === 'audio'
+                        ? (item.thumbnail || '/images/audio-section.webp')
+                        : (item.type === 'video' ? (item.thumbnail || getYouTubeThumbnailUrl(item.src)) : item.src)
+                    }
+                    alt={(item.category as any)?.es || item.category}
+                    className="w-full h-full object-cover transition-all duration-1000 transform group-hover:scale-110 grayscale hover:grayscale-0"
                     loading="lazy"
                   />
 
-                  {/* Video Indicator */}
-                  {item.type === 'video' && (
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                      <div className="w-12 h-12 bg-black/50 rounded-full flex items-center justify-center border border-white/20 backdrop-blur-sm">
+                  {/* Icon Indicator */}
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none group-hover:opacity-0 transition-opacity duration-300">
+                    <div className="w-12 h-12 bg-black/50 rounded-full flex items-center justify-center border border-white/20 backdrop-blur-sm">
+                      {item.type === 'video' ? (
                         <PlayCircle className="text-white" size={24} />
-                      </div>
+                      ) : item.type === 'audio' ? (
+                        <Music className="text-white" size={24} />
+                      ) : (
+                        <ZoomIn className="text-white" size={24} />
+                      )}
                     </div>
-                  )}
+                  </div>
                 </div>
 
-                {/* Overlay on Hover */}
-                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col items-center justify-center p-6 text-center">
-                  <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                    <span className="text-maestro-gold text-xs uppercase tracking-widest font-bold mb-2 block">
-                      {item.category}
+                {/* Overlay on Hover - Rediseñado para evitar sobrecarga de texto */}
+                <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col items-center justify-center p-6 text-center">
+                  <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 w-full">
+                    <span className="text-maestro-gold text-[10px] uppercase tracking-[0.3em] font-bold mb-2 block">
+                      {(item.category as any)?.es || item.category}
                     </span>
-                    <p className="text-white font-serif text-xl italic mb-4">
-                      "{item.caption}"
-                    </p>
-                    {item.type === 'video' ? <PlayCircle className="text-white/50 mx-auto" size={24} /> : <ZoomIn className="text-white/50 mx-auto" size={24} />}
+                    {item.author && (
+                      <p className="text-white/60 text-xs uppercase tracking-widest mb-2 font-medium">
+                        {(item.author as any)?.es || item.author}
+                      </p>
+                    )}
+                    <div className="h-px w-12 bg-maestro-gold/30 mx-auto mb-4" />
+
+                    {/* El botón indica acción según el tipo */}
+                    <div className="flex items-center justify-center gap-2 text-white/90 font-serif italic text-lg decoration-maestro-gold/30 underline-offset-4 hover:underline">
+                      {item.type === 'audio' ? <Music size={18} /> : item.type === 'video' ? <PlayCircle size={18} /> : <ImageIcon size={18} />}
+                      <span>{item.type === 'audio' ? 'Escuchar Grabación' : 'Ver Detalles'}</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -139,15 +173,16 @@ export const Gallery: React.FC<GalleryProps> = ({ items, lang }) => {
         {/* Empty State */}
         {displayedItems.length === 0 && (
           <div className="text-center text-maestro-light/30 py-20 italic font-serif text-xl">
-            {activeTab === 'photos' ? t.emptyPhotos : t.emptyVideos}
+            {activeTab === 'photos' ? t.emptyPhotos : activeTab === 'videos' ? t.emptyVideos : (t as any).emptyAudio}
           </div>
         )}
 
-        {/* Lightbox Modal - Using Portal to ensure it renders above the Navigation bar */}
+        {/* Lightbox Modal */}
         {selectedImageIndex !== null && createPortal(
           <div
-            className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/98 backdrop-blur-xl animate-[fadeIn_0.3s_ease-out]"
+            className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/98 backdrop-blur-xl animate-[fadeIn_0.3s_ease-out] overflow-y-auto pt-20 pb-10"
             style={{ zIndex: 99999 }}
+            onClick={closeLightbox}
           >
 
             {/* Navigation Buttons */}
@@ -155,14 +190,14 @@ export const Gallery: React.FC<GalleryProps> = ({ items, lang }) => {
               <>
                 <button
                   onClick={prevImage}
-                  className="absolute left-4 md:left-8 text-white/30 hover:text-white transition-colors p-4 z-50 hidden md:block"
+                  className="fixed left-4 md:left-8 top-1/2 -translate-y-1/2 text-white/30 hover:text-white transition-colors p-4 z-50 hidden md:block"
                 >
                   <ChevronLeft size={64} />
                 </button>
 
                 <button
                   onClick={nextImage}
-                  className="absolute right-4 md:right-8 text-white/30 hover:text-white transition-colors p-4 z-50 hidden md:block"
+                  className="fixed right-4 md:right-8 top-1/2 -translate-y-1/2 text-white/30 hover:text-white transition-colors p-4 z-50 hidden md:block"
                 >
                   <ChevronRight size={64} />
                 </button>
@@ -170,21 +205,21 @@ export const Gallery: React.FC<GalleryProps> = ({ items, lang }) => {
             )}
 
             {/* Main Media Container */}
-            <div className="relative max-w-5xl w-full max-h-[90vh] p-6 flex flex-col items-center" onClick={(e) => e.stopPropagation()}>
+            <div className="relative max-w-4xl w-full px-6 flex flex-col items-center my-auto" onClick={(e) => e.stopPropagation()}>
 
               {displayedItems[selectedImageIndex].type === 'image' ? (
                 <img
                   src={displayedItems[selectedImageIndex].src}
-                  alt={displayedItems[selectedImageIndex].caption}
-                  className="max-h-[80vh] w-auto object-contain shadow-2xl border border-white/5"
+                  alt={(displayedItems[selectedImageIndex].category as any)?.es || (displayedItems[selectedImageIndex].category as any)}
+                  className="max-h-[70vh] w-auto object-contain shadow-2xl border border-white/5"
                 />
-              ) : (
-                <div className="w-full aspect-video max-w-3xl bg-black border border-white/10 shadow-2xl overflow-hidden rounded-lg">
+              ) : displayedItems[selectedImageIndex].type === 'video' ? (
+                <div className="w-full aspect-video bg-black border border-white/10 shadow-2xl overflow-hidden rounded-lg">
                   <iframe
                     width="100%"
                     height="100%"
                     src={getYouTubeEmbedUrl(displayedItems[selectedImageIndex].src)}
-                    title={displayedItems[selectedImageIndex].caption}
+                    title={(displayedItems[selectedImageIndex].category as any)?.es || (displayedItems[selectedImageIndex].category as any)}
                     frameBorder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     referrerPolicy="strict-origin-when-cross-origin"
@@ -192,37 +227,84 @@ export const Gallery: React.FC<GalleryProps> = ({ items, lang }) => {
                     className="w-full h-full"
                   ></iframe>
                 </div>
+              ) : (
+                <div className="w-full aspect-video md:aspect-[3/1] bg-black/40 border border-white/10 shadow-2xl overflow-hidden rounded-lg flex items-center justify-center">
+                  <iframe
+                    width="100%"
+                    height="100%"
+                    scrolling="no"
+                    frameBorder="no"
+                    allow="autoplay"
+                    src={getSoundCloudEmbedUrl(displayedItems[selectedImageIndex].src)}
+                    className="w-full h-full"
+                  ></iframe>
+                </div>
               )}
 
-              <div className="mt-8 text-center max-w-2xl px-4">
-                <span className="text-maestro-gold text-xs uppercase tracking-[0.3em] font-bold block mb-2">
-                  {displayedItems[selectedImageIndex].category}
+              {/* Information Section */}
+              <div className="mt-8 text-center w-full max-w-2xl bg-white/5 p-8 rounded-lg border border-white/10 backdrop-blur-sm">
+                <span className="text-maestro-gold text-xs uppercase tracking-[0.4em] font-bold block mb-3">
+                  {(displayedItems[selectedImageIndex].category as any)?.es || (displayedItems[selectedImageIndex].category as any)}
                 </span>
-                <h3 className="text-white/95 font-serif text-xl md:text-3xl leading-snug drop-shadow-md">
-                  {displayedItems[selectedImageIndex].caption}
-                </h3>
-                <div className="mt-4 flex items-center justify-center gap-3">
-                  <div className="h-px w-8 bg-maestro-gold/30" />
-                  <p className="text-white/40 text-xs tracking-widest font-bold">
-                    {selectedImageIndex + 1} / {displayedItems.length}
+
+                {displayedItems[selectedImageIndex].author && (
+                  <h4 className="text-white/60 text-sm uppercase tracking-[0.2em] font-medium mb-4">
+                    {(displayedItems[selectedImageIndex].author as any)?.es || displayedItems[selectedImageIndex].author}
+                  </h4>
+                )}
+
+                <div className="h-px w-24 bg-maestro-gold/20 mx-auto mb-6" />
+
+                {/* Description - Collapsible if long */}
+                <div className="relative">
+                  <p className={`text-white/80 font-serif italic text-lg md:text-xl leading-relaxed transition-all duration-500 overflow-hidden ${isDescriptionExpanded ? 'max-h-[1000px]' : 'max-h-[80px]'}`}>
+                    "{(displayedItems[selectedImageIndex].caption as any)?.es || displayedItems[selectedImageIndex].caption}"
                   </p>
-                  <div className="h-px w-8 bg-maestro-gold/30" />
+
+                  {((displayedItems[selectedImageIndex].caption as any)?.es || displayedItems[selectedImageIndex].caption).length > 100 && (
+                    <button
+                      onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                      className="mt-4 text-maestro-gold text-[10px] uppercase tracking-widest font-bold hover:text-white transition-colors flex items-center gap-2 mx-auto border border-maestro-gold/30 px-4 py-2 rounded-full hover:bg-maestro-gold/10"
+                    >
+                      {isDescriptionExpanded ? 'Mostrar menos' : 'Leer descripción completa'}
+                      <ChevronDown size={12} className={`transition-transform duration-300 ${isDescriptionExpanded ? 'rotate-180' : ''}`} />
+                    </button>
+                  )}
+                </div>
+
+                {/* External Link Section */}
+                <div className="mt-8 pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-6">
+                  <div className="flex items-center gap-3">
+                    <div className="h-px w-8 bg-maestro-gold/30" />
+                    <p className="text-white/30 text-[10px] tracking-widest font-bold uppercase">
+                      {selectedImageIndex + 1} / {displayedItems.length}
+                    </p>
+                    <div className="h-px w-8 bg-maestro-gold/30" />
+                  </div>
+
+                  {displayedItems[selectedImageIndex].type === 'audio' && (
+                    <a
+                      href={displayedItems[selectedImageIndex].src}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-maestro-gold hover:text-white transition-colors text-[10px] uppercase tracking-[0.2em] font-bold group"
+                    >
+                      <span>Ir a SoundCloud</span>
+                      <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                    </a>
+                  )}
                 </div>
               </div>
             </div>
 
-            {/* Mobile Navigation Overlay (Click sides to navigate) */}
-            <div className="absolute inset-y-0 left-0 w-1/4 z-[99998] md:hidden cursor-pointer" onClick={prevImage} />
-            <div className="absolute inset-y-0 right-0 w-1/4 z-[99998] md:hidden cursor-pointer" onClick={nextImage} />
-
-            {/* Close Button - Positioned absolutely inside the body-level portal for maximum clickability */}
+            {/* Close Button */}
             <button
               onClick={closeLightbox}
               className="fixed top-8 right-8 text-white/50 hover:text-maestro-gold hover:scale-110 transition-all duration-300 p-4 hover:bg-white/5 rounded-full cursor-pointer z-[99999]"
-              style={{ zIndex: 100000, pointerEvents: 'auto' }}
-              aria-label="Close gallery"
+              style={{ zIndex: 100000 }}
+              aria-label="Close"
             >
-              <X size={48} strokeWidth={1.5} />
+              <X size={32} />
             </button>
           </div>,
           document.body

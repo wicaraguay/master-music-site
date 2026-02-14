@@ -68,9 +68,10 @@ export interface Resource {
 
 export interface GalleryItem {
   id: string;
-  type: 'image' | 'video';
+  type: 'image' | 'video' | 'audio';
   src: string;
   thumbnail?: string;
   category: LocalizedString;
+  author?: LocalizedString;
   caption: LocalizedString;
 }

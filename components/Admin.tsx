@@ -12,6 +12,7 @@ import { uploadToStorage } from '../src/services/storage';
 import { translateFields } from '../src/services/translationService';
 import { RichTextEditor } from './RichTextEditor';
 import { getYouTubeEmbedUrl, getYouTubeThumbnailUrl } from '../src/utils/video';
+import { getSoundCloudEmbedUrl } from '../src/utils/audio';
 import { compressImage } from '../src/utils/image';
 
 interface AdminProps {
@@ -79,10 +80,12 @@ export const Admin: React.FC<AdminProps> = ({
     const [newPerfImages, setNewPerfImages] = useState<string[]>([]);
 
     // Gallery
-    const [newGalType, setNewGalType] = useState<'image' | 'video'>('image');
+    const [newGalType, setNewGalType] = useState<'image' | 'video' | 'audio'>('image');
+    const [adminGalleryTab, setAdminGalleryTab] = useState<'image' | 'video' | 'audio'>('image');
     const [newGalSrc, setNewGalSrc] = useState('');
     const [newGalThumbnail, setNewGalThumbnail] = useState('');
     const [newGalCat, setNewGalCat] = useState('');
+    const [newGalAuthor, setNewGalAuthor] = useState('');
     const [newGalCap, setNewGalCap] = useState('');
 
     // --- HANDLERS ---
@@ -120,7 +123,9 @@ export const Admin: React.FC<AdminProps> = ({
         // Perf
         setNewPerfDate(''); setNewPerfTitle(''); setNewPerfLoc(''); setNewPerfRole(''); setNewPerfDesc(''); setNewPerfImages([]);
         // Gal
-        setNewGalSrc(''); setNewGalThumbnail(''); setNewGalCat(''); setNewGalCap('');
+        setNewGalSrc(''); setNewGalThumbnail(''); setNewGalCat('');
+        setNewGalAuthor('');
+        setNewGalCap('');
     };
 
     const changeTab = (tab: Tab) => {
@@ -430,15 +435,15 @@ export const Admin: React.FC<AdminProps> = ({
         try {
             setTranslating(true);
             const translations = await translateFields(
-                { caption: newGalCap, category: newGalCat },
-                ['caption', 'category']
+                { caption: newGalCap, category: newGalCat, author: newGalAuthor },
+                ['caption', 'category', 'author']
             );
 
             await saveToDb('gallery', editingId,
-                { caption: translations.caption, category: translations.category },
+                { caption: translations.caption, category: translations.category, author: translations.author },
                 {
                     type: newGalType,
-                    src: newGalType === 'video' ? getYouTubeEmbedUrl(newGalSrc) : newGalSrc,
+                    src: newGalType === 'video' ? getYouTubeEmbedUrl(newGalSrc) : (newGalType === 'audio' ? getSoundCloudEmbedUrl(newGalSrc) : newGalSrc),
                     thumbnail: newGalType === 'video' ? (newGalThumbnail || getYouTubeThumbnailUrl(newGalSrc)) : newGalThumbnail
                 }
             );
@@ -453,10 +458,12 @@ export const Admin: React.FC<AdminProps> = ({
     const startEditGallery = (item: any) => {
         setEditingId(item.id);
         setNewGalType(item.type);
+        setAdminGalleryTab(item.type);
         setNewGalSrc(item.src);
         setNewGalThumbnail(item.thumbnail || '');
-        setNewGalCat(item.category?.es || item.category || '');
-        setNewGalCap(item.caption?.es || item.caption || '');
+        setNewGalCat((item.category as any)?.es || item.category || '');
+        setNewGalAuthor((item.author as any)?.es || item.author || '');
+        setNewGalCap((item.caption as any)?.es || item.caption || '');
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
@@ -925,6 +932,12 @@ export const Admin: React.FC<AdminProps> = ({
                                         >
                                             <Video size={16} /> Video
                                         </button>
+                                        <button
+                                            onClick={() => setNewGalType('audio')}
+                                            className={`flex-1 p-3 text-xs uppercase font-bold border flex justify-center items-center gap-2 ${newGalType === 'audio' ? 'bg-maestro-gold text-black border-maestro-gold' : 'border-white/10 text-white/50 hover:bg-white/5'}`}
+                                        >
+                                            <Music size={16} /> Audio
+                                        </button>
                                     </div>
                                     <div className="flex gap-2">
                                         {newGalType === 'image' ? (
@@ -936,7 +949,7 @@ export const Admin: React.FC<AdminProps> = ({
                                                 </label>
                                                 {newGalSrc && <p className="text-[10px] text-maestro-gold mt-1 text-center">✓ Imagen cargada en memoria</p>}
                                             </div>
-                                        ) : (
+                                        ) : newGalType === 'video' ? (
                                             <input
                                                 type="text"
                                                 value={newGalSrc}
@@ -944,8 +957,32 @@ export const Admin: React.FC<AdminProps> = ({
                                                 placeholder="Enlace de YouTube (ej: https://www.youtube.com/watch?v=...)"
                                                 className="flex-grow bg-maestro-dark border border-white/10 p-3 text-white"
                                             />
+                                        ) : (
+                                            <input
+                                                type="text"
+                                                value={newGalSrc}
+                                                onChange={(e) => setNewGalSrc(e.target.value)}
+                                                placeholder="Enlace de SoundCloud (ej: https://soundcloud.com/...)"
+                                                className="flex-grow bg-maestro-dark border border-white/10 p-3 text-white"
+                                            />
                                         )}
                                     </div>
+
+                                    {newGalType === 'audio' && newGalSrc && (
+                                        <div className="mt-4 p-4 bg-black/20 border border-white/5 rounded-sm">
+                                            <p className="text-[10px] uppercase text-maestro-gold mb-2 tracking-widest font-bold">Previsualización de Audio:</p>
+                                            <div className="w-full aspect-[3/1] md:aspect-[4/1] bg-black/40 overflow-hidden rounded-sm">
+                                                <iframe
+                                                    width="100%"
+                                                    height="100%"
+                                                    scrolling="no"
+                                                    frameBorder="no"
+                                                    allow="autoplay"
+                                                    src={getSoundCloudEmbedUrl(newGalSrc)}
+                                                ></iframe>
+                                            </div>
+                                        </div>
+                                    )}
 
                                     {newGalType === 'video' && (
                                         <input
@@ -957,14 +994,35 @@ export const Admin: React.FC<AdminProps> = ({
                                         />
                                     )}
 
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <input type="text" value={newGalCat} onChange={(e) => setNewGalCat(e.target.value)} placeholder="Categoría (ej: Concierto)" className="w-full bg-maestro-dark border border-white/10 p-3 text-white" />
-                                        <input type="text" value={newGalCap} onChange={(e) => setNewGalCap(e.target.value)} placeholder="Pie de foto" className="w-full bg-maestro-dark border border-white/10 p-3 text-white" />
+                                    <div className="space-y-4">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <input
+                                                type="text"
+                                                value={newGalCat}
+                                                onChange={(e) => setNewGalCat(e.target.value)}
+                                                placeholder="Título (ej: Sinfonía No. 5)"
+                                                className="w-full bg-maestro-dark border border-white/10 p-3 text-white"
+                                            />
+                                            <input
+                                                type="text"
+                                                value={newGalAuthor}
+                                                onChange={(e) => setNewGalAuthor(e.target.value)}
+                                                placeholder="Autor (ej: Beethoven, Grabación propia)"
+                                                className="w-full bg-maestro-dark border border-white/10 p-3 text-white"
+                                            />
+                                        </div>
+                                        <textarea
+                                            value={newGalCap}
+                                            onChange={(e) => setNewGalCap(e.target.value)}
+                                            placeholder="Descripción del elemento"
+                                            rows={3}
+                                            className="w-full bg-maestro-dark border border-white/10 p-3 text-white resize-none"
+                                        />
                                     </div>
                                     {translating && (
                                         <div className="flex items-center gap-3 text-maestro-gold text-sm animate-pulse mb-4">
                                             <Database size={16} className="animate-spin" />
-                                            <span>Traduciendo pie de foto...</span>
+                                            <span>Traduciendo descripción...</span>
                                         </div>
                                     )}
                                     <button disabled={translating || loading} onClick={handleSaveGallery} className={`w-full md:w-auto px-6 py-2 uppercase tracking-widest text-xs font-bold transition-colors ${(translating || loading) ? 'bg-gray-600 cursor-not-allowed' : (editingId ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-maestro-gold hover:bg-white text-maestro-dark')}`}>
@@ -972,27 +1030,63 @@ export const Admin: React.FC<AdminProps> = ({
                                     </button>
                                 </div>
 
-                                {/* Gallery Grid Preview */}
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                    {gallery.map(item => (
-                                        <div key={item.id} className={`relative aspect-video group border ${editingId === item.id ? 'border-maestro-gold' : 'border-white/5'}`}>
-                                            <img src={item.type === 'video' ? (item.thumbnail || getYouTubeThumbnailUrl(item.src)) : item.src} alt="Gallery" className="w-full h-full object-cover" />
-
-                                            {/* Type Badge */}
-                                            <div className={`absolute top-2 left-2 px-2 py-0.5 text-[8px] font-bold uppercase tracking-widest rounded-sm ${item.type === 'video' ? 'bg-red-600 text-white' : 'bg-maestro-gold text-maestro-dark'}`}>
-                                                {item.type === 'video' ? 'Video' : 'Foto'}
-                                            </div>
-
-                                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                                                <button onClick={() => startEditGallery(item)} className="p-2 bg-maestro-gold text-maestro-dark rounded-full"><Edit size={16} /></button>
-                                                <button onClick={() => handleDelete('gallery', item.id)} className="p-2 bg-red-500 text-white rounded-full"><Trash2 size={16} /></button>
-                                            </div>
-                                            <div className="absolute bottom-0 left-0 w-full bg-black/80 p-2 text-[10px] text-white/70 truncate">
-                                                {(item.caption as any)?.es || item.caption}
-                                            </div>
-                                        </div>
-                                    ))}
+                                {/* Gallery Filter Tabs */}
+                                <div className="flex gap-4 mb-6 border-b border-white/5 pb-4">
+                                    <button
+                                        onClick={() => setAdminGalleryTab('image')}
+                                        className={`px-4 py-2 text-[10px] uppercase tracking-widest font-bold transition-all flex items-center gap-2 ${adminGalleryTab === 'image' ? 'text-maestro-gold border-b border-maestro-gold' : 'text-white/40 hover:text-white'}`}
+                                    >
+                                        <ImageIcon size={14} /> Fotos ({gallery.filter(i => i.type === 'image').length})
+                                    </button>
+                                    <button
+                                        onClick={() => setAdminGalleryTab('video')}
+                                        className={`px-4 py-2 text-[10px] uppercase tracking-widest font-bold transition-all flex items-center gap-2 ${adminGalleryTab === 'video' ? 'text-maestro-gold border-b border-maestro-gold' : 'text-white/40 hover:text-white'}`}
+                                    >
+                                        <Video size={14} /> Videos ({gallery.filter(i => i.type === 'video').length})
+                                    </button>
+                                    <button
+                                        onClick={() => setAdminGalleryTab('audio')}
+                                        className={`px-4 py-2 text-[10px] uppercase tracking-widest font-bold transition-all flex items-center gap-2 ${adminGalleryTab === 'audio' ? 'text-maestro-gold border-b border-maestro-gold' : 'text-white/40 hover:text-white'}`}
+                                    >
+                                        <Music size={14} /> Audio ({gallery.filter(i => i.type === 'audio').length})
+                                    </button>
                                 </div>
+
+                                {/* Gallery Grid Preview */}
+                                {gallery.filter(item => item.type === adminGalleryTab).length > 0 ? (
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                        {gallery.filter(item => item.type === adminGalleryTab).map(item => (
+                                            <div key={item.id} className={`relative aspect-video group border ${editingId === item.id ? 'border-maestro-gold' : 'border-white/5'}`}>
+                                                <img
+                                                    src={
+                                                        item.type === 'audio'
+                                                            ? (item.thumbnail || '/images/audio-section.webp')
+                                                            : (item.type === 'video' ? (item.thumbnail || getYouTubeThumbnailUrl(item.src)) : item.src)
+                                                    }
+                                                    alt="Gallery"
+                                                    className="w-full h-full object-cover"
+                                                />
+
+                                                {/* Type Badge */}
+                                                <div className={`absolute top-2 left-2 px-2 py-0.5 text-[8px] font-bold uppercase tracking-widest rounded-sm ${item.type === 'video' ? 'bg-red-600 text-white' : item.type === 'audio' ? 'bg-blue-600 text-white' : 'bg-maestro-gold text-maestro-dark'}`}>
+                                                    {item.type === 'video' ? 'Video' : item.type === 'audio' ? 'Audio' : 'Foto'}
+                                                </div>
+
+                                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                                    <button onClick={() => startEditGallery(item)} className="p-2 bg-maestro-gold text-maestro-dark rounded-full"><Edit size={16} /></button>
+                                                    <button onClick={() => handleDelete('gallery', item.id)} className="p-2 bg-red-500 text-white rounded-full"><Trash2 size={16} /></button>
+                                                </div>
+                                                <div className="absolute bottom-0 left-0 w-full bg-black/80 p-2 text-[10px] text-white/70 truncate">
+                                                    {(item.caption as any)?.es || item.caption}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-12 bg-black/20 border border-dashed border-white/5 rounded-sm">
+                                        <p className="text-white/20 text-xs italic">No hay archivos en esta categoría</p>
+                                    </div>
+                                )}
                             </FadeIn>
                         )}
 

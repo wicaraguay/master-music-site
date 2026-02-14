@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Section, Language } from '../types';
 import { translations } from '../translations';
-import { Menu, X, ChevronDown, Lock, Globe } from 'lucide-react';
+import {
+  Menu, X, Home, User, Briefcase, BookOpen,
+  Mail, Calendar, Image as ImageIcon, Globe,
+  ChevronDown, ArrowRight, Lock
+} from 'lucide-react';
 
 interface NavigationProps {
   currentSection: Section;
@@ -63,9 +67,9 @@ export const Navigation: React.FC<NavigationProps> = ({ currentSection, onNaviga
     <>
       <nav
         className={`fixed top-0 left-0 w-full z-50 transition-all duration-700 border-b border-transparent ${isScrolled
-          ? 'bg-maestro-dark/90 backdrop-blur-xl border-white/5 py-4 shadow-2xl'
-          : 'bg-transparent py-8'
-          }`}
+            ? 'bg-maestro-dark/90 backdrop-blur-xl border-white/5 py-4 shadow-2xl'
+            : 'bg-transparent py-8'
+          } `}
       >
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
           {/* Logo */}
@@ -89,9 +93,9 @@ export const Navigation: React.FC<NavigationProps> = ({ currentSection, onNaviga
                   <div key={item.id} className="relative group">
                     <button
                       className={`flex items-center gap-1 text-[10px] xl:text-xs tracking-[0.2em] uppercase transition-all duration-300 hover:text-maestro-gold drop-shadow-sm ${isTrayectoriaActive
-                        ? 'text-maestro-gold font-bold border-b border-maestro-gold pb-1'
-                        : 'text-maestro-light/90'
-                        }`}
+                          ? 'text-maestro-gold font-bold border-b border-maestro-gold pb-1'
+                          : 'text-maestro-light/90'
+                        } `}
                     >
                       {item.label}
                       <ChevronDown size={12} className="group-hover:rotate-180 transition-transform duration-300" />
@@ -105,7 +109,7 @@ export const Navigation: React.FC<NavigationProps> = ({ currentSection, onNaviga
                             key={child.id}
                             onClick={() => handleNavigate(child.id)}
                             className={`block w-full text-left px-4 py-3 text-[10px] uppercase tracking-[0.15em] hover:bg-white/5 hover:text-maestro-gold transition-colors ${currentSection === child.id ? 'text-maestro-gold' : 'text-maestro-light/90'
-                              }`}
+                              } `}
                           >
                             {child.label}
                           </button>
@@ -121,9 +125,9 @@ export const Navigation: React.FC<NavigationProps> = ({ currentSection, onNaviga
                   key={item.id}
                   onClick={() => handleNavigate(item.id as Section)}
                   className={`text-[10px] xl:text-xs tracking-[0.2em] uppercase transition-all duration-300 hover:text-maestro-gold drop-shadow-sm ${currentSection === item.id
-                    ? 'text-maestro-gold font-bold border-b border-maestro-gold pb-1'
-                    : 'text-maestro-light/90'
-                    }`}
+                      ? 'text-maestro-gold font-bold border-b border-maestro-gold pb-1'
+                      : 'text-maestro-light/90'
+                    } `}
                 >
                   {item.label}
                 </button>
@@ -144,7 +148,7 @@ export const Navigation: React.FC<NavigationProps> = ({ currentSection, onNaviga
                     <button
                       key={l}
                       onClick={() => { setLang(l); setIsLangMenuOpen(false); }}
-                      className={`block w-full text-left px-4 py-2 text-[10px] uppercase hover:bg-white/5 ${lang === l ? 'text-maestro-gold font-bold' : 'text-maestro-light/60'}`}
+                      className={`block w-full text-left px-4 py-2 text-[10px] uppercase hover:bg-white/5 ${lang === l ? 'text-maestro-gold font-bold' : 'text-maestro-light/60'} `}
                     >
                       {l === 'es' ? 'Español' : l === 'en' ? 'English' : 'Русский'}
                     </button>
@@ -157,9 +161,9 @@ export const Navigation: React.FC<NavigationProps> = ({ currentSection, onNaviga
             <button
               onClick={() => handleNavigate(Section.ADMIN)}
               className={`text-[10px] xl:text-xs tracking-[0.2em] uppercase transition-all duration-300 hover:text-maestro-gold flex items-center gap-2 border border-white/10 px-3 py-1 rounded-sm ${currentSection === Section.ADMIN
-                ? 'text-maestro-gold border-maestro-gold'
-                : 'text-maestro-light/50'
-                }`}
+                  ? 'text-maestro-gold border-maestro-gold'
+                  : 'text-maestro-light/50'
+                } `}
               title={t.admin}
             >
               <Lock size={12} />
@@ -178,17 +182,17 @@ export const Navigation: React.FC<NavigationProps> = ({ currentSection, onNaviga
 
       {/* Mobile Menu Overlay */}
       <div
-        className={`fixed inset-0 z-[60] lg:hidden overflow-hidden ${isMobileMenuOpen ? 'visible' : 'invisible'}`}
+        className={`fixed inset-0 z-[60] lg:hidden overflow-hidden ${isMobileMenuOpen ? 'visible' : 'invisible'} `}
       >
         {/* Darkened Backdrop (Left side) */}
         <div
-          className={`absolute inset-0 bg-black/60 transition-opacity duration-700 ${isMobileMenuOpen ? 'opacity-100' : 'opacity-0'}`}
+          className={`absolute inset-0 bg-black/60 transition-opacity duration-700 ${isMobileMenuOpen ? 'opacity-100' : 'opacity-0'} `}
           onClick={() => setIsMobileMenuOpen(false)}
         />
 
         {/* Menu Panel (Right side) */}
         <div
-          className={`absolute top-0 right-0 h-full w-[65%] sm:w-[40%] bg-maestro-dark/95 backdrop-blur-2xl border-l border-white/5 shadow-2xl transition-transform duration-700 cubic-bezier(0.7, 0, 0.3, 1) ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
+          className={`absolute top-0 right-0 h-full w-[65%] sm:w-[40%] bg-maestro-dark/95 backdrop-blur-2xl border-l border-white/5 shadow-2xl transition-transform duration-700 cubic-bezier(0.7, 0, 0.3, 1) ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'} `}
         >
           <div className="relative h-full flex flex-col">
             {/* Header in Overlay */}
@@ -219,7 +223,7 @@ export const Navigation: React.FC<NavigationProps> = ({ currentSection, onNaviga
                   <button
                     key={l}
                     onClick={() => setLang(l)}
-                    className={`text-[10px] uppercase tracking-[0.2em] relative py-2 ${lang === l ? 'text-maestro-gold font-bold' : 'text-maestro-light/40'}`}
+                    className={`text-[10px] uppercase tracking-[0.2em] relative py-2 ${lang === l ? 'text-maestro-gold font-bold' : 'text-maestro-light/40'} `}
                   >
                     {l === 'es' ? 'Esp' : l === 'en' ? 'Eng' : 'Рус'}
                     {lang === l && (
@@ -246,7 +250,7 @@ export const Navigation: React.FC<NavigationProps> = ({ currentSection, onNaviga
                       >
                         <button
                           onClick={() => setIsMobileSubmenuOpen(!isMobileSubmenuOpen)}
-                          className={`text-2xl font-serif transition-all duration-500 flex items-center justify-between w-full hover:text-maestro-gold ${isActive ? 'text-maestro-gold' : 'text-maestro-light'}`}
+                          className={`text-2xl font-serif transition-all duration-500 flex items-center justify-between w-full hover:text-maestro-gold ${isActive ? 'text-maestro-gold' : 'text-maestro-light'} `}
                         >
                           <span className="flex items-center gap-4">
                             {item.label}
@@ -254,19 +258,19 @@ export const Navigation: React.FC<NavigationProps> = ({ currentSection, onNaviga
                           </span>
                           <ChevronDown
                             size={18}
-                            className={`transition-transform duration-500 text-maestro-gold/50 ${isMobileSubmenuOpen ? 'rotate-180' : ''}`}
+                            className={`transition-transform duration-500 text-maestro-gold/50 ${isMobileSubmenuOpen ? 'rotate-180' : ''} `}
                           />
                         </button>
 
                         <div className={`
-                            w-full pl-4 flex flex-col space-y-4 overflow-hidden transition-all duration-500 ease-in-out
+w-full pl-4 flex flex-col space-y-4 overflow-hidden transition-all duration-500 ease-in-out
                             ${isMobileSubmenuOpen ? 'max-h-[300px] mt-4 opacity-100' : 'max-h-0 opacity-0'}
-                         `}>
+`}>
                           {item.children.map(child => (
                             <button
                               key={child.id}
                               onClick={() => handleNavigate(child.id)}
-                              className={`text-base font-serif text-left transition-all duration-300 hover:text-maestro-gold ${currentSection === child.id ? 'text-maestro-gold italic pl-3 border-l border-maestro-gold' : 'text-maestro-light/60'}`}
+                              className={`text-base font-serif text-left transition-all duration-300 hover:text-maestro-gold ${currentSection === child.id ? 'text-maestro-gold italic pl-3 border-l border-maestro-gold' : 'text-maestro-light/60'} `}
                             >
                               {child.label}
                             </button>
@@ -280,7 +284,7 @@ export const Navigation: React.FC<NavigationProps> = ({ currentSection, onNaviga
                     <button
                       key={item.id}
                       onClick={() => handleNavigate(item.id as Section)}
-                      className={`text-2xl font-serif text-left transition-all duration-700 transform group ${currentSection === item.id ? 'text-maestro-gold italic' : 'text-maestro-light'}`}
+                      className={`text-2xl font-serif text-left transition-all duration-700 transform group ${currentSection === item.id ? 'text-maestro-gold italic' : 'text-maestro-light'} `}
                       style={{
                         opacity: isMobileMenuOpen ? 1 : 0,
                         transform: isMobileMenuOpen ? 'translateY(0)' : 'translateY(15px)',

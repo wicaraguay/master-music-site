@@ -119,8 +119,10 @@ export const translations = {
       subtitle: 'Una colección de instantes capturados en ensayos, conciertos y viajes de investigación.',
       tabPhotos: 'Fotos',
       tabVideos: 'Videos',
+      tabAudio: 'Audio',
       emptyPhotos: 'No hay fotos disponibles.',
-      emptyVideos: 'No hay videos disponibles.'
+      emptyVideos: 'No hay videos disponibles.',
+      emptyAudio: 'No hay grabaciones de audio disponibles.'
     },
     contact: {
       title: 'Contacto',
@@ -243,8 +245,10 @@ export const translations = {
       subtitle: 'A collection of moments captured in rehearsals, concerts, and research trips.',
       tabPhotos: 'Photos',
       tabVideos: 'Videos',
+      tabAudio: 'Audio',
       emptyPhotos: 'No photos available.',
-      emptyVideos: 'No videos available.'
+      emptyVideos: 'No videos available.',
+      emptyAudio: 'No audio recordings available.'
     },
     contact: {
       title: 'Contact',
@@ -367,8 +371,10 @@ export const translations = {
       subtitle: 'Коллекция моментов, запечатленных на репетициях, концертах и в исследовательских поездках.',
       tabPhotos: 'Фото',
       tabVideos: 'Видео',
+      tabAudio: 'Аудио',
       emptyPhotos: 'Нет доступных фотографий.',
-      emptyVideos: 'Нет доступных видео.'
+      emptyVideos: 'Нет доступных видео.',
+      emptyAudio: 'Нет доступных аудиозаписей.'
     },
     contact: {
       title: 'Контакты',
