@@ -23,8 +23,8 @@ export const translations = {
       back: 'Volver al Sitio'
     },
     home: {
-      role: 'Director de Orquesta',
-      intro: '"Director de Ópera y Orquesta Sinfónica."',
+      role: 'Director de Ópera y Orquesta Sinfónica.',
+      intro: '',
       conductorTag: 'Director',
       ctaWork: 'Conoce mi trabajo',
       ctaContact: 'Contacto',
@@ -173,7 +173,7 @@ export const translations = {
     },
     home: {
       role: 'Conductor',
-      intro: '"Opera and Symphony Orchestra Conductor."',
+      intro: '',
       conductorTag: 'Conductor',
       ctaWork: 'See My Work',
       ctaContact: 'Contact',
@@ -307,7 +307,7 @@ export const translations = {
     },
     home: {
       role: 'Дирижер',
-      intro: '"Оперный и симфонический дирижер."',
+      intro: '',
       conductorTag: 'Дирижер',
       ctaWork: 'Мои работы',
       ctaContact: 'Контакты',

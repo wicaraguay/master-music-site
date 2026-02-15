@@ -77,11 +77,15 @@ export const Navigation: React.FC<NavigationProps> = ({ currentSection, onNaviga
             className="flex items-center gap-4 cursor-pointer group"
             onClick={() => handleNavigate(Section.HOME)}
           >
-            <div className="w-10 h-10 rounded-full border border-maestro-gold flex items-center justify-center bg-maestro-gold/10 group-hover:bg-maestro-gold transition-all duration-500">
-              <span className="font-serif font-bold text-maestro-gold group-hover:text-maestro-dark text-lg">DC</span>
+            <div className="w-11 h-11 flex items-center justify-center bg-white/10 border border-white/20 rounded-full p-0 shadow-inner transition-all duration-500 group-hover:scale-110 group-hover:border-maestro-gold/50 overflow-hidden">
+              <img
+                src="/images/logo-portada.png"
+                alt="Logo"
+                className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(212,175,55,0.4)] scale-125 transition-transform duration-500"
+              />
             </div>
             <span className="text-2xl font-serif font-bold tracking-wide text-maestro-light hidden md:block">
-              DIEGO <span className="text-maestro-gold">CARRIÓN</span>
+              DIEGO <span className="text-maestro-gold">CARRIÓN G.</span>
             </span>
           </div>
 
@@ -198,8 +202,12 @@ export const Navigation: React.FC<NavigationProps> = ({ currentSection, onNaviga
             {/* Header in Overlay */}
             <div className="flex justify-between items-center px-6 py-8">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full border border-maestro-gold/50 flex items-center justify-center bg-maestro-gold/10">
-                  <span className="font-serif font-bold text-maestro-gold text-sm">DC</span>
+                <div className="w-11 h-11 flex items-center justify-center bg-white/10 border border-white/20 rounded-full p-0 shadow-sm overflow-hidden">
+                  <img
+                    src="/images/logo-portada.png"
+                    alt="Logo"
+                    className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(212,175,55,0.4)] scale-125"
+                  />
                 </div>
               </div>
               <button

@@ -157,9 +157,9 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
           />
 
           {/* Dramatic Gradient Overlays - Even Lighter */}
-          <div className="absolute inset-0 bg-gradient-to-r from-maestro-dark/80 via-maestro-dark/20 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-b from-maestro-dark/10 via-transparent to-maestro-dark/60" />
-          <div className="absolute inset-0 bg-gradient-to-t from-maestro-dark/20 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-maestro-dark/50" />
+          <div className="absolute inset-0 bg-gradient-to-b from-maestro-dark/80 via-transparent to-maestro-dark/70" />
+          <div className="absolute inset-0 bg-black/20" />
 
           {/* Animated Gold Overlay */}
           <div className="absolute inset-0 bg-gradient-to-br from-maestro-gold/10 via-transparent to-transparent animate-pulse-slow" />
@@ -176,52 +176,55 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
 
 
 
-        {/* Main Content Container - Fully Responsive Layout */}
+        {/* Main Content Container - Two Column Layout with Left-Aligned Branding */}
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-screen flex items-center justify-center">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-12 lg:gap-16 xl:gap-20 items-center w-full py-24 md:py-20 lg:py-0">
+          <div className="grid grid-cols-1 gap-10 md:gap-12 lg:gap-16 xl:gap-20 items-center w-full py-24 md:py-20 lg:py-0">
 
-            {/* LEFT SIDE - Text Content */}
-            <div className="text-center lg:text-left space-y-4 md:space-y-5 lg:space-y-6 order-2 lg:order-1">
+            {/* LEFT SIDE - Branding Content */}
+            <div className="text-center space-y-0 order-2 lg:order-1 flex flex-col items-center justify-center w-full">
               <FadeIn>
-                {/* Role Badge */}
-                <div className="flex items-center justify-center lg:justify-start gap-3 md:gap-4 group mb-4">
-                  <span className="h-px w-12 md:w-16 bg-gradient-to-r from-maestro-gold/80 to-maestro-gold/30 group-hover:to-maestro-gold transition-all duration-500" />
-                  <h2 className="text-maestro-gold tracking-[0.4em] md:tracking-[0.5em] uppercase text-[10px] md:text-xs lg:text-sm font-bold drop-shadow-xl animate-fade-in-down flex items-center gap-2">
-                    <span className="inline-block w-1.5 h-1.5 md:w-2 md:h-2 bg-maestro-gold rounded-full animate-pulse" />
-                    {t.role}
-                  </h2>
-                  <span className="h-px w-12 md:w-16 bg-gradient-to-l from-maestro-gold/80 to-maestro-gold/30 group-hover:to-maestro-gold transition-all duration-500 lg:hidden" />
+
+                {/* 1. New Central/Left Logo */}
+                <div className="relative mb-0 group w-full flex justify-center">
+                  <div className="absolute -inset-6 bg-maestro-gold/10 blur-2xl rounded-full opacity-60 group-hover:opacity-100 transition-opacity duration-1000" />
+                  <img
+                    src="/images/logo-portada.png"
+                    alt="Diego Carrión G. Logo"
+                    className="w-52 h-52 md:w-72 md:h-72 xl:w-96 xl:h-96 object-contain relative z-10 drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]"
+                  />
                 </div>
 
-                {/* Main Title - Single Line Impact */}
-                <div className="relative">
-                  <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-[6.5rem] font-serif leading-none drop-shadow-2xl tracking-tight lg:whitespace-nowrap">
-                    <span className="inline-block text-maestro-light animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-                      Diego
-                    </span>
-                    <span className="inline-block w-3 md:w-5"></span>
-                    <span className="inline-block text-maestro-gold italic animate-fade-in-up hover:scale-105 transition-transform duration-300 cursor-default pb-2" style={{ animationDelay: '0.3s' }}>
-                      Carrión Granda
+                {/* 2. Main Title - Red Vibrant Name (Single Line) */}
+                <div className="relative -mt-20 md:-mt-28 mb-2">
+                  <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-serif leading-tight drop-shadow-2xl tracking-tight">
+                    <span className="text-[#C41E3A] animate-fade-in-up uppercase font-bold whitespace-nowrap" style={{ animationDelay: '0.1s' }}>
+                      Diego Carrión G.
                     </span>
                   </h1>
                 </div>
 
-                {/* Animated Divider */}
-                <div className="relative h-px w-24 md:w-32 lg:w-40 mx-auto lg:mx-0 group mt-6 mb-6">
+                {/* 3. Role / Subtitle - White Serif */}
+                <div className="space-y-4">
+                  <p className="text-maestro-light text-base sm:text-lg md:text-xl lg:text-2xl font-serif italic leading-relaxed drop-shadow-xl animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+                    {t.role}
+                  </p>
+                  {/* Intro Quote - Lighter */}
+                  <p className="text-maestro-light/60 text-sm sm:text-base md:text-lg font-serif italic animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
+                    {t.intro}
+                  </p>
+                </div>
+
+                {/* 4. Animated Divider */}
+                <div className="relative h-px w-24 md:w-32 lg:w-40 mx-auto lg:mx-0 group mt-8 mb-8">
                   <div className="absolute inset-0 bg-gradient-to-r from-maestro-gold via-maestro-gold/60 to-transparent" />
                   <div className="absolute inset-0 bg-maestro-gold blur-sm opacity-60 group-hover:opacity-100 transition-opacity duration-500" />
                 </div>
 
-                {/* Intro Text */}
-                <p className="text-maestro-light/90 text-sm sm:text-base md:text-lg lg:text-xl font-light max-w-lg mx-auto lg:mx-0 lg:max-w-xl font-serif italic leading-relaxed drop-shadow-xl animate-fade-in-up px-2 sm:px-0" style={{ animationDelay: '0.5s' }}>
-                  {t.intro}
-                </p>
-
-                {/* CTA Buttons */}
-                <div className="flex flex-col sm:flex-row gap-3 md:gap-4 pt-2 md:pt-3 animate-fade-in-up justify-center lg:justify-start" style={{ animationDelay: '0.7s' }}>
+                {/* 5. CTA Buttons */}
+                <div className="flex flex-col sm:flex-row gap-4 pt-2 animate-fade-in-up justify-center" style={{ animationDelay: '0.7s' }}>
                   <button
                     onClick={() => onNavigate(Section.RESEARCH)}
-                    className="group relative px-8 md:px-10 py-3 md:py-4 bg-gradient-to-r from-maestro-gold to-[#c9a961] text-maestro-dark font-bold hover:shadow-2xl hover:shadow-maestro-gold/50 transition-all duration-500 uppercase tracking-widest text-[10px] md:text-xs overflow-hidden"
+                    className="group relative px-8 md:px-10 py-3 md:py-4 bg-gradient-to-r from-maestro-gold to-[#c9a961] text-maestro-dark font-bold hover:shadow-2xl hover:shadow-maestro-gold/50 transition-all duration-500 uppercase tracking-widest text-[10px] md:text-xs overflow-hidden rounded-sm"
                   >
                     <span className="relative z-10">{t.ctaWork}</span>
                     <div className="absolute inset-0 bg-white transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
@@ -231,7 +234,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
                   </button>
                   <button
                     onClick={() => onNavigate(Section.CONTACT)}
-                    className="group relative px-8 md:px-10 py-3 md:py-4 border-2 border-maestro-gold/50 text-maestro-light hover:border-maestro-gold hover:text-maestro-gold transition-all duration-500 uppercase tracking-widest text-[10px] md:text-xs backdrop-blur-md bg-black/30 hover:bg-black/50 overflow-hidden"
+                    className="group relative px-8 md:px-10 py-3 md:py-4 border-2 border-maestro-gold/50 text-maestro-light hover:border-maestro-gold hover:text-maestro-gold transition-all duration-500 uppercase tracking-widest text-[10px] md:text-xs backdrop-blur-md bg-black/30 hover:bg-black/50 overflow-hidden rounded-sm"
                   >
                     <span className="relative z-10">{t.ctaContact}</span>
                     <div className="absolute inset-0 bg-gradient-to-r from-maestro-gold/20 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
@@ -240,42 +243,35 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
               </FadeIn>
             </div>
 
-            {/* RIGHT SIDE - Conductor Photo */}
+            {/* RIGHT SIDE - Conductor Photo - TEMPORARILY REMOVED
             <div className="relative order-1 lg:order-2 flex justify-center lg:justify-end">
               <FadeIn delay={200}>
-                {/* Main Photo Container */}
                 <div className="relative group w-56 sm:w-64 md:w-72 lg:w-68 xl:w-76 2xl:w-[24rem]">
-                  {/* Glow Effect Behind */}
                   <div className="absolute -inset-3 md:-inset-4 bg-gradient-to-br from-maestro-gold/30 via-maestro-gold/10 to-transparent blur-2xl md:blur-3xl opacity-50 group-hover:opacity-80 transition-opacity duration-700" />
 
-                  {/* Photo Frame */}
                   <div className="relative overflow-hidden rounded-sm">
-                    {/* The Main Photo */}
                     <img
                       src="/images/diego-home.webp"
                       alt="Diego Carrión Granda - Director y Musicólogo"
                       className="w-full h-auto object-contain group-hover:scale-105 transition-all duration-1000 shadow-2xl"
                     />
 
-                    {/* Gradient Overlays on Photo */}
                     <div className="absolute inset-0 bg-gradient-to-t from-maestro-dark via-transparent to-transparent opacity-60" />
                     <div className="absolute inset-0 bg-gradient-to-br from-maestro-gold/5 via-transparent to-transparent" />
 
-                    {/* Golden Border Effect */}
                     <div className="absolute inset-0 border-2 border-maestro-gold/20 group-hover:border-maestro-gold/40 transition-colors duration-500" />
                   </div>
 
-                  {/* Decorative Frame Corners */}
                   <div className="absolute -top-2 -left-2 w-8 h-8 md:w-10 md:h-10 border-l-2 border-t-2 border-maestro-gold opacity-60" />
                   <div className="absolute -bottom-2 -right-2 w-8 h-8 md:w-10 md:h-10 border-r-2 border-b-2 border-maestro-gold opacity-60" />
 
-                  {/* Floating Name Tag - Hidden on mobile */}
                   <div className="absolute -bottom-3 md:-bottom-4 -right-3 md:-right-4 bg-maestro-dark/90 backdrop-blur-sm border border-maestro-gold/30 px-3 md:px-4 py-1.5 md:py-2 hidden md:block">
                     <p className="text-maestro-gold text-[10px] md:text-xs font-bold tracking-widest uppercase">{t.conductorTag}</p>
                   </div>
                 </div>
               </FadeIn>
             </div>
+            */}
 
           </div>
         </div>

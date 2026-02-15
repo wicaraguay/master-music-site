@@ -168,11 +168,15 @@ function App() {
             className="flex items-center gap-4 cursor-pointer"
             onClick={() => setCurrentSection(Section.HOME)}
           >
-            <div className="w-10 h-10 rounded-full border border-maestro-gold flex items-center justify-center bg-maestro-gold/10">
-              <span className="font-serif font-bold text-maestro-gold text-lg">DC</span>
+            <div className="w-11 h-11 flex items-center justify-center bg-white/10 border border-white/20 rounded-full p-0 shadow-sm overflow-hidden">
+              <img
+                src="/images/logo-portada.png"
+                alt="Logo"
+                className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(212,175,55,0.4)] scale-125"
+              />
             </div>
             <span className="text-xl font-serif font-bold tracking-wide text-maestro-light">
-              DIEGO <span className="text-maestro-gold">CARRIÓN GRANDA</span>
+              DIEGO <span className="text-maestro-gold">CARRIÓN G.</span>
             </span>
           </div>
           <button onClick={() => setCurrentSection(Section.HOME)} className="text-xs uppercase tracking-widest text-maestro-light hover:text-maestro-gold transition-colors">
