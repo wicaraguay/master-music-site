@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { FadeIn } from './FadeIn';
 import { GalleryItem, Language } from '../types';
@@ -6,7 +6,7 @@ import { translations } from '../translations';
 import { X, ChevronLeft, ChevronRight, ZoomIn, PlayCircle, Image as ImageIcon, Video, Music, ChevronDown, ArrowRight } from 'lucide-react';
 
 import { getYouTubeEmbedUrl, getYouTubeThumbnailUrl } from '../src/utils/video';
-import { getSoundCloudEmbedUrl } from '../src/utils/audio';
+import { getSoundCloudEmbedUrl, getSoundCloudOriginalUrl } from '../src/utils/audio';
 
 interface GalleryProps {
   items: GalleryItem[];
@@ -16,16 +16,37 @@ interface GalleryProps {
 export const Gallery: React.FC<GalleryProps> = ({ items, lang }) => {
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<'photos' | 'videos' | 'audio'>('photos');
+  const [activeSubTab, setActiveSubTab] = useState<string>('all');
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const t = translations[lang].gallery;
 
-  // Filter items based on active tab
+  // Filter items based on active tab and dynamic sub-categories
   const displayedItems = items.filter(item => {
-    if (activeTab === 'photos') return item.type === 'image';
-    if (activeTab === 'videos') return item.type === 'video';
-    if (activeTab === 'audio') return item.type === 'audio';
-    return false;
+    const mainTypeMatch = (activeTab === 'photos' && item.type === 'image') ||
+      (activeTab === 'videos' && item.type === 'video') ||
+      (activeTab === 'audio' && item.type === 'audio');
+
+    if (!mainTypeMatch) return false;
+    if (activeSubTab === 'all') return true;
+    return item.subCategory === activeSubTab;
   });
+
+  // Calculate dynamic sub-categories for the active tab
+  const dynamicSubTabs = Array.from(new Set(items
+    .filter(item => {
+      if (activeTab === 'photos') return item.type === 'image';
+      if (activeTab === 'videos') return item.type === 'video';
+      if (activeTab === 'audio') return item.type === 'audio';
+      return false;
+    })
+    .map(item => (item.subCategory as any)) // transformDataForLang ya lo traduce
+    .filter(Boolean)
+  )) as string[];
+
+  // Reset sub-tab when main tab changes
+  useEffect(() => {
+    setActiveSubTab('all');
+  }, [activeTab]);
 
   const openLightbox = (index: number) => {
     setSelectedImageIndex(index);
@@ -109,6 +130,35 @@ export const Gallery: React.FC<GalleryProps> = ({ items, lang }) => {
             <Music size={16} /> {(t as any).tabAudio}
           </button>
         </div>
+
+        {/* Dynamic Sub-filters - Shown for any tab that has sub-categories */}
+        {dynamicSubTabs.length > 0 && (
+          <FadeIn>
+            <div className="flex flex-wrap justify-center gap-4 mb-12">
+              <button
+                onClick={() => setActiveSubTab('all')}
+                className={`px-6 py-2 rounded-full text-[10px] uppercase tracking-widest font-bold transition-all border ${activeSubTab === 'all'
+                  ? 'bg-maestro-gold text-maestro-dark border-maestro-gold shadow-[0_0_15px_rgba(234,179,8,0.3)]'
+                  : 'text-maestro-light/40 border-white/10 hover:border-maestro-gold/50 hover:text-maestro-gold'
+                  }`}
+              >
+                {(t as any).filterAll || "Todos"}
+              </button>
+              {dynamicSubTabs.map((subTab) => (
+                <button
+                  key={subTab}
+                  onClick={() => setActiveSubTab(subTab)}
+                  className={`px-6 py-2 rounded-full text-[10px] uppercase tracking-widest font-bold transition-all border ${activeSubTab === subTab
+                    ? 'bg-maestro-gold text-maestro-dark border-maestro-gold shadow-[0_0_15px_rgba(234,179,8,0.3)]'
+                    : 'text-maestro-light/40 border-white/10 hover:border-maestro-gold/50 hover:text-maestro-gold'
+                    }`}
+                >
+                  {subTab}
+                </button>
+              ))}
+            </div>
+          </FadeIn>
+        )}
 
         {/* Grid Layout (Garantiza 3 por fila en escritorio) */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -284,7 +334,7 @@ export const Gallery: React.FC<GalleryProps> = ({ items, lang }) => {
 
                   {displayedItems[selectedImageIndex].type === 'audio' && (
                     <a
-                      href={displayedItems[selectedImageIndex].src}
+                      href={getSoundCloudOriginalUrl(displayedItems[selectedImageIndex].src)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-2 text-maestro-gold hover:text-white transition-colors text-[10px] uppercase tracking-[0.2em] font-bold group"

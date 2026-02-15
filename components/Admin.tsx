@@ -3,16 +3,17 @@ import { FadeIn } from './FadeIn';
 import {
     Lock, LogOut, FileText, Music, UploadCloud, Trash2, PlusCircle,
     LayoutDashboard, Image as ImageIcon, X, Briefcase, BookOpen, Calendar, MapPin, Video, PlayCircle, Edit, Save, RotateCcw, Database,
-    ChevronDown, ArrowRight
+    ChevronDown, ArrowRight, Mail
 } from 'lucide-react';
-import { BlogPost, Resource, ExperienceItem, ResearchPaper, Performance, GalleryItem, Language } from '../types';
+import { BlogPost, Resource, ExperienceItem, ResearchPaper, Performance, GalleryItem, Language, ContactMessage } from '../types';
+import { translations } from '../translations';
 import { addItem, updateItem, deleteItem as deleteDbItem } from '../src/services/db';
 import { signIn, logout } from '../src/services/auth';
 import { uploadToStorage } from '../src/services/storage';
 import { translateFields } from '../src/services/translationService';
 import { RichTextEditor } from './RichTextEditor';
 import { getYouTubeEmbedUrl, getYouTubeThumbnailUrl } from '../src/utils/video';
-import { getSoundCloudEmbedUrl } from '../src/utils/audio';
+import { getSoundCloudEmbedUrl, getSoundCloudOriginalUrl } from '../src/utils/audio';
 import { compressImage } from '../src/utils/image';
 
 interface AdminProps {
@@ -27,11 +28,12 @@ interface AdminProps {
     research: ResearchPaper[]; setResearch: (items: ResearchPaper[]) => void;
     performances: Performance[]; setPerformances: (items: Performance[]) => void;
     gallery: GalleryItem[]; setGallery: (items: GalleryItem[]) => void;
+    messages: ContactMessage[]; setMessages: (messages: ContactMessage[]) => void;
 }
 
 export const Admin: React.FC<AdminProps> = ({
     isAuthenticated, onLogin, userEmail, lang,
-    posts, resources, experience, research, performances, gallery
+    posts, resources, experience, research, performances, gallery, messages
 }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -40,7 +42,7 @@ export const Admin: React.FC<AdminProps> = ({
     const [translating, setTranslating] = useState(false);
     const [compressing, setCompressing] = useState(false);
 
-    type Tab = 'blog' | 'resources' | 'experience' | 'research' | 'performances' | 'gallery';
+    type Tab = 'blog' | 'resources' | 'experience' | 'research' | 'performances' | 'gallery' | 'messages';
     const [activeTab, setActiveTab] = useState<Tab>('blog');
 
     // Track which item ID is being edited. Null means "Creating New".
@@ -85,6 +87,7 @@ export const Admin: React.FC<AdminProps> = ({
     const [newGalSrc, setNewGalSrc] = useState('');
     const [newGalThumbnail, setNewGalThumbnail] = useState('');
     const [newGalCat, setNewGalCat] = useState('');
+    const [newGalSubCat, setNewGalSubCat] = useState('');
     const [newGalAuthor, setNewGalAuthor] = useState('');
     const [newGalCap, setNewGalCap] = useState('');
 
@@ -123,7 +126,8 @@ export const Admin: React.FC<AdminProps> = ({
         // Perf
         setNewPerfDate(''); setNewPerfTitle(''); setNewPerfLoc(''); setNewPerfRole(''); setNewPerfDesc(''); setNewPerfImages([]);
         // Gal
-        setNewGalSrc(''); setNewGalThumbnail(''); setNewGalCat('');
+        setNewGalCat('');
+        setNewGalSubCat('');
         setNewGalAuthor('');
         setNewGalCap('');
     };
@@ -434,16 +438,21 @@ export const Admin: React.FC<AdminProps> = ({
         if (!newGalSrc) return;
         try {
             setTranslating(true);
-            const translations = await translateFields(
-                { caption: newGalCap, category: newGalCat, author: newGalAuthor },
-                ['caption', 'category', 'author']
+            const translations_data = await translateFields(
+                { caption: newGalCap, category: newGalCat, author: newGalAuthor, subCategory: newGalSubCat },
+                ['caption', 'category', 'author', 'subCategory']
             );
 
             await saveToDb('gallery', editingId,
-                { caption: translations.caption, category: translations.category, author: translations.author },
+                {
+                    caption: translations_data.caption,
+                    category: translations_data.category,
+                    author: translations_data.author,
+                    subCategory: translations_data.subCategory
+                },
                 {
                     type: newGalType,
-                    src: newGalType === 'video' ? getYouTubeEmbedUrl(newGalSrc) : (newGalType === 'audio' ? getSoundCloudEmbedUrl(newGalSrc) : newGalSrc),
+                    src: newGalType === 'video' ? getYouTubeEmbedUrl(newGalSrc) : (newGalType === 'audio' ? getSoundCloudOriginalUrl(newGalSrc) : newGalSrc),
                     thumbnail: newGalType === 'video' ? (newGalThumbnail || getYouTubeThumbnailUrl(newGalSrc)) : newGalThumbnail
                 }
             );
@@ -462,6 +471,7 @@ export const Admin: React.FC<AdminProps> = ({
         setNewGalSrc(item.src);
         setNewGalThumbnail(item.thumbnail || '');
         setNewGalCat((item.category as any)?.es || item.category || '');
+        setNewGalSubCat((item.subCategory as any)?.es || item.subCategory || '');
         setNewGalAuthor((item.author as any)?.es || item.author || '');
         setNewGalCap((item.caption as any)?.es || item.caption || '');
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -607,6 +617,7 @@ export const Admin: React.FC<AdminProps> = ({
                             { id: 'research', label: 'Investigación', icon: BookOpen },
                             { id: 'performances', label: 'Eventos', icon: Calendar },
                             { id: 'gallery', label: 'Galería', icon: ImageIcon },
+                            { id: 'messages', label: 'Mensajes', icon: Mail },
                         ].map(tab => (
                             <button
                                 key={tab.id}
@@ -908,6 +919,61 @@ export const Admin: React.FC<AdminProps> = ({
                             </FadeIn>
                         )}
 
+                        {/* 7. MESSAGES MANAGEMENT */}
+                        {activeTab === 'messages' && (
+                            <FadeIn>
+                                <div className="flex justify-between items-center mb-6">
+                                    <h3 className="text-xl font-serif text-maestro-light flex items-center gap-2">
+                                        <Mail className="text-maestro-gold" size={20} />
+                                        {translations[lang].admin.messagesTitle}
+                                    </h3>
+                                </div>
+
+                                <div className="space-y-4">
+                                    {messages.length > 0 ? (
+                                        [...messages].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map(msg => (
+                                            <div key={msg.id} className={`p-6 border transition-all bg-maestro-dark border-white/5 hover:border-maestro-gold/30 ${!msg.read ? 'border-l-4 border-l-maestro-gold' : ''}`}>
+                                                <div className="flex justify-between items-start mb-4">
+                                                    <div>
+                                                        <h4 className="text-maestro-light font-bold text-lg">{msg.name}</h4>
+                                                        <p className="text-maestro-gold text-sm">{msg.email}</p>
+                                                        <span className="text-[10px] uppercase tracking-widest text-maestro-light/40">
+                                                            {new Date(msg.date).toLocaleString(lang === 'ru' ? 'ru-RU' : (lang === 'en' ? 'en-US' : 'es-ES'))}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex gap-2">
+                                                        {!msg.read && (
+                                                            <button
+                                                                onClick={() => updateItem('messages', msg.id, { read: true })}
+                                                                className="text-maestro-light/30 hover:text-maestro-gold p-2 transition-colors"
+                                                                title={translations[lang].admin.markAsRead}
+                                                            >
+                                                                <Save size={18} />
+                                                            </button>
+                                                        )}
+                                                        <button
+                                                            onClick={() => handleDelete('messages', msg.id)}
+                                                            className="text-maestro-light/30 hover:text-red-500 p-2 transition-colors"
+                                                            title={translations[lang].admin.deleteMessage}
+                                                        >
+                                                            <Trash2 size={18} />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div className="bg-black/20 p-4 rounded text-maestro-light/70 text-sm whitespace-pre-wrap">
+                                                    {msg.message}
+                                                </div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="text-center py-12 bg-black/20 border border-dashed border-white/5 rounded-sm">
+                                            <p className="text-white/20 text-xs italic">{translations[lang].admin.noMessages}</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </FadeIn>
+                        )}
+
                         {/* 6. GALLERY MANAGEMENT */}
                         {activeTab === 'gallery' && (
                             <FadeIn>
@@ -983,17 +1049,6 @@ export const Admin: React.FC<AdminProps> = ({
                                             </div>
                                         </div>
                                     )}
-
-                                    {newGalType === 'video' && (
-                                        <input
-                                            type="text"
-                                            value={newGalThumbnail}
-                                            onChange={(e) => setNewGalThumbnail(e.target.value)}
-                                            placeholder="URL Miniatura (Opcional, se genera auto para YouTube)"
-                                            className="w-full bg-maestro-dark border border-white/10 p-3 text-white"
-                                        />
-                                    )}
-
                                     <div className="space-y-4">
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <input
@@ -1003,11 +1058,38 @@ export const Admin: React.FC<AdminProps> = ({
                                                 placeholder="Título (ej: Sinfonía No. 5)"
                                                 className="w-full bg-maestro-dark border border-white/10 p-3 text-white"
                                             />
+                                            <div className="space-y-2">
+                                                <input
+                                                    type="text"
+                                                    value={newGalSubCat}
+                                                    onChange={(e) => setNewGalSubCat(e.target.value)}
+                                                    placeholder="Categoría (ej: Retratos, Conciertos, Director)"
+                                                    className="w-full bg-maestro-dark border border-white/10 p-3 text-white"
+                                                />
+                                                {/* Sugerencias de categorías existentes */}
+                                                <div className="flex flex-wrap gap-2">
+                                                    {Array.from(new Set(gallery
+                                                        .filter(item => item.type === newGalType && item.subCategory)
+                                                        .map(item => (item.subCategory as any)?.es || item.subCategory)
+                                                    )).map((cat, idx) => (
+                                                        <button
+                                                            key={idx}
+                                                            type="button"
+                                                            onClick={() => setNewGalSubCat(cat || '')}
+                                                            className={`text-[10px] px-2 py-1 border rounded transition-all ${newGalSubCat === cat ? 'bg-maestro-gold text-maestro-dark border-maestro-gold' : 'border-white/10 text-white/40 hover:text-white hover:border-white/30'}`}
+                                                        >
+                                                            {cat}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <input
                                                 type="text"
                                                 value={newGalAuthor}
                                                 onChange={(e) => setNewGalAuthor(e.target.value)}
-                                                placeholder="Autor (ej: Beethoven, Grabación propia)"
+                                                placeholder="Autor / Orquesta (ej: Orquesta Sinfónica de Guayaquil)"
                                                 className="w-full bg-maestro-dark border border-white/10 p-3 text-white"
                                             />
                                         </div>
@@ -1092,7 +1174,7 @@ export const Admin: React.FC<AdminProps> = ({
 
                     </div>
                 </div>
-            </div>
-        </section>
+            </div >
+        </section >
     );
 };

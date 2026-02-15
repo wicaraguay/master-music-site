@@ -23,7 +23,7 @@ export const translations = {
       back: 'Volver al Sitio'
     },
     home: {
-      role: 'Violinista | Director de Orquesta | Investigador',
+      role: 'Director de Orquesta',
       intro: '"Director de Ópera y Orquesta Sinfónica."',
       conductorTag: 'Director',
       ctaWork: 'Conoce mi trabajo',
@@ -122,13 +122,17 @@ export const translations = {
       tabAudio: 'Audio',
       emptyPhotos: 'No hay fotos disponibles.',
       emptyVideos: 'No hay videos disponibles.',
-      emptyAudio: 'No hay grabaciones de audio disponibles.'
+      emptyAudio: 'No hay grabaciones de audio disponibles.',
+      filterAll: 'Todos',
+      videoCategorySymphonic: 'Director de Orquesta',
+      videoCategoryOthers: 'Otros Autores'
     },
     contact: {
       title: 'Contacto',
       subtitle: 'Para contrataciones, colaboraciones académicas o consultas generales.',
       name: 'Nombre',
       email: 'Email',
+      phone: 'Teléfono',
       message: 'Mensaje',
       send: 'Enviar Mensaje',
       follow: 'Sígueme en redes'
@@ -140,7 +144,11 @@ export const translations = {
       save: 'Guardar',
       edit: 'Editar',
       delete: 'Eliminar',
-      cancel: 'Cancelar'
+      cancel: 'Cancelar',
+      messagesTitle: 'Mensajes Recibidos',
+      noMessages: 'No hay mensajes nuevos.',
+      markAsRead: 'Marcar como leído',
+      deleteMessage: 'Eliminar mensaje'
     },
     calendar: {
       months: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
@@ -164,7 +172,7 @@ export const translations = {
       back: 'Back to Site'
     },
     home: {
-      role: 'Violinist | Conductor | Researcher',
+      role: 'Conductor',
       intro: '"Opera and Symphony Orchestra Conductor."',
       conductorTag: 'Conductor',
       ctaWork: 'See My Work',
@@ -248,13 +256,17 @@ export const translations = {
       tabAudio: 'Audio',
       emptyPhotos: 'No photos available.',
       emptyVideos: 'No videos available.',
-      emptyAudio: 'No audio recordings available.'
+      emptyAudio: 'No audio recordings available.',
+      filterAll: 'All',
+      videoCategorySymphonic: 'Orchestra Conductor',
+      videoCategoryOthers: 'Other Authors'
     },
     contact: {
       title: 'Contact',
       subtitle: 'For bookings, academic collaborations, or general inquiries.',
       name: 'Name',
       email: 'Email',
+      phone: 'Phone',
       message: 'Message',
       send: 'Send Message',
       follow: 'Follow me'
@@ -266,7 +278,11 @@ export const translations = {
       save: 'Save',
       edit: 'Edit',
       delete: 'Delete',
-      cancel: 'Cancel'
+      cancel: 'Cancel',
+      messagesTitle: 'Received Messages',
+      noMessages: 'No new messages.',
+      markAsRead: 'Mark as read',
+      deleteMessage: 'Delete message'
     },
     calendar: {
       months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
@@ -290,7 +306,7 @@ export const translations = {
       back: 'Вернуться на сайт'
     },
     home: {
-      role: 'Скрипач | Дирижер | Исследователь',
+      role: 'Дирижер',
       intro: '"Оперный и симфонический дирижер."',
       conductorTag: 'Дирижер',
       ctaWork: 'Мои работы',
@@ -374,13 +390,17 @@ export const translations = {
       tabAudio: 'Аудио',
       emptyPhotos: 'Нет доступных фотографий.',
       emptyVideos: 'Нет доступных видео.',
-      emptyAudio: 'Нет доступных аудиозаписей.'
+      emptyAudio: 'Нет доступных аудиозаписей.',
+      filterAll: 'Все',
+      videoCategorySymphonic: 'Дирижер оркестра',
+      videoCategoryOthers: 'Другие авторы'
     },
     contact: {
       title: 'Контакты',
       subtitle: 'Для бронирования, академического сотрудничества или общих вопросов.',
       name: 'Имя',
       email: 'Email',
+      phone: 'Телефон',
       message: 'Сообщение',
       send: 'Отправить сообщение',
       follow: 'Следите за мной'
@@ -392,7 +412,11 @@ export const translations = {
       save: 'Сохранить',
       edit: 'Редактировать',
       delete: 'Удалить',
-      cancel: 'Отмена'
+      cancel: 'Отмена',
+      messagesTitle: 'Полученные сообщения',
+      noMessages: 'Новых сообщений нет.',
+      markAsRead: 'Пометить как прочитанное',
+      deleteMessage: 'Удалить сообщение'
     },
     calendar: {
       months: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],

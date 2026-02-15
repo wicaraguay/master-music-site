@@ -12,7 +12,7 @@ import { Resources } from './components/Resources';
 
 import { Admin } from './components/Admin';
 import { translations, getInitialExperience, getInitialPerformances, getInitialPosts, getInitialResearch, getInitialResources, getInitialGallery } from './translations';
-import { Section, BlogPost, Resource, ExperienceItem, ResearchPaper, Performance, GalleryItem, Language } from './types';
+import { Section, BlogPost, Resource, ExperienceItem, ResearchPaper, Performance, GalleryItem, Language, ContactMessage } from './types';
 // Note: importing Section from translations might be wrong if it's in types.ts.
 // Step 144 showed: import { Section, ... } from './types';
 // I need to be careful with imports.
@@ -51,6 +51,7 @@ function App() {
   const [rawResearch, setRawResearch] = useState<any[]>([]);
   const [rawPerformances, setRawPerformances] = useState<any[]>([]);
   const [rawGallery, setRawGallery] = useState<any[]>([]);
+  const [rawMessages, setRawMessages] = useState<any[]>([]);
 
   // Transformed data for display (current language)
   const [posts, setPosts] = useState<BlogPost[]>([]);
@@ -59,6 +60,7 @@ function App() {
   const [research, setResearch] = useState<ResearchPaper[]>([]);
   const [performances, setPerformances] = useState<Performance[]>([]);
   const [gallery, setGallery] = useState<GalleryItem[]>([]);
+  const [messages, setMessages] = useState<ContactMessage[]>([]);
 
   // Auto-detect Language
   useEffect(() => {
@@ -85,7 +87,8 @@ function App() {
       subscribeToCollection('experience', setRawExperience),
       subscribeToCollection('research', setRawResearch),
       subscribeToCollection('performances', setRawPerformances),
-      subscribeToCollection('gallery', setRawGallery)
+      subscribeToCollection('gallery', setRawGallery),
+      subscribeToCollection('messages', setRawMessages)
     ];
 
     return () => unsubs.forEach(unsub => unsub());
@@ -99,7 +102,8 @@ function App() {
     setResearch(transformDataForLang(rawResearch, lang));
     setPerformances(transformDataForLang(rawPerformances, lang));
     setGallery(transformDataForLang(rawGallery, lang));
-  }, [rawPosts, rawResources, rawExperience, rawResearch, rawPerformances, rawGallery, lang]);
+    setMessages(rawMessages); // Messages don't need transformation
+  }, [rawPosts, rawResources, rawExperience, rawResearch, rawPerformances, rawGallery, rawMessages, lang]);
 
   // Scroll to top
   useEffect(() => {
@@ -139,6 +143,7 @@ function App() {
             research={rawResearch} setResearch={setRawResearch}
             performances={rawPerformances} setPerformances={setRawPerformances}
             gallery={rawGallery} setGallery={setRawGallery}
+            messages={rawMessages} setMessages={setRawMessages}
           />
         );
       default:

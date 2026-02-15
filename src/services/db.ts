@@ -12,7 +12,7 @@ import {
 import { ExperienceItem, ResearchPaper, Performance, BlogPost, Resource, GalleryItem, Language } from "../../types";
 
 // Generic types
-type CollectionName = 'experience' | 'research' | 'performances' | 'posts' | 'resources' | 'gallery';
+type CollectionName = 'experience' | 'research' | 'performances' | 'posts' | 'resources' | 'gallery' | 'messages';
 
 // Helper to get collection reference
 const getColRef = (colName: CollectionName) => collection(db, colName);
