@@ -21,12 +21,15 @@ export const Performances: React.FC<PerformancesProps> = ({ items, lang }) => {
     // 1. Prefer dateISO if available (new items)
     if (perf.dateISO) {
       const eventDate = new Date(perf.dateISO);
+      eventDate.setHours(0, 0, 0, 0);
       return eventDate >= today ? 'upcoming' : 'past';
     }
 
     // 2. Legacy fallback: Attempt to parse the date string (format "DD MMM YYYY")
     try {
-      const dateStr = (perf.date as any)?.es || (perf.date as any)?.en || (typeof perf.date === 'string' ? perf.date : '');
+      // Prioritize date_raw (always Spanish) if available from transformation, 
+      // otherwise try localized versions or current string
+      const dateStr = (perf as any).date_raw || (perf.date as any)?.es || (perf.date as any)?.en || (typeof perf.date === 'string' ? perf.date : '');
 
       if (dateStr && typeof dateStr === 'string') {
         const parts = dateStr.trim().split(' ');
@@ -37,8 +40,12 @@ export const Performances: React.FC<PerformancesProps> = ({ items, lang }) => {
 
           if (!isNaN(day) && !isNaN(year)) {
             const months: Record<string, number> = {
-              'ene': 0, 'jan': 0, 'feb': 1, 'mar': 2, 'abr': 3, 'apr': 3, 'may': 4,
-              'jun': 5, 'jul': 6, 'ago': 7, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dic': 11, 'dec': 11
+              // Spanish
+              'ene': 0, 'feb': 1, 'mar': 2, 'abr': 3, 'may': 4, 'jun': 5, 'jul': 6, 'ago': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dic': 11,
+              // English
+              'jan': 0, 'apr': 3, 'aug': 7, 'dec': 11,
+              // Russian (Transliterated/Common)
+              'янв': 0, 'фев': 1, 'апр': 3, 'май': 4, 'июн': 5, 'июл': 6, 'авг': 7, 'сен': 8, 'окт': 9, 'ноя': 10, 'дек': 11
             };
 
             const month = months[monthStr.substring(0, 3)];

@@ -52,8 +52,56 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
       days.push(i);
     }
 
+    const getDynamicStatus = (perf: Performance): 'upcoming' | 'past' => {
+      // 1. Prefer dateISO if available
+      if (perf.dateISO) {
+        const eventDate = new Date(perf.dateISO);
+        eventDate.setHours(0, 0, 0, 0);
+        return eventDate >= today ? 'upcoming' : 'past';
+      }
+
+      // 2. Legacy fallback: Attempt to parse the date string (format "DD MMM YYYY")
+      try {
+        // Prioritize date_raw (always Spanish) if available from transformation, 
+        // otherwise try localized versions or current string
+        const dateStr = (perf as any).date_raw || (perf.date as any)?.es || (perf.date as any)?.en || (typeof perf.date === 'string' ? perf.date : '');
+
+        if (dateStr && typeof dateStr === 'string') {
+          const parts = dateStr.trim().split(' ');
+          if (parts.length === 3) {
+            const day = parseInt(parts[0]);
+            const monthStr = parts[1].toLowerCase().replace('.', '');
+            const year = parseInt(parts[2]);
+
+            if (!isNaN(day) && !isNaN(year)) {
+              const months: Record<string, number> = {
+                // Spanish
+                'ene': 0, 'feb': 1, 'mar': 2, 'abr': 3, 'may': 4, 'jun': 5, 'jul': 6, 'ago': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dic': 11,
+                // English
+                'jan': 0, 'apr': 3, 'aug': 7, 'dec': 11,
+                // Russian (Transliterated/Common)
+                'янв': 0, 'фев': 1, 'апр': 3, 'май': 4, 'июн': 5, 'июл': 6, 'авг': 7, 'сен': 8, 'окт': 9, 'ноя': 10, 'дек': 11
+              };
+
+              const month = months[monthStr.substring(0, 3)];
+              if (month !== undefined) {
+                const eventDate = new Date(year, month, day);
+                return eventDate >= today ? 'upcoming' : 'past';
+              }
+            }
+          }
+        }
+      } catch (e) { }
+
+      return perf.status;
+    };
+
     const hasEvent = (day: number) => {
       return performanceItems.some(perf => {
+        if (perf.dateISO) {
+          const d = new Date(perf.dateISO);
+          return d.getDate() === day && d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+        }
         const perfDate = new Date((perf as any).date_raw || perf.date);
         return perfDate.getDate() === day && perfDate.getMonth() === currentMonth && perfDate.getFullYear() === currentYear;
       });
@@ -61,6 +109,10 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
 
     const getEventForDay = (day: number) => {
       return performanceItems.find(perf => {
+        if (perf.dateISO) {
+          const d = new Date(perf.dateISO);
+          return d.getDate() === day && d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+        }
         const perfDate = new Date((perf as any).date_raw || perf.date);
         return perfDate.getDate() === day && perfDate.getMonth() === currentMonth && perfDate.getFullYear() === currentYear;
       });
@@ -102,7 +154,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
               >
                 {day}
                 {event && (
-                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-maestro-gold rounded-full shadow-[0_0_8px_rgba(234,179,8,0.8)] animate-pulse" />
+                  <div className={`absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full shadow-[0_0_8px_rgba(234,179,8,0.8)] animate-pulse ${getDynamicStatus(event) === 'upcoming' ? 'bg-maestro-gold' : 'bg-white/20 shadow-none'}`} />
                 )}
 
                 {/* Tooltip Popup */}
@@ -117,7 +169,12 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
                       )}
                       <div className="p-4">
                         <div className="absolute top-2 right-2 w-4 h-4 bg-maestro-dark border-r border-b border-maestro-gold/40 rotate-45 -mb-2" />
-                        <span className="text-[10px] uppercase tracking-widest text-maestro-gold font-bold mb-1 block">{event.date}</span>
+                        <div className="flex justify-between items-start mb-1">
+                          <span className="text-[10px] uppercase tracking-widest text-maestro-gold font-bold block">{event.date}</span>
+                          <span className={`text-[8px] uppercase tracking-widest font-bold px-1.5 py-0.5 rounded border ${getDynamicStatus(event) === 'upcoming' ? 'text-maestro-gold border-maestro-gold/30' : 'text-white/30 border-white/10'}`}>
+                            {getDynamicStatus(event) === 'upcoming' ? translations[lang].performances.statusUpcoming : translations[lang].performances.statusPast}
+                          </span>
+                        </div>
                         <h4 className="text-sm font-serif text-white mb-1 leading-tight">{event.title}</h4>
                         <p className="text-[10px] text-white/50 mb-2">{event.location}</p>
                         <button
