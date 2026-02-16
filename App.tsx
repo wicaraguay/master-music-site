@@ -22,6 +22,31 @@ import { subscribeToAuthChanges } from './src/services/auth';
 import type { User } from 'firebase/auth';
 import { Terminal, Menu, X, Globe, ArrowUp, Instagram, Linkedin, Youtube, Facebook, Send, MessageCircle } from 'lucide-react';
 
+// Background Image Preloader
+const StaticImagePreloader: React.FC = () => {
+  useEffect(() => {
+    const imagesToPreload = [
+      '/images/section-header2.webp',
+      '/images/section-events.webp',
+      '/images/section-text.webp',
+      '/images/section-avaliable.webp',
+      '/images/page-contact.webp',
+      '/images/page-blog.webp',
+      '/images/page-events.webp',
+      '/images/section-experience.webp',
+      '/images/section-research.webp',
+      '/images/section-footer.webp'
+    ];
+
+    imagesToPreload.forEach(src => {
+      const img = new Image();
+      img.src = src;
+    });
+  }, []);
+
+  return null;
+};
+
 function App() {
   const [currentSection, setCurrentSection] = useState<Section>(Section.HOME);
   const [lang, setLang] = useState<Language>('es');
@@ -153,6 +178,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-maestro-dark text-maestro-light selection:bg-maestro-gold selection:text-maestro-dark font-sans flex flex-col">
+      <StaticImagePreloader />
       {currentSection !== Section.ADMIN && (
         <Navigation
           currentSection={currentSection}

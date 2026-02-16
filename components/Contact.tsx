@@ -21,6 +21,37 @@ const VkIcon = ({ size = 20 }: { size?: number }) => (
     </svg>
 );
 
+const WhatsAppIcon = ({ size = 20 }: { size?: number }) => (
+    <svg
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+    >
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.414 0 .018 5.396.015 12.03c0 2.12.554 4.189 1.605 6.039L0 24l6.117-1.605a11.803 11.803 0 005.925 1.597h.005c6.635 0 12.032-5.396 12.035-12.031a11.774 11.774 0 00-3.517-8.293" />
+    </svg>
+);
+
+const TelegramIcon = ({ size = 20 }: { size?: number }) => (
+    <svg
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+    >
+        <path d="m22 2-7 20-4-9-9-4Z" />
+        <path d="M22 2 11 13" />
+    </svg>
+);
+
 import { addItem } from '../src/services/db';
 
 interface ContactProps {
@@ -115,8 +146,8 @@ export const Contact: React.FC<ContactProps> = ({ lang }) => {
                                 <button
                                     disabled={status === 'submitting'}
                                     className={`w-full font-bold py-3 uppercase tracking-widest transition-all shadow-lg ${status === 'success' ? 'bg-green-600 text-white' :
-                                            status === 'error' ? 'bg-red-600 text-white' :
-                                                'bg-maestro-gold text-white hover:bg-white hover:text-maestro-dark shadow-maestro-gold/20'
+                                        status === 'error' ? 'bg-red-600 text-white' :
+                                            'bg-maestro-gold text-white hover:bg-white hover:text-maestro-dark shadow-maestro-gold/20'
                                         }`}
                                 >
                                     {status === 'submitting' ? '...' :
@@ -143,9 +174,19 @@ export const Contact: React.FC<ContactProps> = ({ lang }) => {
                                 <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center text-maestro-gold group-hover:bg-maestro-gold group-hover:text-white transition-all">
                                     <Phone />
                                 </div>
-                                <div>
+                                <div className="flex-1">
                                     <h4 className="font-serif text-xl">{t.phone}</h4>
-                                    <p className="text-maestro-light/60 font-light">+79 179 013 345</p>
+                                    <div className="flex flex-wrap items-center gap-3 mt-1">
+                                        <p className="text-maestro-light/60 font-light">+79 179 013 345</p>
+                                        <div className="flex gap-2">
+                                            <a href="https://wa.me/79179013345" target="_blank" rel="noopener noreferrer" className="text-maestro-gold hover:text-white transition-colors bg-white/5 p-1 rounded hover:bg-maestro-gold/20" title="WhatsApp">
+                                                <WhatsAppIcon size={16} />
+                                            </a>
+                                            <a href="https://t.me/+79179013345" target="_blank" rel="noopener noreferrer" className="text-maestro-gold hover:text-white transition-colors bg-white/5 p-1 rounded hover:bg-maestro-gold/20" title="Telegram">
+                                                <TelegramIcon size={16} />
+                                            </a>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -158,6 +199,12 @@ export const Contact: React.FC<ContactProps> = ({ lang }) => {
                                 </a>
                                 <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 border border-white/20 rounded-full flex items-center justify-center text-maestro-light hover:border-maestro-gold hover:text-maestro-gold transition-all hover:scale-110">
                                     <Facebook size={20} />
+                                </a>
+                                <a href="https://wa.me/79179013345" target="_blank" rel="noopener noreferrer" className="w-10 h-10 border border-white/20 rounded-full flex items-center justify-center text-maestro-light hover:border-maestro-gold hover:text-maestro-gold transition-all hover:scale-110">
+                                    <WhatsAppIcon size={20} />
+                                </a>
+                                <a href="https://t.me/+79179013345" target="_blank" rel="noopener noreferrer" className="w-10 h-10 border border-white/20 rounded-full flex items-center justify-center text-maestro-light hover:border-maestro-gold hover:text-maestro-gold transition-all hover:scale-110">
+                                    <TelegramIcon size={20} />
                                 </a>
                                 <a href="https://vk.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 border border-white/20 rounded-full flex items-center justify-center text-maestro-light hover:border-maestro-gold hover:text-maestro-gold transition-all hover:scale-110">
                                     <VkIcon size={20} />

@@ -30,7 +30,7 @@ export const translations = {
       ctaContact: 'Contacto',
       aboutTitle: 'Sobre Mí',
       aboutHeading: 'No soy perfecto, pero sí perfectible.',
-      aboutText1: 'Mi carrera se define por una dualidad: cuando dirijo una ópera o un concierto sinfónico, cada ensayo es una pequeña conversación. Una obra de Bach, Haydn, Bethoveen, Liszt, Salgado la hemos escuchado mil veces, pero cada orquesta es distinta, cada función tiene su propia energía.',
+      aboutText1: 'Esta cualidad me define: dinámico, en cada concierto descubro nuevas formas de interpretar y hacer vibrar al público. Con mis alumnos aprendo que enseñar y afianza el conocimiento. Estrenar obras es ver nacer un ente vivo que crece y vuela en el tiempo y con el tiempo, resonando en la eternidad.',
       aboutText2: 'Mi investigación doctoral profundiza en las partituras olvidadas, trayendo a la luz obras maestras que merecen ser escuchadas nuevamente, interpretadas con una sensibilidad moderna.',
       readBio: 'Leer Biografía Completa',
       focusTitle: 'Panorama Profesional',
@@ -92,7 +92,12 @@ export const translations = {
       titlePrefix: 'Agenda de',
       titleSuffix: 'Eventos',
       moreDetails: '* Más detalles próximamente',
-      imgCredit: 'Imagen del recinto:'
+      imgCredit: 'Imagen del recinto:',
+      statusUpcoming: 'Próximamente',
+      statusPast: 'Realizado',
+      filterAll: 'Todos',
+      filterUpcoming: 'Próximos',
+      filterPast: 'Archivo'
     },
     blog: {
       badge: 'Pensamiento Musical',
@@ -102,7 +107,12 @@ export const translations = {
       empty: 'No hay publicaciones disponibles por el momento.',
       galleryCount: 'Imágenes en galería',
       readMore: 'Leer Artículo Completo',
-      galleryTitle: 'Galería Visual'
+      galleryTitle: 'Galería Visual',
+      notesTitle: 'Notas desde el Podio',
+      notesBody: 'Explora artículos sobre teoría musical, experiencias de dirección y reflexiones artísticas compartidas por el Maestro.',
+      notesStats: 'Artículos Publicados',
+      featuredLabel: 'Última Publicación',
+      closeArticle: 'Cerrar Artículo'
     },
     resources: {
       badge: 'Biblioteca Digital',
@@ -179,7 +189,7 @@ export const translations = {
       ctaContact: 'Contact',
       aboutTitle: 'About Me',
       aboutHeading: 'I am not perfect, but I am perfectible.',
-      aboutText1: 'My career is defined by a duality: when I conduct an opera or a symphonic concert, every rehearsal is a small conversation. We have heard a work by Bach, Haydn, Beethoven, Liszt, or Salgado a thousand times, but every orchestra is different, and every performance has its own energy.',
+      aboutText1: 'This quality defines me: dynamic, in every concert I discover new ways to interpret and move the audience. With my students, I learn that teaching strengthens knowledge. Premiering works is witnessing the birth of a living entity that grows and flies through and with time, resonating in eternity.',
       aboutText2: 'My doctoral research delves into forgotten scores, bringing to light masterpieces that deserve to be heard again, performed with modern sensitivity.',
       readBio: 'Read Full Biography',
       focusTitle: 'Professional Outlook',
@@ -226,7 +236,12 @@ export const translations = {
       titlePrefix: 'Agenda of',
       titleSuffix: 'Events',
       moreDetails: '* More details coming soon',
-      imgCredit: 'Venue image:'
+      imgCredit: 'Venue image:',
+      statusUpcoming: 'Upcoming',
+      statusPast: 'Performed',
+      filterAll: 'All',
+      filterUpcoming: 'Upcoming',
+      filterPast: 'Archive'
     },
     blog: {
       badge: 'Musical Thought',
@@ -236,7 +251,12 @@ export const translations = {
       empty: 'No posts available at the moment.',
       galleryCount: 'Images in gallery',
       readMore: 'Read Full Article',
-      galleryTitle: 'Visual Gallery'
+      galleryTitle: 'Visual Gallery',
+      notesTitle: 'Notes from the Podium',
+      notesBody: 'Explore articles on music theory, conducting experiences, and artistic reflections shared by the Maestro.',
+      notesStats: 'Published Articles',
+      featuredLabel: 'Latest Post',
+      closeArticle: 'Close Article'
     },
     resources: {
       badge: 'Digital Library',
@@ -313,7 +333,7 @@ export const translations = {
       ctaContact: 'Контакты',
       aboutTitle: 'Обо мне',
       aboutHeading: 'Я не совершенен, но я совершенствуем.',
-      aboutText1: 'Моя карьера определяется двойственностью: когда я дирижирую оперой или симфоническим концертом, каждая репетиция — это небольшой разговор. Мы тысячу раз слышали произведения Баха, Гайдна, Бетховена, Листа, Сальгадо, но каждый оркестр индивидуален, у каждого выступления своя энергия.',
+      aboutText1: 'Это качество определяет меня: динамичный, в каждом концерте я открываю новые формы интерпретации и заставляю публику вибрировать. Вместе со своими учениками я узнаю, что преподавание укрепляет знания. Премьера произведений — это рождение живого существа, которое растет и летит сквозь время и со временем, резонируя в вечности.',
       aboutText2: 'Мое докторское исследование посвящено забытым партитурам, возвращая к жизни шедевры, которые заслуживают того, чтобы быть услышанными снова, исполненные с современной чуткостью.',
       readBio: 'Читать полную биографию',
       focusTitle: 'Профессиональный обзор',
@@ -360,7 +380,12 @@ export const translations = {
       titlePrefix: 'Афиша',
       titleSuffix: 'событий',
       moreDetails: '* Подробности скоро',
-      imgCredit: 'Изображение площадки:'
+      imgCredit: 'Изображение площадки:',
+      statusUpcoming: 'Предстоящие',
+      statusPast: 'Завершенные',
+      filterAll: 'Все',
+      filterUpcoming: 'Предстоящие',
+      filterPast: 'Архив'
     },
     blog: {
       badge: 'Музыкальная мысль',
@@ -370,7 +395,12 @@ export const translations = {
       empty: 'На данный момент публикаций нет.',
       galleryCount: 'Изображений в галерее',
       readMore: 'Читать статью полностью',
-      galleryTitle: 'Визуальная галерея'
+      galleryTitle: 'Визуальная галерея',
+      notesTitle: 'Заметки с подиума',
+      notesBody: 'Исследуйте статьи по теории музыки, дирижерскому опыту и художественным размышлениям Маэстро.',
+      notesStats: 'Опубликованные статьи',
+      featuredLabel: 'Последняя публикация',
+      closeArticle: 'Закрыть статью'
     },
     resources: {
       badge: 'Цифровая библиотека',

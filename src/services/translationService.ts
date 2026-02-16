@@ -138,3 +138,54 @@ export const translateFields = async <T extends Record<string, any>>(
         return results;
     }
 };
+/**
+ * Genera un resumen inteligente y breve del contenido de un blog en tres idiomas.
+ */
+export const generateSmartSummary = async (htmlContent: string): Promise<LocalizedString> => {
+    if (!htmlContent || htmlContent.trim() === "") return { es: "", en: "", ru: "" };
+
+    const prompt = `
+    Analiza el siguiente contenido HTML de un artículo de blog y genera un RESUMEN INTELIGENTE de 2 a 3 frases.
+    
+    REGLAS CRÍTICAS:
+    1. El resumen debe ser profesional, cautivador y reflejar el tono del artículo.
+    2. IGNORA ABSOLUTAMENTE cualquier artefacto de la interfaz de usuario, como "Eliminar Pie de foto", "Escribe aquí...", o placeholders del editor.
+    3. Responde ÚNICAMENTE con un objeto JSON válido con el resumen en tres idiomas: español (es), inglés (en) y ruso (ru).
+    4. No incluyas etiquetas HTML en el resumen generado.
+    
+    Formato de respuesta esperado (JSON):
+    {
+      "es": "resumen en español...",
+      "en": "sumary in english...",
+      "ru": "resumen en ruso..."
+    }
+
+    Contenido del artículo:
+    ${htmlContent.substring(0, 5000)} // Limit to 5k chars to avoid token limits
+    `;
+
+    try {
+        console.log("[TranslationService] Generando resumen inteligente con Gemini...");
+        const result = await model.generateContent(prompt);
+        const responseText = result.response.text();
+
+        const cleaned = responseText.replace(/```json/g, "").replace(/```/g, "").trim();
+        const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+
+        if (!jsonMatch) throw new Error("No JSON found in summarization response");
+
+        const summaryData = JSON.parse(jsonMatch[0]);
+        console.log("[TranslationService] Resumen generado con éxito.");
+
+        return {
+            es: summaryData.es || "",
+            en: summaryData.en || "",
+            ru: summaryData.ru || ""
+        };
+    } catch (error) {
+        console.error("[TranslationService] Error al generar resumen:", error);
+        // Fallback: strip HTML and truncate
+        const fallback = htmlContent.replace(/<[^>]*>/g, '').replace(/Eliminar Pie de foto\.\.\./g, '').replace(/\s+/g, ' ').trim().substring(0, 160) + '...';
+        return { es: fallback, en: fallback, ru: fallback };
+    }
+};

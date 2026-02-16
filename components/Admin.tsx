@@ -10,9 +10,9 @@ import { translations } from '../translations';
 import { addItem, updateItem, deleteItem as deleteDbItem } from '../src/services/db';
 import { signIn, logout } from '../src/services/auth';
 import { uploadToStorage } from '../src/services/storage';
-import { translateFields } from '../src/services/translationService';
+import { translateFields, generateSmartSummary } from '../src/services/translationService';
 import { RichTextEditor } from './RichTextEditor';
-import { getYouTubeEmbedUrl, getYouTubeThumbnailUrl } from '../src/utils/video';
+import { getVideoEmbedUrl, getVideoThumbnailUrl } from '../src/utils/video';
 import { getSoundCloudEmbedUrl, getSoundCloudOriginalUrl } from '../src/utils/audio';
 import { compressImage } from '../src/utils/image';
 
@@ -53,7 +53,7 @@ export const Admin: React.FC<AdminProps> = ({
     const [newPostTitle, setNewPostTitle] = useState('');
     const [newPostContent, setNewPostContent] = useState('');
     const [newPostImages, setNewPostImages] = useState<string[]>([]);
-    const [currentImageUrl, setCurrentImageUrl] = useState('');
+    const [newPostPreviewImage, setNewPostPreviewImage] = useState('');
 
     // Resources
     const [newResTitle, setNewResTitle] = useState('');
@@ -72,13 +72,12 @@ export const Admin: React.FC<AdminProps> = ({
     const [newResYear, setNewResYear] = useState('');
     const [newResAbstract, setNewResAbstract] = useState('');
 
-    // Performances
     const [newPerfDate, setNewPerfDate] = useState('');
+    const [newPerfDateISO, setNewPerfDateISO] = useState(''); // YYYY-MM-DD
     const [newPerfTitle, setNewPerfTitle] = useState('');
     const [newPerfLoc, setNewPerfLoc] = useState('');
     const [newPerfRole, setNewPerfRole] = useState('');
     const [newPerfDesc, setNewPerfDesc] = useState('');
-    const [newPerfStatus, setNewPerfStatus] = useState<'upcoming' | 'past'>('upcoming');
     const [newPerfImages, setNewPerfImages] = useState<string[]>([]);
 
     // Gallery
@@ -90,6 +89,12 @@ export const Admin: React.FC<AdminProps> = ({
     const [newGalSubCat, setNewGalSubCat] = useState('');
     const [newGalAuthor, setNewGalAuthor] = useState('');
     const [newGalCap, setNewGalCap] = useState('');
+
+    // Pagination & Search for Gallery Management
+    const [adminGalleryPage, setAdminGalleryPage] = useState(1);
+    const [adminBlogPage, setAdminBlogPage] = useState(1);
+    const [adminGallerySearch, setAdminGallerySearch] = useState('');
+    const ITEMS_PER_PAGE_ADMIN = 12;
 
     // --- HANDLERS ---
     const handleLogin = async (e: React.FormEvent) => {
@@ -116,7 +121,7 @@ export const Admin: React.FC<AdminProps> = ({
     const resetForms = () => {
         setEditingId(null);
         // Blog
-        setNewPostTitle(''); setNewPostContent(''); setNewPostImages([]); setCurrentImageUrl('');
+        setNewPostTitle(''); setNewPostContent(''); setNewPostImages([]); setNewPostPreviewImage('');
         // Res
         setNewResTitle(''); setNewResDesc(''); setNewResType('article');
         // Exp
@@ -124,12 +129,14 @@ export const Admin: React.FC<AdminProps> = ({
         // Research
         setNewResPaperTitle(''); setNewResJournal(''); setNewResYear(''); setNewResAbstract('');
         // Perf
-        setNewPerfDate(''); setNewPerfTitle(''); setNewPerfLoc(''); setNewPerfRole(''); setNewPerfDesc(''); setNewPerfImages([]);
+        setNewPerfDate(''); setNewPerfDateISO(''); setNewPerfTitle(''); setNewPerfLoc(''); setNewPerfRole(''); setNewPerfDesc(''); setNewPerfImages([]);
         // Gal
         setNewGalCat('');
         setNewGalSubCat('');
         setNewGalAuthor('');
         setNewGalCap('');
+        setAdminGalleryPage(1);
+        setAdminBlogPage(1);
     };
 
     const changeTab = (tab: Tab) => {
@@ -191,6 +198,29 @@ export const Admin: React.FC<AdminProps> = ({
         }
     };
 
+    const handleEditorImageUpload = async (file: File): Promise<string> => {
+        try {
+            setLoading(true);
+            let uploadFile = file;
+
+            if (file.type.startsWith('image/')) {
+                setCompressing(true);
+                const compressed = await compressImage(file);
+                uploadFile = compressed as File;
+                setCompressing(false);
+            }
+
+            const url = await uploadToStorage(uploadFile, 'images/blog/content/');
+            return url || '';
+        } catch (error) {
+            console.error('Error uploading editor image:', error);
+            setCompressing(false);
+            throw error;
+        } finally {
+            setLoading(false);
+        }
+    };
+
     // --- DB HELPERS ---
     // Simplificado para el modelo de traducción dinámica.
     // Guarda los datos de forma plana (Source of Truth en Español).
@@ -224,29 +254,30 @@ export const Admin: React.FC<AdminProps> = ({
     };
 
     // --- BLOG HANDLERS ---
-    const handleAddImageUrl = () => { if (currentImageUrl) { setNewPostImages([...newPostImages, currentImageUrl]); setCurrentImageUrl(''); } };
     const removeImage = (index: number) => { setNewPostImages(newPostImages.filter((_, i) => i !== index)); };
 
     const handleSavePost = async () => {
         if (!newPostTitle) return;
         try {
             setTranslating(true);
-            // Limpiar HTML del contenido para el preview
-            const cleanText = newPostContent.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
-            const previewText = cleanText.substring(0, 160) + '...';
+            const smartSummary = await generateSmartSummary(newPostContent);
 
             const translations = await translateFields(
-                { title: newPostTitle, content: newPostContent, preview: previewText },
-                ['title', 'content', 'preview']
+                { title: newPostTitle, content: newPostContent },
+                ['title', 'content']
             );
+
+            // Al editar, mantenemos la fecha original. Si es nuevo, usamos la fecha y hora actual.
+            const originalPost = editingId ? posts.find(p => p.id === editingId) : null;
+            const postDate = originalPost?.date || new Date().toISOString();
 
             await saveToDb('posts', editingId,
                 {
                     title: translations.title,
                     content: translations.content,
-                    preview: translations.preview
+                    preview: smartSummary
                 },
-                { date: new Date().toLocaleDateString('es-ES').toUpperCase(), images: newPostImages }
+                { date: postDate, images: newPostImages, previewImage: newPostPreviewImage }
             );
         } catch (error) {
             console.error("Error saving post:", error);
@@ -261,6 +292,7 @@ export const Admin: React.FC<AdminProps> = ({
         setNewPostTitle(post.title?.es || post.title || '');
         setNewPostContent(post.content?.es || post.content || '');
         setNewPostImages(post.images || []);
+        setNewPostPreviewImage(post.previewImage || '');
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
@@ -401,6 +433,12 @@ export const Admin: React.FC<AdminProps> = ({
                 ['title', 'description', 'location', 'role', 'date']
             );
 
+            // Automatic status calculation: if date is today or in the future -> upcoming, else past
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const eventDate = new Date(newPerfDateISO);
+            const calculatedStatus: 'upcoming' | 'past' = eventDate >= today ? 'upcoming' : 'past';
+
             await saveToDb('performances', editingId,
                 {
                     title: translations.title,
@@ -409,7 +447,7 @@ export const Admin: React.FC<AdminProps> = ({
                     role: translations.role,
                     date: translations.date
                 },
-                { status: newPerfStatus, images: newPerfImages }
+                { status: calculatedStatus, dateISO: newPerfDateISO, images: newPerfImages }
             );
         } catch (error) {
             console.error("Error saving performance:", error);
@@ -422,11 +460,11 @@ export const Admin: React.FC<AdminProps> = ({
     const startEditPerformance = (perf: any) => {
         setEditingId(perf.id);
         setNewPerfDate(perf.date?.es || perf.date || '');
+        setNewPerfDateISO(perf.dateISO || '');
         setNewPerfTitle(perf.title?.es || perf.title || '');
         setNewPerfLoc(perf.location?.es || perf.location || '');
         setNewPerfRole(perf.role?.es || perf.role || '');
         setNewPerfDesc(perf.description?.es || perf.description || '');
-        setNewPerfStatus(perf.status);
         setNewPerfImages(perf.images || []);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
@@ -452,8 +490,8 @@ export const Admin: React.FC<AdminProps> = ({
                 },
                 {
                     type: newGalType,
-                    src: newGalType === 'video' ? getYouTubeEmbedUrl(newGalSrc) : (newGalType === 'audio' ? getSoundCloudOriginalUrl(newGalSrc) : newGalSrc),
-                    thumbnail: newGalType === 'video' ? (newGalThumbnail || getYouTubeThumbnailUrl(newGalSrc)) : newGalThumbnail
+                    src: newGalType === 'video' ? getVideoEmbedUrl(newGalSrc) : (newGalType === 'audio' ? getSoundCloudOriginalUrl(newGalSrc) : newGalSrc),
+                    thumbnail: newGalType === 'video' ? (newGalThumbnail || getVideoThumbnailUrl(newGalSrc)) : newGalThumbnail
                 }
             );
         } catch (error) {
@@ -538,6 +576,7 @@ export const Admin: React.FC<AdminProps> = ({
             const monthStr = date.toLocaleString(lang === 'es' ? 'es-ES' : 'en-US', { month: 'short' }).replace('.', '');
             const yearStr = date.getFullYear();
             setNewPerfDate(`${dayStr} ${monthStr} ${yearStr}`);
+            setNewPerfDateISO(`${yearStr}-${(currentMonth + 1).toString().padStart(2, '0')}-${dayStr}`);
         };
 
         return (
@@ -646,6 +685,38 @@ export const Admin: React.FC<AdminProps> = ({
                                 <div className="space-y-4 mb-12 border-b border-white/10 pb-12">
                                     <input type="text" value={newPostTitle} onChange={(e) => setNewPostTitle(e.target.value)} placeholder="Título..." className="w-full bg-maestro-dark border border-white/10 p-3 text-white focus:border-maestro-gold outline-none" />
 
+                                    {/* Preview Image Field */}
+                                    <div className="space-y-2">
+                                        <label className="block text-[10px] font-bold text-maestro-gold uppercase tracking-[0.2em]">Imagen de Portada (Preview)</label>
+                                        <div className="flex gap-4 items-start">
+                                            <label className="flex-grow bg-white/5 border border-dashed border-white/20 p-6 text-maestro-light hover:text-maestro-gold hover:border-maestro-gold/50 cursor-pointer flex flex-col items-center justify-center gap-2 transition-all group rounded-sm min-h-[120px]">
+                                                <UploadCloud size={24} className="group-hover:scale-110 transition-transform" />
+                                                <span className="text-xs uppercase tracking-widest font-bold">Subir Imagen desde Dispositivo</span>
+                                                <input
+                                                    type="file"
+                                                    onChange={(e) => handleFileUpload(e, setNewPostPreviewImage, 'images/blog/previews/')}
+                                                    className="hidden"
+                                                    accept="image/*"
+                                                />
+                                            </label>
+
+                                            {newPostPreviewImage && (
+                                                <div className="relative w-48 aspect-video border border-maestro-gold/50 bg-black/20 overflow-hidden rounded-sm group shadow-2xl">
+                                                    <img src={newPostPreviewImage} alt="Preview" className="w-full h-full object-cover" />
+                                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                        <button
+                                                            onClick={() => setNewPostPreviewImage('')}
+                                                            className="bg-red-500 text-white p-2 rounded-full hover:bg-red-400 transition-colors shadow-lg"
+                                                            title="Eliminar imagen"
+                                                        >
+                                                            <Trash2 size={16} />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+
                                     {translating && (
                                         <div className="flex items-center gap-3 text-maestro-gold text-sm animate-pulse bg-maestro-gold/10 p-3 border border-maestro-gold/20">
                                             <Database size={16} className="animate-spin" />
@@ -661,24 +732,109 @@ export const Admin: React.FC<AdminProps> = ({
                                     <RichTextEditor
                                         value={newPostContent}
                                         onChange={setNewPostContent}
+                                        onImageUpload={handleEditorImageUpload}
                                         placeholder="Contenido del artículo..."
                                         minHeight="300px"
                                     />
+
+                                    {/* Article Gallery Section */}
+                                    <div className="space-y-4 bg-maestro-dark border border-white/10 p-4 rounded-sm">
+                                        <label className="block text-[10px] font-bold text-maestro-gold uppercase tracking-[0.2em]">Galería de Imágenes del Artículo</label>
+
+                                        <div className="flex flex-wrap gap-4">
+                                            <label className="w-40 aspect-square bg-white/5 border border-dashed border-white/20 text-maestro-light/40 hover:text-maestro-gold hover:border-maestro-gold/50 cursor-pointer flex flex-col items-center justify-center gap-2 transition-all group rounded-sm">
+                                                <PlusCircle size={24} className="group-hover:scale-110 transition-transform" />
+                                                <span className="text-[10px] uppercase font-bold text-center px-2">Añadir Foto</span>
+                                                <input
+                                                    type="file"
+                                                    onChange={handleBlogImageUpload}
+                                                    className="hidden"
+                                                    accept="image/*"
+                                                />
+                                            </label>
+
+                                            {newPostImages.map((img, idx) => (
+                                                <div key={idx} className="relative w-40 aspect-square border border-white/10 overflow-hidden rounded-sm group shadow-xl">
+                                                    <img src={img} alt={`Gallery ${idx}`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                                                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                        <button
+                                                            onClick={() => removeImage(idx)}
+                                                            className="bg-red-500 text-white p-2 rounded-full hover:bg-red-400 transition-colors shadow-lg"
+                                                        >
+                                                            <Trash2 size={16} />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
                                     <button disabled={translating || loading} onClick={handleSavePost} className={`w-full md:w-auto px-6 py-2 uppercase tracking-widest text-xs font-bold transition-colors ${(translating || loading) ? 'bg-gray-600 cursor-not-allowed' : (editingId ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-maestro-gold hover:bg-white text-maestro-dark')}`}>
                                         {translating ? 'Traduciendo...' : (loading ? 'Guardando...' : (editingId ? 'Guardar Cambios' : 'Publicar'))}
                                     </button>
                                 </div>
-                                {/* List */}
+                                {/* List with Sorting and Pagination */}
                                 <div className="space-y-4">
-                                    {posts.map(post => (
-                                        <div key={post.id} className={`flex justify-between items-center p-4 border transition-all ${editingId === post.id ? 'bg-maestro-gold/10 border-maestro-gold' : 'bg-maestro-dark border-white/5 hover:border-maestro-gold/30'}`}>
-                                            <div><h4 className="text-maestro-light font-bold">{(post.title as any)?.es || post.title}</h4><span className="text-xs text-maestro-light/40">{post.date}</span></div>
-                                            <div className="flex gap-2">
-                                                <button onClick={() => startEditPost(post)} className="text-maestro-light/30 hover:text-blue-400 p-2"><Edit size={18} /></button>
-                                                <button onClick={() => handleDelete('posts', post.id)} className="text-maestro-light/30 hover:text-red-500 p-2"><Trash2 size={18} /></button>
-                                            </div>
-                                        </div>
-                                    ))}
+                                    {(() => {
+                                        // Helper to parse dates for sorting
+                                        const parseDate = (d: string) => {
+                                            if (!d) return 0;
+                                            if (d.includes('T')) return new Date(d).getTime();
+                                            const [day, month, year] = d.split('/').map(Number);
+                                            return new Date(year, month - 1, day).getTime();
+                                        };
+
+                                        // Helper to format date for display
+                                        const formatDate = (d: string) => {
+                                            if (!d) return '--/--/----';
+                                            if (!d.includes('T')) return d;
+                                            const date = new Date(d);
+                                            return isNaN(date.getTime()) ? d : `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+                                        };
+
+                                        const sortedPosts = [...posts].sort((a, b) => parseDate(b.date) - parseDate(a.date));
+                                        const totalPages = Math.ceil(sortedPosts.length / ITEMS_PER_PAGE_ADMIN);
+                                        const paginatedPosts = sortedPosts.slice((adminBlogPage - 1) * ITEMS_PER_PAGE_ADMIN, adminBlogPage * ITEMS_PER_PAGE_ADMIN);
+
+                                        return (
+                                            <>
+                                                {paginatedPosts.map(post => (
+                                                    <div key={post.id} className={`flex justify-between items-center p-4 border transition-all ${editingId === post.id ? 'bg-maestro-gold/10 border-maestro-gold' : 'bg-maestro-dark border-white/5 hover:border-maestro-gold/30'}`}>
+                                                        <div>
+                                                            <h4 className="text-maestro-light font-bold">{(post.title as any)?.es || post.title}</h4>
+                                                            <span className="text-xs text-maestro-gold/60 font-mono">{formatDate(post.date)}</span>
+                                                        </div>
+                                                        <div className="flex gap-2">
+                                                            <button onClick={() => startEditPost(post)} className="text-maestro-light/30 hover:text-blue-400 p-2" title="Editar"><Edit size={18} /></button>
+                                                            <button onClick={() => handleDelete('posts', post.id)} className="text-maestro-light/30 hover:text-red-500 p-2" title="Eliminar"><Trash2 size={18} /></button>
+                                                        </div>
+                                                    </div>
+                                                ))}
+
+                                                {/* Pagination Controls */}
+                                                {totalPages > 1 && (
+                                                    <div className="flex justify-center items-center gap-4 mt-8 pt-4 border-t border-white/5">
+                                                        <button
+                                                            disabled={adminBlogPage === 1}
+                                                            onClick={() => setAdminBlogPage(prev => prev - 1)}
+                                                            className="p-2 text-maestro-light/40 hover:text-maestro-gold disabled:opacity-20 transition-colors"
+                                                        >
+                                                            <ChevronDown size={20} className="rotate-90" />
+                                                        </button>
+                                                        <span className="text-[10px] uppercase tracking-widest font-bold text-maestro-gold/80">
+                                                            Página {adminBlogPage} de {totalPages}
+                                                        </span>
+                                                        <button
+                                                            disabled={adminBlogPage === totalPages}
+                                                            onClick={() => setAdminBlogPage(prev => prev + 1)}
+                                                            className="p-2 text-maestro-light/40 hover:text-maestro-gold disabled:opacity-20 transition-colors"
+                                                        >
+                                                            <ChevronDown size={20} className="-rotate-90" />
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </>
+                                        );
+                                    })()}
                                 </div>
                             </FadeIn>
                         )}
@@ -1115,60 +1271,122 @@ export const Admin: React.FC<AdminProps> = ({
                                 {/* Gallery Filter Tabs */}
                                 <div className="flex gap-4 mb-6 border-b border-white/5 pb-4">
                                     <button
-                                        onClick={() => setAdminGalleryTab('image')}
+                                        onClick={() => { setAdminGalleryTab('image'); setAdminGalleryPage(1); }}
                                         className={`px-4 py-2 text-[10px] uppercase tracking-widest font-bold transition-all flex items-center gap-2 ${adminGalleryTab === 'image' ? 'text-maestro-gold border-b border-maestro-gold' : 'text-white/40 hover:text-white'}`}
                                     >
                                         <ImageIcon size={14} /> Fotos ({gallery.filter(i => i.type === 'image').length})
                                     </button>
                                     <button
-                                        onClick={() => setAdminGalleryTab('video')}
+                                        onClick={() => { setAdminGalleryTab('video'); setAdminGalleryPage(1); }}
                                         className={`px-4 py-2 text-[10px] uppercase tracking-widest font-bold transition-all flex items-center gap-2 ${adminGalleryTab === 'video' ? 'text-maestro-gold border-b border-maestro-gold' : 'text-white/40 hover:text-white'}`}
                                     >
                                         <Video size={14} /> Videos ({gallery.filter(i => i.type === 'video').length})
                                     </button>
                                     <button
-                                        onClick={() => setAdminGalleryTab('audio')}
+                                        onClick={() => { setAdminGalleryTab('audio'); setAdminGalleryPage(1); }}
                                         className={`px-4 py-2 text-[10px] uppercase tracking-widest font-bold transition-all flex items-center gap-2 ${adminGalleryTab === 'audio' ? 'text-maestro-gold border-b border-maestro-gold' : 'text-white/40 hover:text-white'}`}
                                     >
                                         <Music size={14} /> Audio ({gallery.filter(i => i.type === 'audio').length})
                                     </button>
                                 </div>
 
-                                {/* Gallery Grid Preview */}
-                                {gallery.filter(item => item.type === adminGalleryTab).length > 0 ? (
-                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                        {gallery.filter(item => item.type === adminGalleryTab).map(item => (
-                                            <div key={item.id} className={`relative aspect-video group border ${editingId === item.id ? 'border-maestro-gold' : 'border-white/5'}`}>
-                                                <img
-                                                    src={
-                                                        item.type === 'audio'
-                                                            ? (item.thumbnail || '/images/audio-section.webp')
-                                                            : (item.type === 'video' ? (item.thumbnail || getYouTubeThumbnailUrl(item.src)) : item.src)
-                                                    }
-                                                    alt="Gallery"
-                                                    className="w-full h-full object-cover"
-                                                />
+                                {/* Gallery Search & Info */}
+                                <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+                                    <div className="relative w-full md:w-64">
+                                        <input
+                                            type="text"
+                                            value={adminGallerySearch}
+                                            onChange={(e) => { setAdminGallerySearch(e.target.value); setAdminGalleryPage(1); }}
+                                            placeholder="Buscar en esta categoría..."
+                                            className="w-full bg-maestro-dark border border-white/10 p-2 pl-8 text-[10px] text-white focus:border-maestro-gold outline-none"
+                                        />
+                                        <PlusCircle size={14} className="absolute left-2 top-1/2 -translate-y-1/2 text-white/30" />
+                                    </div>
+                                    <p className="text-[10px] text-white/30 uppercase tracking-widest">
+                                        Total: {gallery.filter(item => item.type === adminGalleryTab).length} elementos
+                                    </p>
+                                </div>
 
-                                                {/* Type Badge */}
-                                                <div className={`absolute top-2 left-2 px-2 py-0.5 text-[8px] font-bold uppercase tracking-widest rounded-sm ${item.type === 'video' ? 'bg-red-600 text-white' : item.type === 'audio' ? 'bg-blue-600 text-white' : 'bg-maestro-gold text-maestro-dark'}`}>
-                                                    {item.type === 'video' ? 'Video' : item.type === 'audio' ? 'Audio' : 'Foto'}
-                                                </div>
+                                {/* Gallery Grid Preview with Pagination & Search */}
+                                {(() => {
+                                    const filtered = gallery
+                                        .filter(item => item.type === adminGalleryTab)
+                                        .filter(item => {
+                                            if (!adminGallerySearch) return true;
+                                            const search = adminGallerySearch.toLowerCase();
+                                            const caption = ((item.caption as any)?.es || item.caption || '').toLowerCase();
+                                            const author = ((item.author as any)?.es || item.author || '').toLowerCase();
+                                            const category = ((item.category as any)?.es || item.category || '').toLowerCase();
+                                            return caption.includes(search) || author.includes(search) || category.includes(search);
+                                        });
 
-                                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                                                    <button onClick={() => startEditGallery(item)} className="p-2 bg-maestro-gold text-maestro-dark rounded-full"><Edit size={16} /></button>
-                                                    <button onClick={() => handleDelete('gallery', item.id)} className="p-2 bg-red-500 text-white rounded-full"><Trash2 size={16} /></button>
-                                                </div>
-                                                <div className="absolute bottom-0 left-0 w-full bg-black/80 p-2 text-[10px] text-white/70 truncate">
-                                                    {(item.caption as any)?.es || item.caption}
-                                                </div>
+                                    const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE_ADMIN);
+                                    const paginated = filtered.slice((adminGalleryPage - 1) * ITEMS_PER_PAGE_ADMIN, adminGalleryPage * ITEMS_PER_PAGE_ADMIN);
+
+                                    if (filtered.length === 0) {
+                                        return (
+                                            <div className="text-center py-12 bg-black/20 border border-dashed border-white/5 rounded-sm">
+                                                <p className="text-white/20 text-xs italic">No se encontraron elementos</p>
                                             </div>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <div className="text-center py-12 bg-black/20 border border-dashed border-white/5 rounded-sm">
-                                        <p className="text-white/20 text-xs italic">No hay archivos en esta categoría</p>
-                                    </div>
-                                )}
+                                        );
+                                    }
+
+                                    return (
+                                        <>
+                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                                {paginated.map(item => (
+                                                    <div key={item.id} className={`relative aspect-video group border ${editingId === item.id ? 'border-maestro-gold' : 'border-white/5'}`}>
+                                                        <img
+                                                            src={
+                                                                item.type === 'audio'
+                                                                    ? (item.thumbnail || '/images/audio-section.webp')
+                                                                    : (item.type === 'video' ? (item.thumbnail || getVideoThumbnailUrl(item.src)) : item.src)
+                                                            }
+                                                            alt="Gallery"
+                                                            className="w-full h-full object-cover"
+                                                        />
+
+                                                        {/* Type Badge */}
+                                                        <div className={`absolute top-2 left-2 px-2 py-0.5 text-[8px] font-bold uppercase tracking-widest rounded-sm ${item.type === 'video' ? 'bg-red-600 text-white' : item.type === 'audio' ? 'bg-blue-600 text-white' : 'bg-maestro-gold text-maestro-dark'}`}>
+                                                            {item.type === 'video' ? 'Video' : item.type === 'audio' ? 'Audio' : 'Foto'}
+                                                        </div>
+
+                                                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                                            <button onClick={() => startEditGallery(item)} className="p-2 bg-maestro-gold text-maestro-dark rounded-full"><Edit size={16} /></button>
+                                                            <button onClick={() => handleDelete('gallery', item.id)} className="p-2 bg-red-500 text-white rounded-full"><Trash2 size={16} /></button>
+                                                        </div>
+                                                        <div className="absolute bottom-0 left-0 w-full bg-black/80 p-2 text-[10px] text-white/70 truncate">
+                                                            {(item.caption as any)?.es || item.caption}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+
+                                            {/* Pagination Controls */}
+                                            {totalPages > 1 && (
+                                                <div className="mt-8 flex justify-center items-center gap-4">
+                                                    <button
+                                                        disabled={adminGalleryPage === 1}
+                                                        onClick={() => setAdminGalleryPage(prev => Math.max(1, prev - 1))}
+                                                        className="p-2 text-white/40 hover:text-maestro-gold disabled:opacity-20 transition-colors"
+                                                    >
+                                                        <ChevronDown size={20} className="rotate-90" />
+                                                    </button>
+                                                    <span className="text-[10px] uppercase tracking-widest font-bold text-maestro-gold">
+                                                        Página {adminGalleryPage} de {totalPages}
+                                                    </span>
+                                                    <button
+                                                        disabled={adminGalleryPage === totalPages}
+                                                        onClick={() => setAdminGalleryPage(prev => Math.min(totalPages, prev + 1))}
+                                                        className="p-2 text-white/40 hover:text-maestro-gold disabled:opacity-20 transition-colors"
+                                                    >
+                                                        <ChevronDown size={20} className="-rotate-90" />
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </>
+                                    );
+                                })()}
                             </FadeIn>
                         )}
 

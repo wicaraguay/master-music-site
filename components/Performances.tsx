@@ -11,21 +11,104 @@ interface PerformancesProps {
 
 export const Performances: React.FC<PerformancesProps> = ({ items, lang }) => {
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [activeFilter, setActiveFilter] = useState<'all' | 'upcoming' | 'past'>('all');
   const t = translations[lang].performances;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const getDynamicStatus = (perf: Performance): 'upcoming' | 'past' => {
+    // 1. Prefer dateISO if available (new items)
+    if (perf.dateISO) {
+      const eventDate = new Date(perf.dateISO);
+      return eventDate >= today ? 'upcoming' : 'past';
+    }
+
+    // 2. Legacy fallback: Attempt to parse the date string (format "DD MMM YYYY")
+    try {
+      const dateStr = (perf.date as any)?.es || (perf.date as any)?.en || (typeof perf.date === 'string' ? perf.date : '');
+
+      if (dateStr && typeof dateStr === 'string') {
+        const parts = dateStr.trim().split(' ');
+        if (parts.length === 3) {
+          const day = parseInt(parts[0]);
+          const monthStr = parts[1].toLowerCase().replace('.', '');
+          const year = parseInt(parts[2]);
+
+          if (!isNaN(day) && !isNaN(year)) {
+            const months: Record<string, number> = {
+              'ene': 0, 'jan': 0, 'feb': 1, 'mar': 2, 'abr': 3, 'apr': 3, 'may': 4,
+              'jun': 5, 'jul': 6, 'ago': 7, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dic': 11, 'dec': 11
+            };
+
+            const month = months[monthStr.substring(0, 3)];
+            if (month !== undefined) {
+              const eventDate = new Date(year, month, day);
+              return eventDate >= today ? 'upcoming' : 'past';
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('Error parsing legacy date:', e);
+    }
+
+    // 3. Final fallback to manually set status
+    return perf.status;
+  };
+
+  const filteredItems = items.filter(item => {
+    if (activeFilter === 'all') return true;
+    return getDynamicStatus(item) === activeFilter;
+  });
 
   const toggleExpand = (id: string) => {
     setExpandedId(expandedId === id ? null : id);
   };
 
   return (
-    <section className="py-24 px-6 bg-maestro-dark">
-      <div className="max-w-5xl mx-auto">
-        <h2 className="text-4xl font-serif text-center text-maestro-light mb-16">
+    <section className="relative py-24 px-6 bg-maestro-dark overflow-hidden min-h-screen">
+      {/* Background Image with Cinematic Overlay (Fixed/Parallax) */}
+      <div className="absolute inset-0 z-0 select-none pointer-events-none">
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-fixed opacity-65"
+          style={{ backgroundImage: "url('/images/page-events.webp')" }}
+        />
+        {/* Gradients to merge with edges and maintain readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-maestro-dark/95 via-transparent to-maestro-dark/95 z-1"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-maestro-dark/40 via-transparent to-maestro-dark/40 z-1"></div>
+        <div className="absolute inset-0 bg-black/20 z-1" />
+      </div>
+
+      <div className="relative z-10 max-w-5xl mx-auto">
+        <h2 className="text-4xl font-serif text-center text-maestro-light mb-12">
           {t.titlePrefix} <span className="text-maestro-gold italic">{t.titleSuffix}</span>
         </h2>
 
+        {/* Filter Tabs */}
+        <div className="flex justify-center gap-4 mb-12">
+          {[
+            { id: 'all', label: t.filterAll },
+            { id: 'upcoming', label: t.filterUpcoming },
+            { id: 'past', label: t.filterPast }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveFilter(tab.id as any)}
+              className={`
+                px-6 py-2 text-xs uppercase tracking-widest transition-all duration-300 border-b-2
+                ${activeFilter === tab.id
+                  ? 'text-maestro-gold border-maestro-gold font-bold'
+                  : 'text-maestro-light/40 border-transparent hover:text-maestro-light/60 hover:border-white/10'}
+              `}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
         <div className="space-y-6">
-          {items.map((event, idx) => {
+          {filteredItems.map((event, idx) => {
             const isExpanded = expandedId === event.id;
 
             return (
@@ -48,7 +131,11 @@ export const Performances: React.FC<PerformancesProps> = ({ items, lang }) => {
                         alt={event.location}
                         className={`
                             w-full h-full object-cover transition-all duration-1000
-                            ${isExpanded ? 'scale-105 opacity-50 grayscale-0' : 'scale-100 opacity-20 grayscale group-hover:opacity-30'}
+                            ${isExpanded
+                            ? 'scale-105 opacity-50 grayscale-0'
+                            : getDynamicStatus(event) === 'past'
+                              ? 'scale-100 opacity-10 grayscale'
+                              : 'scale-100 opacity-20 grayscale group-hover:opacity-30'}
                           `}
                       />
                     </div>
@@ -81,11 +168,16 @@ export const Performances: React.FC<PerformancesProps> = ({ items, lang }) => {
                       </div>
                     </div>
 
-                    {/* Role & Chevron */}
+                    {/* Role, Status & Chevron */}
                     <div className="md:w-1/4 flex flex-col items-center md:items-end mt-4 md:mt-0 gap-3 w-full">
-                      <span className={`text-xs uppercase tracking-widest px-3 py-1 border rounded transition-colors ${isExpanded ? 'border-maestro-gold text-maestro-gold' : 'border-white/10 text-maestro-light/40'}`}>
-                        {event.role}
-                      </span>
+                      <div className="flex flex-col items-center md:items-end gap-2">
+                        <span className={`text-[10px] items-center gap-1 uppercase tracking-widest font-bold ${getDynamicStatus(event) === 'upcoming' ? 'text-maestro-gold' : 'text-maestro-light/30'}`}>
+                          {getDynamicStatus(event) === 'upcoming' ? t.statusUpcoming : t.statusPast}
+                        </span>
+                        <span className={`text-xs uppercase tracking-widest px-3 py-1 border rounded transition-colors ${isExpanded ? 'border-maestro-gold text-maestro-gold' : 'border-white/10 text-maestro-light/40'}`}>
+                          {event.role}
+                        </span>
+                      </div>
                       <div className={`transition-transform duration-500 ${isExpanded ? 'rotate-180 text-maestro-gold' : 'text-maestro-light/20'}`}>
                         <ChevronDown size={20} />
                       </div>

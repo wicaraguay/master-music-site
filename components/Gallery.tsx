@@ -5,7 +5,7 @@ import { GalleryItem, Language } from '../types';
 import { translations } from '../translations';
 import { X, ChevronLeft, ChevronRight, ZoomIn, PlayCircle, Image as ImageIcon, Video, Music, ChevronDown, ArrowRight } from 'lucide-react';
 
-import { getYouTubeEmbedUrl, getYouTubeThumbnailUrl } from '../src/utils/video';
+import { getVideoEmbedUrl, getVideoThumbnailUrl } from '../src/utils/video';
 import { getSoundCloudEmbedUrl, getSoundCloudOriginalUrl } from '../src/utils/audio';
 
 interface GalleryProps {
@@ -13,11 +13,14 @@ interface GalleryProps {
   lang: Language;
 }
 
+const ITEMS_PER_PAGE = 9;
+
 export const Gallery: React.FC<GalleryProps> = ({ items, lang }) => {
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<'photos' | 'videos' | 'audio'>('photos');
   const [activeSubTab, setActiveSubTab] = useState<string>('all');
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+  const [visibleItemsCount, setVisibleItemsCount] = useState(ITEMS_PER_PAGE);
   const t = translations[lang].gallery;
 
   // Filter items based on active tab and dynamic sub-categories
@@ -31,6 +34,9 @@ export const Gallery: React.FC<GalleryProps> = ({ items, lang }) => {
     return item.subCategory === activeSubTab;
   });
 
+  // Items actually sliced for display
+  const paginatedItems = displayedItems.slice(0, visibleItemsCount);
+
   // Calculate dynamic sub-categories for the active tab
   const dynamicSubTabs = Array.from(new Set(items
     .filter(item => {
@@ -43,12 +49,22 @@ export const Gallery: React.FC<GalleryProps> = ({ items, lang }) => {
     .filter(Boolean)
   )) as string[];
 
-  // Reset sub-tab when main tab changes
+  // Reset sub-tab and visible count when main tab changes
   useEffect(() => {
     setActiveSubTab('all');
+    setVisibleItemsCount(ITEMS_PER_PAGE);
   }, [activeTab]);
 
+  // Reset visible count when sub-tab changes
+  useEffect(() => {
+    setVisibleItemsCount(ITEMS_PER_PAGE);
+  }, [activeSubTab]);
+
   const openLightbox = (index: number) => {
+    // In the lightbox, we should pass the index relative to displayedItems 
+    // to allow navigation through all filtered items, or relative to paginatedItems?
+    // Usually lightbox should allow navigating all FILTERED items even if not "loaded" yet in grid?
+    // Let's use displayedItems for the lightbox to avoid confusing the user.
     setSelectedImageIndex(index);
     setIsDescriptionExpanded(false);
     document.body.style.overflow = 'hidden';
@@ -162,7 +178,7 @@ export const Gallery: React.FC<GalleryProps> = ({ items, lang }) => {
 
         {/* Grid Layout (Garantiza 3 por fila en escritorio) */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {displayedItems.map((item, index) => (
+          {paginatedItems.map((item, index) => (
             <FadeIn key={item.id} delay={index * 50}>
               <div
                 className="group relative cursor-pointer overflow-hidden rounded-sm bg-maestro-gray aspect-video"
@@ -174,7 +190,7 @@ export const Gallery: React.FC<GalleryProps> = ({ items, lang }) => {
                     src={
                       item.type === 'audio'
                         ? (item.thumbnail || '/images/audio-section.webp')
-                        : (item.type === 'video' ? (item.thumbnail || getYouTubeThumbnailUrl(item.src)) : item.src)
+                        : (item.type === 'video' ? (item.thumbnail || getVideoThumbnailUrl(item.src)) : item.src)
                     }
                     alt={(item.category as any)?.es || item.category}
                     className="w-full h-full object-cover transition-all duration-1000 transform group-hover:scale-110 grayscale hover:grayscale-0"
@@ -219,6 +235,19 @@ export const Gallery: React.FC<GalleryProps> = ({ items, lang }) => {
             </FadeIn>
           ))}
         </div>
+
+        {/* Load More Button */}
+        {visibleItemsCount < displayedItems.length && (
+          <div className="mt-16 text-center">
+            <button
+              onClick={() => setVisibleItemsCount(prev => prev + ITEMS_PER_PAGE)}
+              className="group relative px-10 py-4 bg-transparent border border-maestro-gold/30 hover:border-maestro-gold text-maestro-gold uppercase tracking-[0.3em] text-xs font-bold transition-all duration-300 overflow-hidden"
+            >
+              <span className="relative z-10">Explorar Más</span>
+              <div className="absolute inset-0 bg-maestro-gold/10 transform -translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+            </button>
+          </div>
+        )}
 
         {/* Empty State */}
         {displayedItems.length === 0 && (
@@ -268,7 +297,7 @@ export const Gallery: React.FC<GalleryProps> = ({ items, lang }) => {
                   <iframe
                     width="100%"
                     height="100%"
-                    src={getYouTubeEmbedUrl(displayedItems[selectedImageIndex].src)}
+                    src={getVideoEmbedUrl(displayedItems[selectedImageIndex].src)}
                     title={(displayedItems[selectedImageIndex].category as any)?.es || (displayedItems[selectedImageIndex].category as any)}
                     frameBorder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

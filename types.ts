@@ -31,6 +31,7 @@ export interface ExperienceItem {
 export interface Performance {
   id: string;
   date: LocalizedString;
+  dateISO: string; // YYYY-MM-DD for automatic status calculation
   title: LocalizedString;
   location: LocalizedString;
   role: LocalizedString;
@@ -54,6 +55,7 @@ export interface BlogPost {
   date: string;
   preview: LocalizedString;
   content: LocalizedString;
+  previewImage?: string;
   images?: string[];
 }
 

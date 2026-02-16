@@ -93,6 +93,8 @@
     outline: none;
     overflow-y: auto;
     max-height: 600px;
+    overflow-wrap: anywhere;
+    word-break: break-all;
 }
 
 .editor-content:empty:before {
@@ -107,9 +109,9 @@
 .editor-content h2,
 .editor-content h3 {
     color: #eab308;
-    font-family: serif;
     margin: 16px 0 8px 0;
     font-weight: bold;
+    font-family: inherit;
 }
 
 .editor-content h1 {
@@ -194,10 +196,10 @@
 .blog-content h2,
 .blog-content h3 {
     color: #eab308;
-    font-family: serif;
     margin: 24px 0 16px 0;
     font-weight: bold;
     line-height: 1.3;
+    font-family: inherit;
 }
 
 .blog-content h1 {
@@ -217,6 +219,8 @@
 .blog-content p {
     margin: 16px 0;
     line-height: 1.8;
+    overflow-wrap: anywhere;
+    word-break: break-all;
 }
 
 .blog-content a {
@@ -263,4 +267,156 @@
 
 .blog-content li::marker {
     color: #eab308;
+}
+
+.layout-columns {
+    display: flex;
+    gap: 2rem;
+    margin: 2rem 0;
+    width: 100%;
+}
+
+.layout-column {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
+.content-img-container {
+    margin: 2rem 0;
+    text-align: center;
+    position: relative;
+    clear: both;
+    /* Ensure blocks don't overlap vertically by default */
+}
+
+.content-img-container.float-left,
+.content-img-container.float-right {
+    width: 45%;
+    max-width: 450px;
+    min-width: 250px;
+    text-align: left;
+    clear: none;
+    /* Crucial: allow text to float next to it */
+}
+
+.content-img-container.float-left {
+    float: left;
+    margin: 0 2rem 1.5rem 0;
+}
+
+.content-img-container.float-right {
+    float: right;
+    margin: 0 0 1.5rem 2rem;
+}
+
+.content-img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 2px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.img-caption {
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.4);
+    font-style: italic;
+    text-align: center;
+}
+
+/* Stack columns on mobile */
+@media (max-width: 768px) {
+    .layout-columns {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+}
+
+/* Editor Specific Helpers */
+.editor-content .layout-columns {
+    border: 1px dashed rgba(234, 179, 8, 0.2);
+    padding: 10px;
+    position: relative;
+}
+
+.editor-content .layout-column {
+    outline: 1px dashed rgba(255, 255, 255, 0.1);
+    padding: 10px;
+    min-height: 50px;
+}
+
+/* Delete Button for Editor Layouts */
+.editor-content .layout-columns,
+.editor-content .content-img-container {
+    position: relative;
+}
+
+/* Default: Hide remove button (frontend) */
+.remove-btn {
+    display: none;
+}
+
+/* Specific remove button inside the editor */
+.editor-content .remove-btn {
+    display: block !important;
+    position: absolute;
+    top: -10px;
+    /* ... rest of existing styles ... */
+    right: 10px;
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 2px 10px;
+    font-size: 11px;
+    cursor: pointer;
+    z-index: 50;
+    opacity: 1;
+    /* Always visible in editor for clarity */
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    pointer-events: auto;
+    display: block !important;
+}
+
+.editor-content .remove-btn:hover {
+    background: #dc2626;
+    transform: scale(1.05);
+}
+
+/* Floating Layouts (Text Wrapping) */
+.float-left {
+    float: left;
+    margin: 0 2rem 1.5rem 0;
+    max-width: 45%;
+}
+
+.float-right {
+    float: right;
+    margin: 0 0 1.5rem 2rem;
+    max-width: 45%;
+}
+
+/* Clear floats helper for content */
+.blog-content::after,
+.editor-content::after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+/* On mobile, remove floats to allow full width stacking */
+@media (max-width: 768px) {
+
+    .float-left,
+    .float-right {
+        float: none;
+        margin: 2rem 0;
+        max-width: 100%;
+        display: block;
+    }
 }
