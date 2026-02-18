@@ -9,6 +9,7 @@ export enum Section {
   RESOURCES = 'recursos',
   CONTACT = 'contacto',
   ADMIN = 'admin',
+  PRESS = 'prensa',
 }
 
 export type Language = 'es' | 'en' | 'ru';
@@ -22,6 +23,7 @@ export interface LocalizedString {
 export interface ExperienceItem {
   id: string;
   year: LocalizedString;
+  dateISO?: string; // YYYY-MM-DD for calendar selection and sorting
   role: LocalizedString;
   institution: LocalizedString;
   description: LocalizedString;
@@ -86,4 +88,16 @@ export interface ContactMessage {
   message: string;
   date: string;
   read: boolean;
+}
+
+export interface PressItem {
+  id: string;
+  title: LocalizedString;
+  source: string;
+  date: string;
+  dateISO?: string; // YYYY-MM-DD for calendar selection
+  excerpt: LocalizedString;
+  url: string;
+  image?: string;
+  category: LocalizedString;
 }

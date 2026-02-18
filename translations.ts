@@ -15,7 +15,9 @@ export const translations = {
       experience: 'Experiencia',
       research: 'Investigación',
       performances: 'Eventos',
+      multimedia: 'Fotos y Videos',
       gallery: 'Galería',
+      press: 'Prensa',
       resources: 'Recursos',
       blog: 'Blog',
       contact: 'Contacto',
@@ -137,6 +139,13 @@ export const translations = {
       videoCategorySymphonic: 'Director de Orquesta',
       videoCategoryOthers: 'Otros Autores'
     },
+    press: {
+      badge: 'Medios',
+      titlePrefix: 'Prensa &',
+      titleSuffix: 'Entrevistas',
+      subtitle: 'Artículos, entrevistas y menciones en medios de comunicación nacionales e internacionales.',
+      empty: 'No hay artículos de prensa disponibles por el momento.'
+    },
     contact: {
       title: 'Contacto',
       subtitle: 'Para contrataciones, colaboraciones académicas o consultas generales.',
@@ -158,7 +167,10 @@ export const translations = {
       messagesTitle: 'Mensajes Recibidos',
       noMessages: 'No hay mensajes nuevos.',
       markAsRead: 'Marcar como leído',
-      deleteMessage: 'Eliminar mensaje'
+      deleteMessage: 'Eliminar mensaje',
+      pressTitle: 'Gestión de Prensa',
+      addPress: 'Agregar Artículo de Prensa',
+      editPress: 'Editar Artículo de Prensa'
     },
     calendar: {
       months: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
@@ -174,7 +186,9 @@ export const translations = {
       experience: 'Experience',
       research: 'Research',
       performances: 'Agenda',
+      multimedia: 'Photos & Videos',
       gallery: 'Gallery',
+      press: 'Press',
       resources: 'Resources',
       blog: 'Blog',
       contact: 'Contact',
@@ -281,6 +295,13 @@ export const translations = {
       videoCategorySymphonic: 'Orchestra Conductor',
       videoCategoryOthers: 'Other Authors'
     },
+    press: {
+      badge: 'Media',
+      titlePrefix: 'Press &',
+      titleSuffix: 'Interviews',
+      subtitle: 'Articles, interviews, and media mentions in national and international outlets.',
+      empty: 'No press articles available at the moment.'
+    },
     contact: {
       title: 'Contact',
       subtitle: 'For bookings, academic collaborations, or general inquiries.',
@@ -302,7 +323,10 @@ export const translations = {
       messagesTitle: 'Received Messages',
       noMessages: 'No new messages.',
       markAsRead: 'Mark as read',
-      deleteMessage: 'Delete message'
+      deleteMessage: 'Delete message',
+      pressTitle: 'Press Management',
+      addPress: 'Add Press Article',
+      editPress: 'Edit Press Article'
     },
     calendar: {
       months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
@@ -318,7 +342,9 @@ export const translations = {
       experience: 'Опыт',
       research: 'Исследования',
       performances: 'События',
+      multimedia: 'Фото и Видео',
       gallery: 'Галерея',
+      press: 'Пресса',
       resources: 'Ресурсы',
       blog: 'Блог',
       contact: 'Контакты',
@@ -425,6 +451,13 @@ export const translations = {
       videoCategorySymphonic: 'Дирижер оркестра',
       videoCategoryOthers: 'Другие авторы'
     },
+    press: {
+      badge: 'СМИ',
+      titlePrefix: 'Пресса и',
+      titleSuffix: 'интервью',
+      subtitle: 'Статьи, интервью и упоминания в национальных и международных СМИ.',
+      empty: 'На данный момент статей в прессе нет.'
+    },
     contact: {
       title: 'Контакты',
       subtitle: 'Для бронирования, академического сотрудничества или общих вопросов.',
@@ -446,7 +479,10 @@ export const translations = {
       messagesTitle: 'Полученные сообщения',
       noMessages: 'Новых сообщений нет.',
       markAsRead: 'Пометить как прочитанное',
-      deleteMessage: 'Удалить сообщение'
+      deleteMessage: 'Удалить сообщение',
+      pressTitle: 'Управление прессой',
+      addPress: 'Добавить статью в прессе',
+      editPress: 'Редактировать статью в прессе'
     },
     calendar: {
       months: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],

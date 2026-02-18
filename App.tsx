@@ -6,13 +6,14 @@ import { Experience } from './components/Experience';
 import { Research } from './components/Research';
 import { Performances } from './components/Performances';
 import { Gallery } from './components/Gallery';
+import { Press } from './components/Press';
 import { Blog } from './components/Blog';
 import { Contact } from './components/Contact';
 import { Resources } from './components/Resources';
 
 import { Admin } from './components/Admin';
 import { translations, getInitialExperience, getInitialPerformances, getInitialPosts, getInitialResearch, getInitialResources, getInitialGallery } from './translations';
-import { Section, BlogPost, Resource, ExperienceItem, ResearchPaper, Performance, GalleryItem, Language, ContactMessage } from './types';
+import { Section, BlogPost, Resource, ExperienceItem, ResearchPaper, Performance, GalleryItem, Language, ContactMessage, PressItem } from './types';
 // Note: importing Section from translations might be wrong if it's in types.ts.
 // Step 144 showed: import { Section, ... } from './types';
 // I need to be careful with imports.
@@ -22,30 +23,7 @@ import { subscribeToAuthChanges } from './src/services/auth';
 import type { User } from 'firebase/auth';
 import { Terminal, Menu, X, Globe, ArrowUp, Instagram, Linkedin, Youtube, Facebook, Send, MessageCircle } from 'lucide-react';
 
-// Background Image Preloader
-const StaticImagePreloader: React.FC = () => {
-  useEffect(() => {
-    const imagesToPreload = [
-      '/images/section-header2.webp',
-      '/images/section-events.webp',
-      '/images/section-text.webp',
-      '/images/section-avaliable.webp',
-      '/images/page-contact.webp',
-      '/images/page-blog.webp',
-      '/images/page-events.webp',
-      '/images/section-experience.webp',
-      '/images/section-research.webp',
-      '/images/section-footer.webp'
-    ];
 
-    imagesToPreload.forEach(src => {
-      const img = new Image();
-      img.src = src;
-    });
-  }, []);
-
-  return null;
-};
 
 function App() {
   const [currentSection, setCurrentSection] = useState<Section>(Section.HOME);
@@ -76,6 +54,7 @@ function App() {
   const [rawResearch, setRawResearch] = useState<any[]>([]);
   const [rawPerformances, setRawPerformances] = useState<any[]>([]);
   const [rawGallery, setRawGallery] = useState<any[]>([]);
+  const [rawPress, setRawPress] = useState<any[]>([]);
   const [rawMessages, setRawMessages] = useState<any[]>([]);
 
   // Transformed data for display (current language)
@@ -85,6 +64,7 @@ function App() {
   const [research, setResearch] = useState<ResearchPaper[]>([]);
   const [performances, setPerformances] = useState<Performance[]>([]);
   const [gallery, setGallery] = useState<GalleryItem[]>([]);
+  const [press, setPress] = useState<PressItem[]>([]);
   const [messages, setMessages] = useState<ContactMessage[]>([]);
 
   // Auto-detect Language
@@ -113,6 +93,7 @@ function App() {
       subscribeToCollection('research', setRawResearch),
       subscribeToCollection('performances', setRawPerformances),
       subscribeToCollection('gallery', setRawGallery),
+      subscribeToCollection('press', setRawPress),
       subscribeToCollection('messages', setRawMessages)
     ];
 
@@ -127,8 +108,9 @@ function App() {
     setResearch(transformDataForLang(rawResearch, lang));
     setPerformances(transformDataForLang(rawPerformances, lang));
     setGallery(transformDataForLang(rawGallery, lang));
+    setPress(transformDataForLang(rawPress, lang));
     setMessages(rawMessages); // Messages don't need transformation
-  }, [rawPosts, rawResources, rawExperience, rawResearch, rawPerformances, rawGallery, rawMessages, lang]);
+  }, [rawPosts, rawResources, rawExperience, rawResearch, rawPerformances, rawGallery, rawPress, rawMessages, lang]);
 
   // Scroll to top
   useEffect(() => {
@@ -151,6 +133,8 @@ function App() {
         return <Blog posts={posts} lang={lang} />;
       case Section.GALLERY:
         return <Gallery items={gallery} lang={lang} />;
+      case Section.PRESS:
+        return <Press lang={lang} items={press} />;
       // case Section.RESOURCES:
       //   return <Resources resources={resources} lang={lang} />;
       case Section.CONTACT:
@@ -168,6 +152,7 @@ function App() {
             research={rawResearch} setResearch={setRawResearch}
             performances={rawPerformances} setPerformances={setRawPerformances}
             gallery={rawGallery} setGallery={setRawGallery}
+            press={rawPress} setPress={setRawPress}
             messages={rawMessages} setMessages={setRawMessages}
           />
         );
@@ -178,7 +163,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-maestro-dark text-maestro-light selection:bg-maestro-gold selection:text-maestro-dark font-sans flex flex-col">
-      <StaticImagePreloader />
+
       {currentSection !== Section.ADMIN && (
         <Navigation
           currentSection={currentSection}

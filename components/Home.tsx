@@ -235,7 +235,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
 
         {/* Main Content Container - Two Column Layout with Left-Aligned Branding */}
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-screen flex items-center justify-center">
-          <div className="grid grid-cols-1 gap-10 md:gap-12 lg:gap-16 xl:gap-20 items-center w-full py-24 md:py-20 lg:py-0">
+          <div className="grid grid-cols-1 gap-10 md:gap-12 lg:gap-16 xl:gap-20 items-center w-full pt-4 pb-24 md:pt-8 md:pb-20 lg:py-0">
 
             {/* LEFT SIDE - Branding Content */}
             <div className="text-center space-y-0 order-2 lg:order-1 flex flex-col items-center justify-center w-full">
@@ -350,7 +350,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
       </section>
 
       {/* ABOUT PREVIEW SECTION - Elegant Introduction */}
-      <section id="about-preview" className="relative py-80 px-6 bg-maestro-dark overflow-hidden">
+      <section id="about-preview" className="relative pt-[28rem] pb-80 px-6 bg-maestro-dark overflow-hidden">
         {/* Orchestra Background Image - Local section-header2.jpg - Lightened */}
         <div className="absolute inset-0 z-0 select-none pointer-events-none">
           <img
@@ -368,7 +368,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
         {/* Subtle Background Glow */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-4xl bg-maestro-gold/5 blur-[120px] rounded-full pointer-events-none z-0" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[length:24px_24px] opacity-20 pointer-events-none z-0" />
-        <div className="max-w-7xl mx-auto space-y-16">
+        <div className="max-w-7xl mx-auto space-y-4">
           {/* Centered Title Section */}
           <FadeIn>
             <div className="text-center space-y-4">

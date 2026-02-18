@@ -25,6 +25,7 @@ export const Navigation: React.FC<NavigationProps> = ({ currentSection, onNaviga
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobileSubmenuOpen, setIsMobileSubmenuOpen] = useState(true);
+  const [isMobileGalleryOpen, setIsMobileGalleryOpen] = useState(false);
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
 
   const t = translations[lang].nav;
@@ -50,7 +51,15 @@ export const Navigation: React.FC<NavigationProps> = ({ currentSection, onNaviga
       ]
     },
     { id: Section.PERFORMANCES, label: t.performances },
-    { id: Section.GALLERY, label: t.gallery },
+    {
+      id: 'gallery-submenu',
+      label: t.gallery,
+      isSubmenu: true,
+      children: [
+        { id: Section.GALLERY, label: t.multimedia },
+        { id: Section.PRESS, label: t.press },
+      ]
+    },
     // { id: Section.RESOURCES, label: t.resources },
     { id: Section.BLOG, label: t.blog },
     { id: Section.CONTACT, label: t.contact },
@@ -62,6 +71,7 @@ export const Navigation: React.FC<NavigationProps> = ({ currentSection, onNaviga
   };
 
   const isTrayectoriaActive = [Section.EXPERIENCE, Section.RESEARCH].includes(currentSection);
+  const isGalleryActive = [Section.GALLERY, Section.PRESS].includes(currentSection);
 
   return (
     <>
@@ -96,7 +106,7 @@ export const Navigation: React.FC<NavigationProps> = ({ currentSection, onNaviga
                 return (
                   <div key={item.id} className="relative group">
                     <button
-                      className={`flex items-center gap-1 text-[10px] xl:text-xs tracking-[0.2em] uppercase transition-all duration-300 hover:text-maestro-gold drop-shadow-sm ${isTrayectoriaActive
+                      className={`flex items-center gap-1 text-[10px] xl:text-xs tracking-[0.2em] uppercase transition-all duration-300 hover:text-maestro-gold drop-shadow-sm ${(item.id === 'trayectoria' && isTrayectoriaActive) || (item.id === 'gallery-submenu' && isGalleryActive)
                         ? 'text-maestro-gold font-bold border-b border-maestro-gold pb-1'
                         : 'text-maestro-light/90'
                         } `}
@@ -243,7 +253,7 @@ export const Navigation: React.FC<NavigationProps> = ({ currentSection, onNaviga
 
               <div className="flex flex-col space-y-6">
                 {navStructure.map((item, index) => {
-                  const isActive = item.isSubmenu ? isTrayectoriaActive : currentSection === item.id;
+                  const isActive = item.id === 'trayectoria' ? isTrayectoriaActive : item.id === 'gallery-submenu' ? isGalleryActive : (item.id as Section) === currentSection;
 
                   if (item.isSubmenu && item.children) {
                     return (
@@ -257,7 +267,10 @@ export const Navigation: React.FC<NavigationProps> = ({ currentSection, onNaviga
                         }}
                       >
                         <button
-                          onClick={() => setIsMobileSubmenuOpen(!isMobileSubmenuOpen)}
+                          onClick={() => {
+                            if (item.id === 'trayectoria') setIsMobileSubmenuOpen(!isMobileSubmenuOpen);
+                            if (item.id === 'gallery-submenu') setIsMobileGalleryOpen(!isMobileGalleryOpen);
+                          }}
                           className={`text-2xl font-serif transition-all duration-500 flex items-center justify-between w-full hover:text-maestro-gold ${isActive ? 'text-maestro-gold' : 'text-maestro-light'} `}
                         >
                           <span className="flex items-center gap-4">
@@ -266,13 +279,13 @@ export const Navigation: React.FC<NavigationProps> = ({ currentSection, onNaviga
                           </span>
                           <ChevronDown
                             size={18}
-                            className={`transition-transform duration-500 text-maestro-gold/50 ${isMobileSubmenuOpen ? 'rotate-180' : ''} `}
+                            className={`transition-transform duration-500 text-maestro-gold/50 ${item.id === 'trayectoria' ? (isMobileSubmenuOpen ? 'rotate-180' : '') : (isMobileGalleryOpen ? 'rotate-180' : '')} `}
                           />
                         </button>
 
                         <div className={`
 w-full pl-4 flex flex-col space-y-4 overflow-hidden transition-all duration-500 ease-in-out
-                            ${isMobileSubmenuOpen ? 'max-h-[300px] mt-4 opacity-100' : 'max-h-0 opacity-0'}
+                            ${(item.id === 'trayectoria' ? isMobileSubmenuOpen : isMobileGalleryOpen) ? 'max-h-[300px] mt-4 opacity-100' : 'max-h-0 opacity-0'}
 `}>
                           {item.children.map(child => (
                             <button

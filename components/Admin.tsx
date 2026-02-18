@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { FadeIn } from './FadeIn';
 import {
     Lock, LogOut, FileText, Music, UploadCloud, Trash2, PlusCircle,
     LayoutDashboard, Image as ImageIcon, X, Briefcase, BookOpen, Calendar, MapPin, Video, PlayCircle, Edit, Save, RotateCcw, Database,
     ChevronDown, ArrowRight, Mail
 } from 'lucide-react';
-import { BlogPost, Resource, ExperienceItem, ResearchPaper, Performance, GalleryItem, Language, ContactMessage } from '../types';
+import { BlogPost, Resource, ExperienceItem, ResearchPaper, Performance, GalleryItem, Language, ContactMessage, PressItem } from '../types';
 import { translations } from '../translations';
 import { addItem, updateItem, deleteItem as deleteDbItem } from '../src/services/db';
 import { signIn, logout } from '../src/services/auth';
@@ -28,12 +28,386 @@ interface AdminProps {
     research: ResearchPaper[]; setResearch: (items: ResearchPaper[]) => void;
     performances: Performance[]; setPerformances: (items: Performance[]) => void;
     gallery: GalleryItem[]; setGallery: (items: GalleryItem[]) => void;
+    press: PressItem[]; setPress: (items: PressItem[]) => void;
     messages: ContactMessage[]; setMessages: (messages: ContactMessage[]) => void;
 }
 
+interface AdminCalendarProps {
+    lang: Language;
+    performances: Performance[];
+    setNewPerfDate: (date: string) => void;
+    setNewPerfDateISO: (date: string) => void;
+}
+
+const AdminCalendar: React.FC<AdminCalendarProps> = ({
+    lang, performances, setNewPerfDate, setNewPerfDateISO
+}) => {
+    const today = new Date();
+    const [currentMonth, setCurrentMonth] = useState(today.getMonth());
+    const [currentYear, setCurrentYear] = useState(today.getFullYear());
+
+    const monthNames = lang === 'es' ?
+        ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'] :
+        ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+    const getDaysInMonth = (month: number, year: number) => new Date(year, month + 1, 0).getDate();
+    const getFirstDayOfMonth = (month: number, year: number) => new Date(year, month, 1).getDay();
+
+    const days = [];
+    const daysInMonth = getDaysInMonth(currentMonth, currentYear);
+    const firstDay = getFirstDayOfMonth(currentMonth, currentYear);
+
+    for (let i = 0; i < firstDay; i++) days.push(null);
+    for (let i = 1; i <= daysInMonth; i++) days.push(i);
+
+    const getEventsForDay = (day: number) => {
+        return performances.filter(perf => {
+            const perfDate = new Date((perf.date as any)?.es || perf.date);
+            return perfDate.getDate() === day && perfDate.getMonth() === currentMonth && perfDate.getFullYear() === currentYear;
+        });
+    };
+
+    const onDateSelect = (day: number) => {
+        const date = new Date(currentYear, currentMonth, day);
+        const dayStr = date.getDate().toString().padStart(2, '0');
+        const monthStr = date.toLocaleString(lang === 'es' ? 'es-ES' : 'en-US', { month: 'short' }).replace('.', '');
+        const yearStr = date.getFullYear();
+        setNewPerfDate(`${dayStr} ${monthStr} ${yearStr}`);
+        setNewPerfDateISO(`${yearStr}-${(currentMonth + 1).toString().padStart(2, '0')}-${dayStr}`);
+    };
+
+    return (
+        <div className="bg-maestro-dark border border-white/10 p-6 rounded-xl shadow-xl">
+            <div className="flex justify-between items-center mb-6">
+                <div className="flex flex-col">
+                    <h4 className="text-maestro-gold font-serif tracking-wide">{monthNames[currentMonth]}</h4>
+                    <select
+                        value={currentYear}
+                        onChange={(e) => setCurrentYear(parseInt(e.target.value))}
+                        className="bg-transparent text-maestro-gold/60 text-xs outline-none cursor-pointer hover:text-maestro-gold"
+                    >
+                        {[...Array(75)].map((_, i) => {
+                            const y = 1960 + i;
+                            return <option key={y} value={y} style={{ backgroundColor: '#0a0a0a' }}>{y}</option>;
+                        })}
+                    </select>
+                </div>
+                <div className="flex gap-2">
+                    <button onClick={() => {
+                        if (currentMonth === 0) {
+                            setCurrentMonth(11);
+                            setCurrentYear(prev => prev - 1);
+                        } else {
+                            setCurrentMonth(prev => prev - 1);
+                        }
+                    }} className="p-1 hover:text-maestro-gold transition-colors">
+                        <ChevronDown size={18} className="rotate-90" />
+                    </button>
+                    <button onClick={() => {
+                        if (currentMonth === 11) {
+                            setCurrentMonth(0);
+                            setCurrentYear(prev => prev + 1);
+                        } else {
+                            setCurrentMonth(prev => prev + 1);
+                        }
+                    }} className="p-1 hover:text-maestro-gold transition-colors">
+                        <ChevronDown size={18} className="-rotate-90" />
+                    </button>
+                </div>
+            </div>
+            <div className="grid grid-cols-7 gap-1 text-center text-[10px] uppercase text-white/40 mb-2 font-bold">
+                {['D', 'L', 'M', 'X', 'J', 'V', 'S'].map(d => <div key={d}>{d}</div>)}
+            </div>
+            <div className="grid grid-cols-7 gap-1">
+                {days.map((day, idx) => {
+                    const dayEvents = day ? getEventsForDay(day) : [];
+                    const isToday = day === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear();
+
+                    return (
+                        <div
+                            key={idx}
+                            onClick={() => day && onDateSelect(day)}
+                            className={`
+                                h-8 flex flex-col items-center justify-center text-xs rounded-md transition-all
+                                ${day ? 'hover:bg-maestro-gold/20 cursor-pointer' : ''}
+                                ${isToday ? 'bg-white/10 text-maestro-gold font-bold border border-maestro-gold/30' : 'text-white/70'}
+                            `}
+                        >
+                            {day}
+                            {dayEvents.length > 0 && (
+                                <div className="flex gap-0.5 mt-0.5">
+                                    {dayEvents.slice(0, 3).map((_, eIdx) => (
+                                        <div key={eIdx} className="w-1 h-1 bg-maestro-gold rounded-full shadow-[0_0_5px_rgba(234,179,8,0.8)]" />
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    );
+                })}
+            </div>
+            <p className="text-[9px] text-white/30 mt-4 italic text-center">Tip: Haz clic en un día para seleccionar la fecha</p>
+        </div>
+    );
+};
+
+interface PressCalendarProps {
+    lang: Language;
+    press: PressItem[];
+    setNewPressDate: (date: string) => void;
+    setNewPressDateISO: (date: string) => void;
+}
+
+const PressCalendar: React.FC<PressCalendarProps> = ({
+    lang, press, setNewPressDate, setNewPressDateISO
+}) => {
+    const today = new Date();
+    const [currentMonth, setCurrentMonth] = useState(today.getMonth());
+    const [currentYear, setCurrentYear] = useState(today.getFullYear());
+
+    const monthNames = lang === 'es' ?
+        ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'] :
+        ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+    const getDaysInMonth = (month: number, year: number) => new Date(year, month + 1, 0).getDate();
+    const getFirstDayOfMonth = (month: number, year: number) => new Date(year, month, 1).getDay();
+
+    const days = [];
+    const daysInMonth = getDaysInMonth(currentMonth, currentYear);
+    const firstDay = getFirstDayOfMonth(currentMonth, currentYear);
+
+    for (let i = 0; i < firstDay; i++) days.push(null);
+    for (let i = 1; i <= daysInMonth; i++) days.push(i);
+
+    const getArticlesForDay = (day: number) => {
+        return press.filter(item => {
+            const articleDate = new Date(item.dateISO || (item.date as any)?.es || item.date);
+            return articleDate.getDate() === day && articleDate.getMonth() === currentMonth && articleDate.getFullYear() === currentYear;
+        });
+    };
+
+    const onDateSelect = (day: number) => {
+        const date = new Date(currentYear, currentMonth, day);
+        const dayStr = date.getDate().toString().padStart(2, '0');
+        const monthStr = date.toLocaleString(lang === 'es' ? 'es-ES' : 'en-US', { month: 'short' }).replace('.', '');
+        const yearStr = date.getFullYear();
+        setNewPressDate(`${dayStr} ${monthStr} ${yearStr}`);
+        setNewPressDateISO(`${yearStr}-${(currentMonth + 1).toString().padStart(2, '0')}-${dayStr}`);
+    };
+
+    return (
+        <div className="bg-maestro-dark border border-white/10 p-6 rounded-xl shadow-xl">
+            <div className="flex justify-between items-center mb-6">
+                <div className="flex flex-col">
+                    <h4 className="text-maestro-gold font-serif tracking-wide">{monthNames[currentMonth]}</h4>
+                    <select
+                        value={currentYear}
+                        onChange={(e) => setCurrentYear(parseInt(e.target.value))}
+                        className="bg-transparent text-maestro-gold/60 text-xs outline-none cursor-pointer hover:text-maestro-gold"
+                    >
+                        {[...Array(75)].map((_, i) => {
+                            const y = 1960 + i;
+                            return <option key={y} value={y} style={{ backgroundColor: '#0a0a0a' }}>{y}</option>;
+                        })}
+                    </select>
+                </div>
+                <div className="flex gap-2">
+                    <button onClick={() => {
+                        if (currentMonth === 0) {
+                            setCurrentMonth(11);
+                            setCurrentYear(prev => prev - 1);
+                        } else {
+                            setCurrentMonth(prev => prev - 1);
+                        }
+                    }} className="p-1 hover:text-maestro-gold transition-colors">
+                        <ChevronDown size={18} className="rotate-90" />
+                    </button>
+                    <button onClick={() => {
+                        if (currentMonth === 11) {
+                            setCurrentMonth(0);
+                            setCurrentYear(prev => prev + 1);
+                        } else {
+                            setCurrentMonth(prev => prev + 1);
+                        }
+                    }} className="p-1 hover:text-maestro-gold transition-colors">
+                        <ChevronDown size={18} className="-rotate-90" />
+                    </button>
+                </div>
+            </div>
+            <div className="grid grid-cols-7 gap-1 text-center text-[10px] uppercase text-white/40 mb-2 font-bold">
+                {['D', 'L', 'M', 'X', 'J', 'V', 'S'].map(d => <div key={d}>{d}</div>)}
+            </div>
+            <div className="grid grid-cols-7 gap-1">
+                {days.map((day, idx) => {
+                    const dayArticles = day ? getArticlesForDay(day) : [];
+                    const isToday = day === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear();
+
+                    return (
+                        <div
+                            key={idx}
+                            onClick={() => day && onDateSelect(day)}
+                            className={`
+                                h-8 flex flex-col items-center justify-center text-xs rounded-md transition-all
+                                ${day ? 'hover:bg-maestro-gold/20 cursor-pointer' : ''}
+                                ${isToday ? 'bg-white/10 text-maestro-gold font-bold border border-maestro-gold/30' : 'text-white/70'}
+                            `}
+                        >
+                            {day}
+                            {dayArticles.length > 0 && (
+                                <div className="flex gap-0.5 mt-0.5">
+                                    {dayArticles.slice(0, 3).map((_, eIdx) => (
+                                        <div key={eIdx} className="w-1 h-1 bg-maestro-gold rounded-full shadow-[0_0_5px_rgba(234,179,8,0.8)]" />
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    );
+                })}
+            </div>
+            <p className="text-[9px] text-white/30 mt-4 italic text-center">Tip: Haz clic en un día para seleccionar la fecha</p>
+        </div>
+    );
+};
+
+interface ExperienceCalendarProps {
+    lang: Language;
+    experience: ExperienceItem[];
+    setNewExpYear: (year: string) => void;
+    setNewExpDateISO: (date: string) => void;
+}
+
+const ExperienceCalendar: React.FC<ExperienceCalendarProps> = ({
+    lang, experience, setNewExpYear, setNewExpDateISO
+}) => {
+    const today = new Date();
+    const [currentMonth, setCurrentMonth] = useState(today.getMonth());
+    const [currentYear, setCurrentYear] = useState(today.getFullYear());
+    const [rangeStart, setRangeStart] = useState<Date | null>(null);
+
+    const monthNames = lang === 'es' ?
+        ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'] :
+        ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+    const getDaysInMonth = (month: number, year: number) => new Date(year, month + 1, 0).getDate();
+    const getFirstDayOfMonth = (month: number, year: number) => new Date(year, month, 1).getDay();
+
+    const days = [];
+    const daysInMonth = getDaysInMonth(currentMonth, currentYear);
+    const firstDay = getFirstDayOfMonth(currentMonth, currentYear);
+
+    for (let i = 0; i < firstDay; i++) days.push(null);
+    for (let i = 1; i <= daysInMonth; i++) days.push(i);
+
+    const getExperienceForDay = (day: number) => {
+        return experience.filter(item => {
+            const itemDate = new Date(item.dateISO || (item.year as any)?.es || item.year);
+            return itemDate.getDate() === day && itemDate.getMonth() === currentMonth && itemDate.getFullYear() === currentYear;
+        });
+    };
+
+    const formatDate = (d: Date) => {
+        const dStr = d.getDate().toString().padStart(2, '0');
+        const mStr = d.toLocaleString(lang === 'es' ? 'es-ES' : 'en-US', { month: 'short' }).replace('.', '');
+        const yStr = d.getFullYear();
+        return `${dStr} ${mStr} ${yStr}`;
+    };
+
+    const onDateSelect = (day: number) => {
+        const date = new Date(currentYear, currentMonth, day);
+
+        if (!rangeStart) {
+            setRangeStart(date);
+            setNewExpYear(`${lang === 'es' ? 'Desde' : 'From'} ${formatDate(date)}...`);
+            setNewExpDateISO(`${date.getFullYear()}-${(currentMonth + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`);
+        } else {
+            const start = rangeStart < date ? rangeStart : date;
+            const end = rangeStart < date ? date : rangeStart;
+
+            setNewExpYear(`${formatDate(start)} - ${formatDate(end)}`);
+            setNewExpDateISO(`${start.getFullYear()}-${(start.getMonth() + 1).toString().padStart(2, '0')}-${start.getDate().toString().padStart(2, '0')}`);
+            setRangeStart(null);
+        }
+    };
+
+    return (
+        <div className="bg-maestro-dark border border-white/10 p-6 rounded-xl shadow-xl">
+            <div className="flex justify-between items-center mb-6">
+                <div className="flex flex-col">
+                    <h4 className="text-maestro-gold font-serif tracking-wide">{monthNames[currentMonth]}</h4>
+                    <select
+                        value={currentYear}
+                        onChange={(e) => setCurrentYear(parseInt(e.target.value))}
+                        className="bg-transparent text-maestro-gold/60 text-xs outline-none cursor-pointer hover:text-maestro-gold"
+                    >
+                        {[...Array(75)].map((_, i) => {
+                            const y = 1960 + i;
+                            return <option key={y} value={y} style={{ backgroundColor: '#0a0a0a' }}>{y}</option>;
+                        })}
+                    </select>
+                </div>
+                <div className="flex gap-2">
+                    <button onClick={() => {
+                        if (currentMonth === 0) {
+                            setCurrentMonth(11);
+                            setCurrentYear(prev => prev - 1);
+                        } else {
+                            setCurrentMonth(prev => prev - 1);
+                        }
+                    }} className="p-1 hover:text-maestro-gold transition-colors">
+                        <ChevronDown size={18} className="rotate-90" />
+                    </button>
+                    <button onClick={() => {
+                        if (currentMonth === 11) {
+                            setCurrentMonth(0);
+                            setCurrentYear(prev => prev + 1);
+                        } else {
+                            setCurrentMonth(prev => prev + 1);
+                        }
+                    }} className="p-1 hover:text-maestro-gold transition-colors">
+                        <ChevronDown size={18} className="-rotate-90" />
+                    </button>
+                </div>
+            </div>
+            <div className="grid grid-cols-7 gap-1 text-center text-[10px] uppercase text-white/40 mb-2 font-bold">
+                {['D', 'L', 'M', 'X', 'J', 'V', 'S'].map(d => <div key={d}>{d}</div>)}
+            </div>
+            <div className="grid grid-cols-7 gap-1">
+                {days.map((day, idx) => {
+                    const dayItems = day ? getExperienceForDay(day) : [];
+                    const isToday = day === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear();
+                    const isSelected = rangeStart && day === rangeStart.getDate() && currentMonth === rangeStart.getMonth() && currentYear === rangeStart.getFullYear();
+
+                    return (
+                        <div
+                            key={idx}
+                            onClick={() => day && onDateSelect(day)}
+                            className={`
+                                h-8 flex flex-col items-center justify-center text-xs rounded-md transition-all
+                                ${day ? 'hover:bg-maestro-gold/20 cursor-pointer' : ''}
+                                ${isSelected ? 'bg-maestro-gold text-maestro-dark font-bold' : (isToday ? 'bg-white/10 text-maestro-gold font-bold border border-maestro-gold/30' : 'text-white/70')}
+                            `}
+                        >
+                            {day}
+                            {dayItems.length > 0 && (
+                                <div className="flex gap-0.5 mt-0.5">
+                                    {dayItems.slice(0, 3).map((_, eIdx) => (
+                                        <div key={eIdx} className="w-1 h-1 bg-maestro-gold rounded-full shadow-[0_0_5px_rgba(234,179,8,0.8)]" />
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    );
+                })}
+            </div>
+            <p className="text-[9px] text-white/30 mt-4 italic text-center">
+                {rangeStart ? (lang === 'es' ? 'Selecciona la fecha final' : 'Select end date') : (lang === 'es' ? 'Tip: Selecciona inicio y fin para el rango' : 'Tip: Select start and end for range')}
+            </p>
+        </div>
+    );
+};
+
 export const Admin: React.FC<AdminProps> = ({
     isAuthenticated, onLogin, userEmail, lang,
-    posts, resources, experience, research, performances, gallery, messages
+    posts, resources, experience, research, performances, gallery, press, messages
 }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -42,7 +416,7 @@ export const Admin: React.FC<AdminProps> = ({
     const [translating, setTranslating] = useState(false);
     const [compressing, setCompressing] = useState(false);
 
-    type Tab = 'blog' | 'resources' | 'experience' | 'research' | 'performances' | 'gallery' | 'messages';
+    type Tab = 'blog' | 'resources' | 'experience' | 'research' | 'performances' | 'gallery' | 'press' | 'messages';
     const [activeTab, setActiveTab] = useState<Tab>('blog');
 
     // Track which item ID is being edited. Null means "Creating New".
@@ -62,6 +436,7 @@ export const Admin: React.FC<AdminProps> = ({
 
     // Experience
     const [newExpYear, setNewExpYear] = useState('');
+    const [newExpDateISO, setNewExpDateISO] = useState(''); // YYYY-MM-DD
     const [newExpRole, setNewExpRole] = useState('');
     const [newExpInst, setNewExpInst] = useState('');
     const [newExpDesc, setNewExpDesc] = useState('');
@@ -90,9 +465,20 @@ export const Admin: React.FC<AdminProps> = ({
     const [newGalAuthor, setNewGalAuthor] = useState('');
     const [newGalCap, setNewGalCap] = useState('');
 
+    // Press
+    const [newPressTitle, setNewPressTitle] = useState('');
+    const [newPressSource, setNewPressSource] = useState('');
+    const [newPressDate, setNewPressDate] = useState('');
+    const [newPressExcerpt, setNewPressExcerpt] = useState('');
+    const [newPressUrl, setNewPressUrl] = useState('');
+    const [newPressImage, setNewPressImage] = useState('');
+    const [newPressCategory, setNewPressCategory] = useState('');
+    const [newPressDateISO, setNewPressDateISO] = useState(''); // YYYY-MM-DD
+
     // Pagination & Search for Gallery Management
     const [adminGalleryPage, setAdminGalleryPage] = useState(1);
     const [adminBlogPage, setAdminBlogPage] = useState(1);
+    const [adminPressPage, setAdminPressPage] = useState(1);
     const [adminGallerySearch, setAdminGallerySearch] = useState('');
     const ITEMS_PER_PAGE_ADMIN = 12;
 
@@ -125,7 +511,10 @@ export const Admin: React.FC<AdminProps> = ({
         // Res
         setNewResTitle(''); setNewResDesc(''); setNewResType('article');
         // Exp
-        setNewExpYear(''); setNewExpRole(''); setNewExpInst(''); setNewExpDesc('');
+        setNewExpYear('');
+        setNewExpDateISO('');
+        setNewExpRole('');
+        setNewExpInst(''); setNewExpDesc('');
         // Research
         setNewResPaperTitle(''); setNewResJournal(''); setNewResYear(''); setNewResAbstract('');
         // Perf
@@ -135,8 +524,19 @@ export const Admin: React.FC<AdminProps> = ({
         setNewGalSubCat('');
         setNewGalAuthor('');
         setNewGalCap('');
+        // Press
+        setNewPressTitle('');
+        setNewPressSource('');
+        setNewPressDate('');
+        setNewPressDateISO('');
+        setNewPressExcerpt('');
+        setNewPressUrl('');
+        setNewPressImage('');
+        setNewPressCategory('');
+
         setAdminGalleryPage(1);
         setAdminBlogPage(1);
+        setAdminPressPage(1);
     };
 
     const changeTab = (tab: Tab) => {
@@ -214,6 +614,29 @@ export const Admin: React.FC<AdminProps> = ({
             return url || '';
         } catch (error) {
             console.error('Error uploading editor image:', error);
+            setCompressing(false);
+            throw error;
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handlePressEditorImageUpload = async (file: File): Promise<string> => {
+        try {
+            setLoading(true);
+            let uploadFile = file;
+
+            if (file.type.startsWith('image/')) {
+                setCompressing(true);
+                const compressed = await compressImage(file);
+                uploadFile = compressed as File;
+                setCompressing(false);
+            }
+
+            const url = await uploadToStorage(uploadFile, 'images/press/content/');
+            return url || '';
+        } catch (error) {
+            console.error('Error uploading press editor image:', error);
             setCompressing(false);
             throw error;
         } finally {
@@ -343,7 +766,7 @@ export const Admin: React.FC<AdminProps> = ({
                     description: translations.description,
                     year: translations.year
                 },
-                { yearRaw: newExpYear } // Keep raw year for sorting if needed
+                { yearRaw: newExpYear, dateISO: newExpDateISO } // Keep raw year for sorting if needed
             );
         } catch (error) {
             console.error("Error saving experience:", error);
@@ -356,6 +779,7 @@ export const Admin: React.FC<AdminProps> = ({
     const startEditExperience = (exp: any) => {
         setEditingId(exp.id);
         setNewExpYear(exp.year?.es || exp.year || '');
+        setNewExpDateISO(exp.dateISO || '');
         setNewExpRole(exp.role?.es || exp.role || '');
         setNewExpInst(exp.institution?.es || exp.institution || '');
         setNewExpDesc(exp.description?.es || exp.description || '');
@@ -515,6 +939,51 @@ export const Admin: React.FC<AdminProps> = ({
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
+    // --- PRESS HANDLERS ---
+    const handleSavePress = async () => {
+        if (!newPressTitle) return;
+        try {
+            setTranslating(true);
+            const translations_data = await translateFields(
+                { title: newPressTitle, excerpt: newPressExcerpt, category: newPressCategory },
+                ['title', 'excerpt', 'category']
+            );
+
+            await saveToDb('press', editingId,
+                {
+                    title: translations_data.title,
+                    excerpt: translations_data.excerpt,
+                    category: translations_data.category
+                },
+                {
+                    source: newPressSource,
+                    date: newPressDate,
+                    dateISO: newPressDateISO,
+                    url: newPressUrl,
+                    image: newPressImage
+                }
+            );
+        } catch (error) {
+            console.error("Error saving press item:", error);
+            alert("Error al guardar el artículo de prensa.");
+        } finally {
+            setTranslating(false);
+        }
+    };
+
+    const startEditPress = (item: PressItem) => {
+        setEditingId(item.id);
+        setNewPressTitle((item.title as any)?.es || item.title || '');
+        setNewPressSource(item.source);
+        setNewPressDate(item.date);
+        setNewPressDateISO(item.dateISO || '');
+        setNewPressExcerpt((item.excerpt as any)?.es || item.excerpt || '');
+        setNewPressUrl(item.url);
+        setNewPressImage(item.image || '');
+        setNewPressCategory((item.category as any)?.es || item.category || '');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
 
 
 
@@ -543,89 +1012,6 @@ export const Admin: React.FC<AdminProps> = ({
     }
 
     // --- DASHBOARD VIEW ---
-    // --- PERFORMANCE CALENDAR HELPER ---
-    const AdminCalendar = () => {
-        const today = new Date();
-        const [currentMonth, setCurrentMonth] = useState(today.getMonth());
-        const [currentYear, setCurrentYear] = useState(today.getFullYear());
-
-        const monthNames = lang === 'es' ?
-            ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'] :
-            ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
-        const getDaysInMonth = (month: number, year: number) => new Date(year, month + 1, 0).getDate();
-        const getFirstDayOfMonth = (month: number, year: number) => new Date(year, month, 1).getDay();
-
-        const days = [];
-        const daysInMonth = getDaysInMonth(currentMonth, currentYear);
-        const firstDay = getFirstDayOfMonth(currentMonth, currentYear);
-
-        for (let i = 0; i < firstDay; i++) days.push(null);
-        for (let i = 1; i <= daysInMonth; i++) days.push(i);
-
-        const getEventsForDay = (day: number) => {
-            return performances.filter(perf => {
-                const perfDate = new Date((perf.date as any)?.es || perf.date);
-                return perfDate.getDate() === day && perfDate.getMonth() === currentMonth && perfDate.getFullYear() === currentYear;
-            });
-        };
-
-        const onDateSelect = (day: number) => {
-            const date = new Date(currentYear, currentMonth, day);
-            const dayStr = date.getDate().toString().padStart(2, '0');
-            const monthStr = date.toLocaleString(lang === 'es' ? 'es-ES' : 'en-US', { month: 'short' }).replace('.', '');
-            const yearStr = date.getFullYear();
-            setNewPerfDate(`${dayStr} ${monthStr} ${yearStr}`);
-            setNewPerfDateISO(`${yearStr}-${(currentMonth + 1).toString().padStart(2, '0')}-${dayStr}`);
-        };
-
-        return (
-            <div className="bg-maestro-dark border border-white/10 p-6 rounded-xl shadow-xl">
-                <div className="flex justify-between items-center mb-6">
-                    <h4 className="text-maestro-gold font-serif tracking-wide">{monthNames[currentMonth]} {currentYear}</h4>
-                    <div className="flex gap-2">
-                        <button onClick={() => setCurrentMonth(prev => prev === 0 ? 11 : prev - 1)} className="p-1 hover:text-maestro-gold transition-colors">
-                            <ChevronDown size={18} className="rotate-90" />
-                        </button>
-                        <button onClick={() => setCurrentMonth(prev => prev === 11 ? 0 : prev + 1)} className="p-1 hover:text-maestro-gold transition-colors">
-                            <ChevronDown size={18} className="-rotate-90" />
-                        </button>
-                    </div>
-                </div>
-                <div className="grid grid-cols-7 gap-1 text-center text-[10px] uppercase text-white/40 mb-2 font-bold">
-                    {['D', 'L', 'M', 'X', 'J', 'V', 'S'].map(d => <div key={d}>{d}</div>)}
-                </div>
-                <div className="grid grid-cols-7 gap-1">
-                    {days.map((day, idx) => {
-                        const dayEvents = day ? getEventsForDay(day) : [];
-                        const isToday = day === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear();
-
-                        return (
-                            <div
-                                key={idx}
-                                onClick={() => day && onDateSelect(day)}
-                                className={`
-                                    h-8 flex flex-col items-center justify-center text-xs rounded-md transition-all
-                                    ${day ? 'hover:bg-maestro-gold/20 cursor-pointer' : ''}
-                                    ${isToday ? 'bg-white/10 text-maestro-gold font-bold border border-maestro-gold/30' : 'text-white/70'}
-                                `}
-                            >
-                                {day}
-                                {dayEvents.length > 0 && (
-                                    <div className="flex gap-0.5 mt-0.5">
-                                        {dayEvents.slice(0, 3).map((_, eIdx) => (
-                                            <div key={eIdx} className="w-1 h-1 bg-maestro-gold rounded-full shadow-[0_0_5px_rgba(234,179,8,0.8)]" />
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        );
-                    })}
-                </div>
-                <p className="text-[9px] text-white/30 mt-4 italic text-center">Tip: Haz clic en un día para seleccionar la fecha</p>
-            </div>
-        );
-    };
 
     return (
         <section className="min-h-screen bg-maestro-dark pt-28 px-6 pb-24">
@@ -656,6 +1042,7 @@ export const Admin: React.FC<AdminProps> = ({
                             { id: 'research', label: 'Investigación', icon: BookOpen },
                             { id: 'performances', label: 'Eventos', icon: Calendar },
                             { id: 'gallery', label: 'Galería', icon: ImageIcon },
+                            { id: 'press', label: 'Prensa', icon: FileText },
                             { id: 'messages', label: 'Mensajes', icon: Mail },
                         ].map(tab => (
                             <button
@@ -896,27 +1283,41 @@ export const Admin: React.FC<AdminProps> = ({
                                     </h3>
                                     {editingId && <button onClick={resetForms} className="text-xs text-red-400 flex items-center gap-1 hover:text-red-300"><RotateCcw size={12} /> Cancelar Edición</button>}
                                 </div>
-                                <div className="space-y-4 mb-12 border-b border-white/10 pb-12">
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <input type="text" value={newExpYear} onChange={(e) => setNewExpYear(e.target.value)} placeholder="Año (ej: 2023 - Presente)" className="w-full bg-maestro-dark border border-white/10 p-3 text-white" />
-                                        <input type="text" value={newExpRole} onChange={(e) => setNewExpRole(e.target.value)} placeholder="Rol (ej: Director)" className="w-full bg-maestro-dark border border-white/10 p-3 text-white" />
+
+                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12 border-b border-white/10 pb-12">
+                                    {/* Left: Interactive Calendar */}
+                                    <div className="lg:col-span-1">
+                                        <ExperienceCalendar
+                                            lang={lang}
+                                            experience={experience}
+                                            setNewExpYear={setNewExpYear}
+                                            setNewExpDateISO={setNewExpDateISO}
+                                        />
                                     </div>
-                                    <input type="text" value={newExpInst} onChange={(e) => setNewExpInst(e.target.value)} placeholder="Institución" className="w-full bg-maestro-dark border border-white/10 p-3 text-white" />
-                                    <RichTextEditor
-                                        value={newExpDesc}
-                                        onChange={setNewExpDesc}
-                                        placeholder="Descripción de la experiencia..."
-                                        minHeight="200px"
-                                    />
-                                    {translating && (
-                                        <div className="flex items-center gap-3 text-maestro-gold text-sm animate-pulse mb-4">
-                                            <Database size={16} className="animate-spin" />
-                                            <span>Traduciendo experiencia...</span>
+
+                                    {/* Right: The Form */}
+                                    <div className="lg:col-span-2 space-y-4">
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <input type="text" value={newExpYear} onChange={(e) => setNewExpYear(e.target.value)} placeholder="Año (ej: 2023 - Presente o Selecciona en Calendario)" className="w-full bg-maestro-dark border border-white/10 p-3 text-white focus:border-maestro-gold outline-none" />
+                                            <input type="text" value={newExpRole} onChange={(e) => setNewExpRole(e.target.value)} placeholder="Rol (ej: Director)" className="w-full bg-maestro-dark border border-white/10 p-3 text-white focus:border-maestro-gold outline-none" />
                                         </div>
-                                    )}
-                                    <button disabled={translating || loading} onClick={handleSaveExperience} className={`w-full md:w-auto px-6 py-2 uppercase tracking-widest text-xs font-bold transition-colors ${(translating || loading) ? 'bg-gray-600 cursor-not-allowed' : (editingId ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-maestro-gold hover:bg-white text-maestro-dark')}`}>
-                                        {translating ? 'Traduciendo...' : (loading ? 'Guardando...' : (editingId ? 'Guardar Cambios' : 'Añadir'))}
-                                    </button>
+                                        <input type="text" value={newExpInst} onChange={(e) => setNewExpInst(e.target.value)} placeholder="Institución" className="w-full bg-maestro-dark border border-white/10 p-3 text-white focus:border-maestro-gold outline-none" />
+                                        <RichTextEditor
+                                            value={newExpDesc}
+                                            onChange={setNewExpDesc}
+                                            placeholder="Descripción de la experiencia..."
+                                            minHeight="200px"
+                                        />
+                                        {translating && (
+                                            <div className="flex items-center gap-3 text-maestro-gold text-sm animate-pulse mb-4">
+                                                <Database size={16} className="animate-spin" />
+                                                <span>Traduciendo experiencia...</span>
+                                            </div>
+                                        )}
+                                        <button disabled={translating || loading} onClick={handleSaveExperience} className={`w-full md:w-auto px-6 py-2 uppercase tracking-widest text-xs font-bold transition-colors ${(translating || loading) ? 'bg-gray-600 cursor-not-allowed' : (editingId ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-maestro-gold hover:bg-white text-maestro-dark')}`}>
+                                            {translating ? 'Traduciendo...' : (loading ? 'Guardando...' : (editingId ? 'Guardar Cambios' : 'Añadir'))}
+                                        </button>
+                                    </div>
                                 </div>
                                 <div className="space-y-4">
                                     {experience.map(exp => (
@@ -992,7 +1393,12 @@ export const Admin: React.FC<AdminProps> = ({
                                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12 border-b border-white/10 pb-12">
                                     {/* Left: Interactive Calendar */}
                                     <div className="lg:col-span-1">
-                                        <AdminCalendar />
+                                        <AdminCalendar
+                                            lang={lang}
+                                            performances={performances}
+                                            setNewPerfDate={setNewPerfDate}
+                                            setNewPerfDateISO={setNewPerfDateISO}
+                                        />
                                     </div>
 
                                     {/* Right: The Form */}
@@ -1387,6 +1793,206 @@ export const Admin: React.FC<AdminProps> = ({
                                         </>
                                     );
                                 })()}
+                            </FadeIn>
+                        )}
+
+                        {/* 8. PRESS MANAGEMENT */}
+                        {activeTab === 'press' && (
+                            <FadeIn>
+                                <div className="flex justify-between items-center mb-6">
+                                    <h3 className="text-xl font-serif text-maestro-light flex items-center gap-2">
+                                        {editingId ? <Edit className="text-maestro-gold" size={20} /> : <PlusCircle className="text-maestro-gold" size={20} />}
+                                        {editingId ? translations[lang].admin.editPress : translations[lang].admin.addPress}
+                                    </h3>
+                                    {editingId && <button onClick={resetForms} className="text-xs text-red-400 flex items-center gap-1 hover:text-red-300"><RotateCcw size={12} /> Cancelar Edición</button>}
+                                </div>
+
+                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12 border-b border-white/10 pb-12">
+                                    {/* Left: Interactive Calendar */}
+                                    <div className="lg:col-span-1">
+                                        <PressCalendar
+                                            lang={lang}
+                                            press={press}
+                                            setNewPressDate={setNewPressDate}
+                                            setNewPressDateISO={setNewPressDateISO}
+                                        />
+                                    </div>
+
+                                    {/* Right: The Form */}
+                                    <div className="lg:col-span-2 space-y-4">
+                                        <input
+                                            type="text"
+                                            value={newPressTitle}
+                                            onChange={(e) => setNewPressTitle(e.target.value)}
+                                            placeholder="Título del artículo..."
+                                            className="w-full bg-maestro-dark border border-white/10 p-3 text-white focus:border-maestro-gold outline-none"
+                                        />
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <input
+                                                type="text"
+                                                value={newPressSource}
+                                                onChange={(e) => setNewPressSource(e.target.value)}
+                                                placeholder="Fuente (ej: El Universo, BBC)"
+                                                className="w-full bg-maestro-dark border border-white/10 p-3 text-white focus:border-maestro-gold outline-none"
+                                            />
+                                            <input
+                                                type="text"
+                                                value={newPressDate}
+                                                onChange={(e) => setNewPressDate(e.target.value)}
+                                                placeholder="Fecha (ej: 15 May 2023)"
+                                                className="w-full bg-maestro-dark border border-white/10 p-3 text-white focus:border-maestro-gold outline-none"
+                                            />
+                                        </div>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <input
+                                                type="text"
+                                                value={newPressCategory}
+                                                onChange={(e) => setNewPressCategory(e.target.value)}
+                                                placeholder="Categoría (ej: Entrevista, Crítica)"
+                                                className="w-full bg-maestro-dark border border-white/10 p-3 text-white focus:border-maestro-gold outline-none"
+                                            />
+                                            <input
+                                                type="text"
+                                                value={newPressUrl}
+                                                onChange={(e) => setNewPressUrl(e.target.value)}
+                                                placeholder="Enlace al artículo (URL completa)"
+                                                className="w-full bg-maestro-dark border border-white/10 p-3 text-white focus:border-maestro-gold outline-none"
+                                            />
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <label className="block text-[10px] font-bold text-maestro-gold uppercase tracking-[0.2em]">Imagen del Artículo</label>
+                                            <div className="flex gap-4 items-start">
+                                                <label className="flex-grow bg-white/5 border border-dashed border-white/20 p-6 text-maestro-light hover:text-maestro-gold hover:border-maestro-gold/50 cursor-pointer flex flex-col items-center justify-center gap-2 transition-all group rounded-sm min-h-[120px]">
+                                                    <UploadCloud size={24} className="group-hover:scale-110 transition-transform" />
+                                                    <span className="text-xs uppercase tracking-widest font-bold">Subir Imagen desde Dispositivo</span>
+                                                    <input
+                                                        type="file"
+                                                        onChange={(e) => handleFileUpload(e, setNewPressImage, 'images/press/')}
+                                                        className="hidden"
+                                                        accept="image/*"
+                                                    />
+                                                </label>
+
+                                                {newPressImage && (
+                                                    <div className="relative w-48 aspect-video border border-maestro-gold/50 bg-black/20 overflow-hidden rounded-sm group shadow-2xl">
+                                                        <img src={newPressImage} alt="Press" className="w-full h-full object-cover" />
+                                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                            <button
+                                                                onClick={() => setNewPressImage('')}
+                                                                className="bg-red-500 text-white p-2 rounded-full hover:bg-red-400 transition-colors shadow-lg"
+                                                                title="Eliminar imagen"
+                                                            >
+                                                                <Trash2 size={16} />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <label className="block text-[10px] font-bold text-maestro-gold uppercase tracking-[0.2em]">Resumen o extracto del artículo</label>
+                                            <RichTextEditor
+                                                value={newPressExcerpt}
+                                                onChange={setNewPressExcerpt}
+                                                onImageUpload={handlePressEditorImageUpload}
+                                                placeholder="Escribe el resumen o extracto aquí..."
+                                                minHeight="200px"
+                                            />
+                                        </div>
+
+                                        {translating && (
+                                            <div className="flex items-center gap-3 text-maestro-gold text-sm animate-pulse bg-maestro-gold/10 p-3 border border-maestro-gold/20">
+                                                <Database size={16} className="animate-spin" />
+                                                <span>Traduciendo artículo...</span>
+                                            </div>
+                                        )}
+
+                                        <button
+                                            disabled={translating || loading}
+                                            onClick={handleSavePress}
+                                            className={`w-full md:w-auto px-6 py-2 uppercase tracking-widest text-xs font-bold transition-colors ${(translating || loading) ? 'bg-gray-600 cursor-not-allowed' : (editingId ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-maestro-gold hover:bg-white text-maestro-dark')}`}
+                                        >
+                                            {translating ? 'Traduciendo...' : (loading ? 'Guardando...' : (editingId ? 'Guardar Cambios' : 'Añadir'))}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <div className="flex justify-between items-center mb-4">
+                                        <h4 className="text-maestro-gold uppercase tracking-widest text-xs font-bold opacity-70">Listado de Prensa</h4>
+                                        <p className="text-[10px] text-white/30 uppercase tracking-widest">Total: {press.length} artículos</p>
+                                    </div>
+
+                                    {(() => {
+                                        const totalPages = Math.ceil(press.length / ITEMS_PER_PAGE_ADMIN);
+                                        const paginatedPress = press.slice((adminPressPage - 1) * ITEMS_PER_PAGE_ADMIN, adminPressPage * ITEMS_PER_PAGE_ADMIN);
+
+                                        if (press.length === 0) {
+                                            return (
+                                                <div className="text-center py-12 bg-black/20 border border-dashed border-white/5 rounded-sm">
+                                                    <p className="text-white/20 text-xs italic">No hay artículos de prensa registrados</p>
+                                                </div>
+                                            );
+                                        }
+
+                                        return (
+                                            <>
+                                                <div className="space-y-4">
+                                                    {paginatedPress.map(item => (
+                                                        <div key={item.id} className={`flex justify-between items-center p-4 border transition-all ${editingId === item.id ? 'bg-maestro-gold/10 border-maestro-gold' : 'bg-maestro-dark border-white/5 hover:border-maestro-gold/30'}`}>
+                                                            <div className="flex items-center gap-4">
+                                                                {item.image ? (
+                                                                    <div className="w-16 h-10 border border-white/10 overflow-hidden rounded-sm">
+                                                                        <img src={item.image} alt="Thumbnail" className="w-full h-full object-cover" />
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="w-16 h-10 bg-maestro-gold/10 rounded flex items-center justify-center border border-maestro-gold/20">
+                                                                        <FileText size={16} className="text-maestro-gold" />
+                                                                    </div>
+                                                                )}
+                                                                <div>
+                                                                    <h4 className="text-maestro-light font-bold text-sm">{(item.title as any)?.es || item.title}</h4>
+                                                                    <span className="text-[10px] uppercase tracking-widest text-maestro-light/40">{item.source} | {item.date}</span>
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex gap-2">
+                                                                <button onClick={() => startEditPress(item)} className="text-maestro-light/30 hover:text-blue-400 p-2 transition-colors"><Edit size={18} /></button>
+                                                                <button onClick={() => handleDelete('press', item.id)} className="text-maestro-light/30 hover:text-red-500 p-2 transition-colors"><Trash2 size={18} /></button>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+
+                                                {/* Press Pagination Controls */}
+                                                {totalPages > 1 && (
+                                                    <div className="mt-8 flex justify-center items-center gap-4 border-t border-white/5 pt-6">
+                                                        <button
+                                                            disabled={adminPressPage === 1}
+                                                            onClick={() => { setAdminPressPage(prev => Math.max(1, prev - 1)); }}
+                                                            className="p-2 text-white/40 hover:text-maestro-gold disabled:opacity-20 transition-colors"
+                                                        >
+                                                            <ChevronDown size={20} className="rotate-90" />
+                                                        </button>
+                                                        <span className="text-[10px] uppercase tracking-widest font-bold text-maestro-gold">
+                                                            Página {adminPressPage} de {totalPages}
+                                                        </span>
+                                                        <button
+                                                            disabled={adminPressPage === totalPages}
+                                                            onClick={() => { setAdminPressPage(prev => Math.min(totalPages, prev + 1)); }}
+                                                            className="p-2 text-white/40 hover:text-maestro-gold disabled:opacity-20 transition-colors"
+                                                        >
+                                                            <ChevronDown size={20} className="-rotate-90" />
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </>
+                                        );
+                                    })()}
+                                </div>
                             </FadeIn>
                         )}
 
