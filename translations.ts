@@ -126,9 +126,9 @@ export const translations = {
       download: 'Descargar'
     },
     gallery: {
-      badge: 'Archivo Visual',
-      titlePrefix: 'Momentos en el',
-      titleSuffix: 'Podio',
+      badge: 'Archivo Audiovisual',
+      titlePrefix: 'Momentos',
+      titleSuffix: 'Importantes',
       subtitle: 'Una colección de instantes capturados en ensayos, conciertos y viajes de investigación.',
       tabPhotos: 'Fotos',
       tabVideos: 'Videos',
@@ -288,9 +288,9 @@ export const translations = {
       download: 'Download'
     },
     gallery: {
-      badge: 'Visual Archive',
-      titlePrefix: 'Moments at the',
-      titleSuffix: 'Podium',
+      badge: 'Audiovisual Archive',
+      titlePrefix: 'Important',
+      titleSuffix: 'Moments',
       subtitle: 'A collection of moments captured in rehearsals, concerts, and research trips.',
       tabPhotos: 'Photos',
       tabVideos: 'Videos',
@@ -450,9 +450,9 @@ export const translations = {
       download: 'Скачать'
     },
     gallery: {
-      badge: 'Визуальный архив',
-      titlePrefix: 'Моменты на',
-      titleSuffix: 'подиуме',
+      badge: 'Аудиовизуальный архив',
+      titlePrefix: 'Важные',
+      titleSuffix: 'моменты',
       subtitle: 'Коллекция моментов, запечатленных на репетициях, концертах и в исследовательских поездках.',
       tabPhotos: 'Фото',
       tabVideos: 'Видео',
