@@ -48,16 +48,7 @@ export const Press: React.FC<PressProps> = ({ lang, items }) => {
         return (cat[lang] || cat.es || cat) as string;
     }))).filter(Boolean).sort() as string[];
 
-    const getLatestCreatedId = () => {
-        if (!items || items.length === 0) return null;
-        return [...items].sort((a, b) => {
-            const valA = (a as any).createdAt || a.dateISO || '';
-            const valB = (b as any).createdAt || b.dateISO || '';
-            return valB.localeCompare(valA);
-        })[0]?.id;
-    };
 
-    const latestCreatedId = getLatestCreatedId();
 
     // Filter items by category
     const filteredItems = items.filter(item => {
@@ -66,15 +57,62 @@ export const Press: React.FC<PressProps> = ({ lang, items }) => {
         return cat === selectedCategory;
     });
 
-    // Sort items: Priority to latest created, then dateISO descending
-    const sortedItems = [...filteredItems].sort((a, b) => {
-        if (a.id === latestCreatedId) return -1;
-        if (b.id === latestCreatedId) return 1;
+    // Helper to parse date string (DD MMM YYYY) for sorting
+    const getSortableDate = (item: PressItem): number => {
+        // 1. PRIORITIZE: Parse the visible text string "DD MMM YYYY"
+        // This ensures "What You See Is What You Get" sorting
+        const dateStr = item.date;
+        if (dateStr) {
+            try {
+                // Split by any whitespace to handle multiple spaces or tabs
+                const parts = dateStr.trim().split(/\s+/);
+                // Handle cases where separator might be '-' or '/' if user typed that
+                // but the regex above only handles whitespace.
+                // If parts length is 1, maybe they used '-'?
+                const cleanParts = parts.length === 1 && parts[0].includes('-') ? parts[0].split('-') :
+                    parts.length === 1 && parts[0].includes('/') ? parts[0].split('/') : parts;
 
-        if (!a.dateISO || !b.dateISO) return 0;
-        if (b.dateISO < a.dateISO) return -1;
-        if (b.dateISO > a.dateISO) return 1;
-        return 0;
+                if (cleanParts.length >= 3) {
+                    const day = parseInt(cleanParts[0]);
+                    const monthStr = cleanParts[1].toLowerCase().replace('.', '');
+                    const year = parseInt(cleanParts[2]);
+
+                    if (!isNaN(day) && !isNaN(year)) {
+                        const months: Record<string, number> = {
+                            // Spanish
+                            'ene': 0, 'feb': 1, 'mar': 2, 'abr': 3, 'may': 4, 'jun': 5, 'jul': 6, 'ago': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dic': 11,
+                            // English
+                            'jan': 0, 'apr': 3, 'aug': 7, 'dec': 11,
+                            // Common abbreviations
+                            'sept': 8
+                        };
+
+                        const month = months[monthStr.substring(0, 3)];
+                        // Only return if we found a valid month index
+                        if (month !== undefined) {
+                            return new Date(year, month, day).getTime();
+                        }
+                    }
+                }
+            } catch (e) {
+                console.warn('Date parse error', e);
+            }
+        }
+
+        // 2. Fallback to dateISO if parsing failed
+        if (item.dateISO && !isNaN(new Date(item.dateISO).getTime())) {
+            return new Date(item.dateISO).getTime();
+        }
+
+        // 3. Final fallback
+        return (item.createdAt ? new Date(item.createdAt).getTime() : 0);
+    };
+
+    // Sort items: Strict Date Descending (Newest to Oldest) using robust parser
+    const sortedItems = [...filteredItems].sort((a, b) => {
+        const dateA = getSortableDate(a);
+        const dateB = getSortableDate(b);
+        return dateB - dateA;
     });
 
     const totalPages = Math.ceil(sortedItems.length / ITEMS_PER_PAGE);
@@ -106,7 +144,7 @@ export const Press: React.FC<PressProps> = ({ lang, items }) => {
 
             <div className="max-w-7xl mx-auto relative z-10">
                 {/* Header */}
-                <div className="text-center mb-20">
+                <div className="text-center mb-12">
                     <FadeIn>
                         <span className="text-maestro-gold uppercase tracking-[0.3em] text-xs font-bold mb-4 block" style={{ textShadow: '0 0 20px rgba(212,175,55,0.3)' }}>
                             {t.badge}
@@ -114,7 +152,7 @@ export const Press: React.FC<PressProps> = ({ lang, items }) => {
                         <h2 className="text-4xl md:text-6xl font-serif text-maestro-light mb-6 leading-tight">
                             {t.titlePrefix} <span className="italic text-maestro-gold">{t.titleSuffix}</span>
                         </h2>
-                        <div className="h-px w-24 bg-maestro-gold/30 mx-auto mb-8" />
+                        <div className="h-px w-24 bg-maestro-gold/30 mx-auto mb-6" />
                         <p className="text-maestro-light/60 max-w-2xl mx-auto font-light leading-relaxed font-serif">
                             {t.subtitle}
                         </p>
@@ -122,7 +160,7 @@ export const Press: React.FC<PressProps> = ({ lang, items }) => {
                 </div>
 
                 {/* Categories Filter */}
-                <div className="flex flex-wrap justify-center gap-4 mb-16">
+                <div className="flex flex-wrap justify-center gap-4 mb-10">
                     <FadeIn delay={100}>
                         <div className="flex flex-wrap justify-center gap-3">
                             <button
@@ -171,11 +209,7 @@ export const Press: React.FC<PressProps> = ({ lang, items }) => {
                                                 alt={((item.title as any)[lang] || (item.title as any).es || item.title) as string}
                                                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                             />
-                                            {item.id === latestCreatedId && (
-                                                <div className="absolute top-0 left-0 bg-maestro-gold text-black text-[9px] font-bold px-2 py-1 uppercase tracking-tighter">
-                                                    {(t as any).latestPost}
-                                                </div>
-                                            )}
+
                                         </div>
                                     </div>
 
