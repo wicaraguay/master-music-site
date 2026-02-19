@@ -59,6 +59,8 @@ export interface BlogPost {
   content: LocalizedString;
   previewImage?: string;
   images?: string[];
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Resource {
@@ -100,4 +102,6 @@ export interface PressItem {
   url: string;
   image?: string;
   category: LocalizedString;
+  createdAt?: string;
+  updatedAt?: string;
 }

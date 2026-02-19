@@ -67,10 +67,10 @@ export const Performances: React.FC<PerformancesProps> = ({ items, lang }) => {
   const getLatestCreatedId = () => {
     if (!items || items.length === 0) return null;
     return [...items].sort((a, b) => {
-      const dateA = (a as any).createdAt || 0;
-      const dateB = (b as any).createdAt || 0;
-      if (dateA < dateB) return 1;
-      if (dateA > dateB) return -1;
+      const valA = (a as any).createdAt || a.dateISO || 0;
+      const valB = (b as any).createdAt || b.dateISO || 0;
+      if (valA < valB) return 1;
+      if (valA > valB) return -1;
       return 0;
     })[0]?.id;
   };
@@ -83,13 +83,18 @@ export const Performances: React.FC<PerformancesProps> = ({ items, lang }) => {
       return getDynamicStatus(item) === activeFilter;
     })
     .sort((a, b) => {
+      // 1. Absolute Priority for the "Latest Publication" badge
+      if (a.id === latestCreatedId) return -1;
+      if (b.id === latestCreatedId) return 1;
+
       const statusA = getDynamicStatus(a);
       const statusB = getDynamicStatus(b);
 
-      // If one is upcoming and the other is past, upcoming always goes first
+      // 2. Status Priority: Upcoming always before Past
       if (statusA === 'upcoming' && statusB === 'past') return -1;
       if (statusA === 'past' && statusB === 'upcoming') return 1;
 
+      // 3. Chronological sorting within each group
       // If both are upcoming, sort by date ascending (sooner first)
       if (statusA === 'upcoming' && statusB === 'upcoming') {
         if (a.dateISO < b.dateISO) return -1;

@@ -64,9 +64,23 @@ export const Blog: React.FC<BlogProps> = ({ posts, lang }) => {
         return `${day}/${month}/${year}`;
     };
 
-    // Sort posts: Newest first (using precise internal timestamps)
-    const sortedPosts = [...posts].sort((a, b) => parseDate(b.date) - parseDate(a.date));
-    const latestPostId = sortedPosts.length > 0 ? sortedPosts[0].id : null;
+    // Find the latest post by creation date for the badge
+    const getLatestCreatedBlogId = () => {
+        if (!posts || posts.length === 0) return null;
+        return [...posts].sort((a, b) => {
+            const valA = (a as any).createdAt || a.date || '';
+            const valB = (b as any).createdAt || b.date || '';
+            return valB.localeCompare(valA);
+        })[0]?.id;
+    };
+    const latestPostId = getLatestCreatedBlogId();
+
+    // Sort posts: Newest first (using precise internal timestamps), but latest created always at top
+    const sortedPosts = [...posts].sort((a, b) => {
+        if (a.id === latestPostId) return -1;
+        if (b.id === latestPostId) return 1;
+        return parseDate(b.date) - parseDate(a.date);
+    });
 
     return (
         <section className="relative py-24 px-6 bg-maestro-dark min-h-screen overflow-hidden">

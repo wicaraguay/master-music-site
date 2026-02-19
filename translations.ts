@@ -145,7 +145,9 @@ export const translations = {
       titlePrefix: 'Prensa &',
       titleSuffix: 'Entrevistas',
       subtitle: 'Artículos, entrevistas y menciones en medios de comunicación nacionales e internacionales.',
-      empty: 'No hay artículos de prensa disponibles por el momento.'
+      empty: 'No hay artículos de prensa disponibles por el momento.',
+      latestPost: 'Última Publicación',
+      filterAll: 'Todos'
     },
     contact: {
       title: 'Contacto',
@@ -302,7 +304,9 @@ export const translations = {
       titlePrefix: 'Press &',
       titleSuffix: 'Interviews',
       subtitle: 'Articles, interviews, and media mentions in national and international outlets.',
-      empty: 'No press articles available at the moment.'
+      empty: 'No press articles available at the moment.',
+      latestPost: 'Latest Publication',
+      filterAll: 'All'
     },
     contact: {
       title: 'Contact',
@@ -459,7 +463,9 @@ export const translations = {
       titlePrefix: 'Пресса и',
       titleSuffix: 'интервью',
       subtitle: 'Статьи, интервью и упоминания в национальных и международных СМИ.',
-      empty: 'На данный момент статей в прессе нет.'
+      empty: 'На данный момент статей в прессе нет.',
+      latestPost: 'Последняя публикация',
+      filterAll: 'Все'
     },
     contact: {
       title: 'Контакты',

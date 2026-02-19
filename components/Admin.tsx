@@ -693,6 +693,7 @@ export const Admin: React.FC<AdminProps> = ({
             // Al editar, mantenemos la fecha original. Si es nuevo, usamos la fecha y hora actual.
             const originalPost = editingId ? posts.find(p => p.id === editingId) : null;
             const postDate = originalPost?.date || new Date().toISOString();
+            const postCreatedAt = (originalPost as any)?.createdAt || postDate;
 
             await saveToDb('posts', editingId,
                 {
@@ -700,7 +701,12 @@ export const Admin: React.FC<AdminProps> = ({
                     content: translations.content,
                     preview: smartSummary
                 },
-                { date: postDate, images: newPostImages, previewImage: newPostPreviewImage }
+                {
+                    date: postDate,
+                    images: newPostImages,
+                    previewImage: newPostPreviewImage,
+                    createdAt: postCreatedAt
+                }
             );
         } catch (error) {
             console.error("Error saving post:", error);
@@ -871,7 +877,7 @@ export const Admin: React.FC<AdminProps> = ({
                     role: translations.role,
                     date: translations.date
                 },
-                { status: calculatedStatus, dateISO: newPerfDateISO, images: newPerfImages }
+                { status: calculatedStatus, dateISO: newPerfDateISO, images: newPerfImages, createdAt: new Date().toISOString() }
             );
         } catch (error) {
             console.error("Error saving performance:", error);
@@ -949,6 +955,9 @@ export const Admin: React.FC<AdminProps> = ({
                 ['title', 'excerpt', 'category']
             );
 
+            const originalPress = editingId ? press.find(p => p.id === editingId) : null;
+            const pressCreatedAt = (originalPress as any)?.createdAt || originalPress?.dateISO || new Date().toISOString();
+
             await saveToDb('press', editingId,
                 {
                     title: translations_data.title,
@@ -960,7 +969,8 @@ export const Admin: React.FC<AdminProps> = ({
                     date: newPressDate,
                     dateISO: newPressDateISO,
                     url: newPressUrl,
-                    image: newPressImage
+                    image: newPressImage,
+                    createdAt: pressCreatedAt
                 }
             );
         } catch (error) {
@@ -1846,13 +1856,30 @@ export const Admin: React.FC<AdminProps> = ({
                                         </div>
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <input
-                                                type="text"
-                                                value={newPressCategory}
-                                                onChange={(e) => setNewPressCategory(e.target.value)}
-                                                placeholder="Categoría (ej: Entrevista, Crítica)"
-                                                className="w-full bg-maestro-dark border border-white/10 p-3 text-white focus:border-maestro-gold outline-none"
-                                            />
+                                            <div className="space-y-2">
+                                                <input
+                                                    type="text"
+                                                    value={newPressCategory}
+                                                    onChange={(e) => setNewPressCategory(e.target.value)}
+                                                    placeholder="Categoría (ej: Entrevista, Crítica)"
+                                                    className="w-full bg-maestro-dark border border-white/10 p-3 text-white focus:border-maestro-gold outline-none"
+                                                />
+                                                {/* Sugerencias de categorías existentes */}
+                                                <div className="flex flex-wrap gap-2">
+                                                    {Array.from(new Set(press
+                                                        .map(item => (typeof item.category === 'object' ? item.category?.es : item.category) || '')
+                                                    )).filter(Boolean).map((cat, idx) => (
+                                                        <button
+                                                            key={idx}
+                                                            type="button"
+                                                            onClick={() => setNewPressCategory(cat || '')}
+                                                            className={`text-[10px] px-2 py-1 border rounded transition-all ${newPressCategory === cat ? 'bg-maestro-gold text-maestro-dark border-maestro-gold' : 'border-white/10 text-white/40 hover:text-white hover:border-white/30'}`}
+                                                        >
+                                                            {cat}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
                                             <input
                                                 type="text"
                                                 value={newPressUrl}

@@ -14,14 +14,54 @@ const ITEMS_PER_PAGE = 8;
 export const Press: React.FC<PressProps> = ({ lang, items }) => {
     const t = translations[lang].press;
     const [currentPage, setCurrentPage] = useState(1);
+    const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
-    // Filtered/Ordered items (assuming newest first if needed, but here we just slice)
-    const totalPages = Math.ceil(items.length / ITEMS_PER_PAGE);
-    const paginatedItems = items.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+    // Extract unique categories for the current language
+    const categories = Array.from(new Set(items.map(item => {
+        const cat = item.category as any;
+        return (cat[lang] || cat.es || cat) as string;
+    }))).filter(Boolean).sort() as string[];
+
+    const getLatestCreatedId = () => {
+        if (!items || items.length === 0) return null;
+        return [...items].sort((a, b) => {
+            const valA = (a as any).createdAt || a.dateISO || '';
+            const valB = (b as any).createdAt || b.dateISO || '';
+            return valB.localeCompare(valA);
+        })[0]?.id;
+    };
+
+    const latestCreatedId = getLatestCreatedId();
+
+    // Filter items by category
+    const filteredItems = items.filter(item => {
+        if (selectedCategory === 'all') return true;
+        const cat = (item.category as any)[lang] || (item.category as any).es || item.category;
+        return cat === selectedCategory;
+    });
+
+    // Sort items: Priority to latest created, then dateISO descending
+    const sortedItems = [...filteredItems].sort((a, b) => {
+        if (a.id === latestCreatedId) return -1;
+        if (b.id === latestCreatedId) return 1;
+
+        if (!a.dateISO || !b.dateISO) return 0;
+        if (b.dateISO < a.dateISO) return -1;
+        if (b.dateISO > a.dateISO) return 1;
+        return 0;
+    });
+
+    const totalPages = Math.ceil(sortedItems.length / ITEMS_PER_PAGE);
+    const paginatedItems = sortedItems.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
         window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const handleCategoryChange = (category: string) => {
+        setSelectedCategory(category);
+        setCurrentPage(1);
     };
 
     return (
@@ -55,6 +95,35 @@ export const Press: React.FC<PressProps> = ({ lang, items }) => {
                     </FadeIn>
                 </div>
 
+                {/* Categories Filter */}
+                <div className="flex flex-wrap justify-center gap-4 mb-16">
+                    <FadeIn delay={100}>
+                        <div className="flex flex-wrap justify-center gap-3">
+                            <button
+                                onClick={() => handleCategoryChange('all')}
+                                className={`px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all duration-300 border ${selectedCategory === 'all'
+                                    ? 'bg-maestro-gold text-maestro-dark border-maestro-gold shadow-[0_0_20px_rgba(212,175,55,0.3)]'
+                                    : 'bg-white/5 text-maestro-light/60 border-white/10 hover:border-maestro-gold/50 hover:text-maestro-gold'
+                                    }`}
+                            >
+                                {(t as any).filterAll}
+                            </button>
+                            {categories.map((category) => (
+                                <button
+                                    key={category}
+                                    onClick={() => handleCategoryChange(category)}
+                                    className={`px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all duration-300 border ${selectedCategory === category
+                                        ? 'bg-maestro-gold text-maestro-dark border-maestro-gold shadow-[0_0_20px_rgba(212,175,55,0.3)]'
+                                        : 'bg-white/5 text-maestro-light/60 border-white/10 hover:border-maestro-gold/50 hover:text-maestro-gold'
+                                        }`}
+                                >
+                                    {category}
+                                </button>
+                            ))}
+                        </div>
+                    </FadeIn>
+                </div>
+
                 {/* Press Feed */}
                 <div className="grid grid-cols-1 gap-12 max-w-5xl mx-auto">
                     {items.length === 0 ? (
@@ -69,7 +138,7 @@ export const Press: React.FC<PressProps> = ({ lang, items }) => {
                                     <div className="w-full md:w-72 h-64 md:h-auto overflow-hidden flex-shrink-0 relative">
                                         <img
                                             src={item.image}
-                                            alt={item.title as any}
+                                            alt={((item.title as any)[lang] || (item.title as any).es || item.title) as string}
                                             className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 grayscale-0 md:grayscale md:group-hover:grayscale-0"
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent pointer-events-none" />
@@ -81,6 +150,11 @@ export const Press: React.FC<PressProps> = ({ lang, items }) => {
                                             <span className="text-[10px] uppercase tracking-widest text-maestro-gold font-bold bg-maestro-gold/10 px-3 py-1 rounded-full border border-maestro-gold/20">
                                                 {(item.category as any)[lang] || (item.category as any).es || item.category}
                                             </span>
+                                            {item.id === latestCreatedId && (
+                                                <span className="bg-maestro-gold text-maestro-dark text-[9px] font-bold px-3 py-1 uppercase tracking-widest rounded-full shadow-[0_0_15px_rgba(212,175,55,0.4)] border border-maestro-gold group-hover:bg-white group-hover:border-white transition-all duration-300">
+                                                    {(t as any).latestPost}
+                                                </span>
+                                            )}
                                             <span className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-maestro-light/40">
                                                 <Calendar size={12} /> {item.date}
                                             </span>
