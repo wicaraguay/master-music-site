@@ -64,10 +64,48 @@ export const Performances: React.FC<PerformancesProps> = ({ items, lang }) => {
     return perf.status;
   };
 
-  const filteredItems = items.filter(item => {
-    if (activeFilter === 'all') return true;
-    return getDynamicStatus(item) === activeFilter;
-  });
+  const getLatestCreatedId = () => {
+    if (!items || items.length === 0) return null;
+    return [...items].sort((a, b) => {
+      const dateA = (a as any).createdAt || 0;
+      const dateB = (b as any).createdAt || 0;
+      if (dateA < dateB) return 1;
+      if (dateA > dateB) return -1;
+      return 0;
+    })[0]?.id;
+  };
+
+  const latestCreatedId = getLatestCreatedId();
+
+  const filteredItems = items
+    .filter(item => {
+      if (activeFilter === 'all') return true;
+      return getDynamicStatus(item) === activeFilter;
+    })
+    .sort((a, b) => {
+      const statusA = getDynamicStatus(a);
+      const statusB = getDynamicStatus(b);
+
+      // If one is upcoming and the other is past, upcoming always goes first
+      if (statusA === 'upcoming' && statusB === 'past') return -1;
+      if (statusA === 'past' && statusB === 'upcoming') return 1;
+
+      // If both are upcoming, sort by date ascending (sooner first)
+      if (statusA === 'upcoming' && statusB === 'upcoming') {
+        if (a.dateISO < b.dateISO) return -1;
+        if (a.dateISO > b.dateISO) return 1;
+        return 0;
+      }
+
+      // If both are past, sort by date descending (most recent first)
+      if (statusA === 'past' && statusB === 'past') {
+        if (b.dateISO < a.dateISO) return -1;
+        if (b.dateISO > a.dateISO) return 1;
+        return 0;
+      }
+
+      return 0;
+    });
 
   const toggleExpand = (id: string) => {
     setExpandedId(expandedId === id ? null : id);
@@ -181,6 +219,11 @@ export const Performances: React.FC<PerformancesProps> = ({ items, lang }) => {
                         <span className={`text-[10px] items-center gap-1 uppercase tracking-widest font-bold ${getDynamicStatus(event) === 'upcoming' ? 'text-maestro-gold' : 'text-maestro-light/30'}`}>
                           {getDynamicStatus(event) === 'upcoming' ? t.statusUpcoming : t.statusPast}
                         </span>
+                        {event.id === latestCreatedId && (
+                          <span className="bg-maestro-gold text-maestro-dark text-[9px] font-bold px-3 py-1 uppercase tracking-widest rounded-full shadow-[0_0_15px_rgba(212,175,55,0.4)] border border-maestro-gold group-hover:bg-white group-hover:border-white transition-all duration-300">
+                            {(t as any).latestPost}
+                          </span>
+                        )}
                         <span className={`text-xs uppercase tracking-widest px-3 py-1 border rounded transition-colors ${isExpanded ? 'border-maestro-gold text-maestro-gold' : 'border-white/10 text-maestro-light/40'}`}>
                           {event.role}
                         </span>

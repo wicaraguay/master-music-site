@@ -99,7 +99,8 @@ export const translations = {
       statusPast: 'Realizado',
       filterAll: 'Todos',
       filterUpcoming: 'Próximos',
-      filterPast: 'Archivo'
+      filterPast: 'Archivo',
+      latestPost: 'Última Publicación'
     },
     blog: {
       badge: 'Pensamiento Musical',
@@ -255,7 +256,8 @@ export const translations = {
       statusPast: 'Performed',
       filterAll: 'All',
       filterUpcoming: 'Upcoming',
-      filterPast: 'Archive'
+      filterPast: 'Archive',
+      latestPost: 'Latest Publication'
     },
     blog: {
       badge: 'Musical Thought',
@@ -411,7 +413,8 @@ export const translations = {
       statusPast: 'Завершенные',
       filterAll: 'Все',
       filterUpcoming: 'Предстоящие',
-      filterPast: 'Архив'
+      filterPast: 'Архив',
+      latestPost: 'Последняя публикация'
     },
     blog: {
       badge: 'Музыкальная мысль',
