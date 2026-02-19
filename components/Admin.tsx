@@ -62,7 +62,7 @@ const AdminCalendar: React.FC<AdminCalendarProps> = ({
 
     const getEventsForDay = (day: number) => {
         return performances.filter(perf => {
-            const perfDate = new Date((perf.date as any)?.es || perf.date);
+            const perfDate = new Date((typeof perf.date === 'object' ? perf.date?.es : perf.date) || '');
             return perfDate.getDate() === day && perfDate.getMonth() === currentMonth && perfDate.getFullYear() === currentYear;
         });
     };
@@ -1187,7 +1187,7 @@ export const Admin: React.FC<AdminProps> = ({
                                                 {paginatedPosts.map(post => (
                                                     <div key={post.id} className={`flex justify-between items-center p-4 border transition-all ${editingId === post.id ? 'bg-maestro-gold/10 border-maestro-gold' : 'bg-maestro-dark border-white/5 hover:border-maestro-gold/30'}`}>
                                                         <div>
-                                                            <h4 className="text-maestro-light font-bold">{(post.title as any)?.es || post.title}</h4>
+                                                            <h4 className="text-maestro-light font-bold">{(typeof post.title === 'object' ? post.title?.es : post.title) || ''}</h4>
                                                             <span className="text-xs text-maestro-gold/60 font-mono">{formatDate(post.date)}</span>
                                                         </div>
                                                         <div className="flex gap-2">
@@ -1262,7 +1262,7 @@ export const Admin: React.FC<AdminProps> = ({
                                 <div className="space-y-4">
                                     {resources.map(res => (
                                         <div key={res.id} className={`flex justify-between items-center p-4 border transition-all ${editingId === res.id ? 'bg-maestro-gold/10 border-maestro-gold' : 'bg-maestro-dark border-white/5 hover:border-maestro-gold/30'}`}>
-                                            <div><h4 className="text-maestro-light font-bold">{(res.title as any)?.es || res.title}</h4><span className="text-xs text-maestro-light/40">{res.type}</span></div>
+                                            <div><h4 className="text-maestro-light font-bold">{(typeof res.title === 'object' ? res.title?.es : res.title) || ''}</h4><span className="text-xs text-maestro-light/40">{res.type}</span></div>
                                             <div className="flex gap-2">
                                                 <button onClick={() => startEditResource(res)} className="text-maestro-light/30 hover:text-blue-400 p-2"><Edit size={18} /></button>
                                                 <button onClick={() => handleDelete('resources', res.id)} className="text-maestro-light/30 hover:text-red-500 p-2"><Trash2 size={18} /></button>
@@ -1322,7 +1322,7 @@ export const Admin: React.FC<AdminProps> = ({
                                 <div className="space-y-4">
                                     {experience.map(exp => (
                                         <div key={exp.id} className={`flex justify-between items-center p-4 border transition-all ${editingId === exp.id ? 'bg-maestro-gold/10 border-maestro-gold' : 'bg-maestro-dark border-white/5 hover:border-maestro-gold/30'}`}>
-                                            <div><h4 className="text-maestro-light font-bold">{(exp.role as any)?.es || exp.role}</h4><span className="text-xs text-maestro-light/40">{(exp.year as any)?.es || exp.year}</span></div>
+                                            <div><h4 className="text-maestro-light font-bold">{(typeof exp.role === 'object' ? exp.role?.es : exp.role) || ''}</h4><span className="text-xs text-maestro-light/40">{(typeof exp.year === 'object' ? exp.year?.es : exp.year) || ''}</span></div>
                                             <div className="flex gap-2">
                                                 <button onClick={() => startEditExperience(exp)} className="text-maestro-light/30 hover:text-blue-400 p-2"><Edit size={18} /></button>
                                                 <button onClick={() => handleDelete('experience', exp.id)} className="text-maestro-light/30 hover:text-red-500 p-2"><Trash2 size={18} /></button>
@@ -1368,7 +1368,7 @@ export const Admin: React.FC<AdminProps> = ({
                                 <div className="space-y-4">
                                     {research.map(res => (
                                         <div key={res.id} className={`flex justify-between items-center p-4 border transition-all ${editingId === res.id ? 'bg-maestro-gold/10 border-maestro-gold' : 'bg-maestro-dark border-white/5 hover:border-maestro-gold/30'}`}>
-                                            <div><h4 className="text-maestro-light font-bold">{(res.title as any)?.es || res.title}</h4><span className="text-xs text-maestro-light/40">{res.year}</span></div>
+                                            <div><h4 className="text-maestro-light font-bold">{(typeof res.title === 'object' ? res.title?.es : res.title) || ''}</h4><span className="text-xs text-maestro-light/40">{res.year}</span></div>
                                             <div className="flex gap-2">
                                                 <button onClick={() => startEditResearch(res)} className="text-maestro-light/30 hover:text-blue-400 p-2"><Edit size={18} /></button>
                                                 <button onClick={() => handleDelete('research', res.id)} className="text-maestro-light/30 hover:text-red-500 p-2"><Trash2 size={18} /></button>
@@ -1467,8 +1467,8 @@ export const Admin: React.FC<AdminProps> = ({
                                                     <Calendar size={16} className="text-maestro-gold" />
                                                 </div>
                                                 <div>
-                                                    <h4 className="text-maestro-light font-bold text-sm">{(perf.title as any)?.es || perf.title}</h4>
-                                                    <span className="text-[10px] uppercase tracking-widest text-maestro-light/40">{(perf.date as any)?.es || perf.date} | {(perf.location as any)?.es || perf.location}</span>
+                                                    <h4 className="text-maestro-light font-bold text-sm">{(typeof perf.title === 'object' ? perf.title?.es : perf.title) || ''}</h4>
+                                                    <span className="text-[10px] uppercase tracking-widest text-maestro-light/40">{(typeof perf.date === 'object' ? perf.date?.es : perf.date) || ''} | {(typeof perf.location === 'object' ? perf.location?.es : perf.location) || ''}</span>
                                                 </div>
                                             </div>
                                             <div className="flex gap-2">
@@ -1632,7 +1632,7 @@ export const Admin: React.FC<AdminProps> = ({
                                                 <div className="flex flex-wrap gap-2">
                                                     {Array.from(new Set(gallery
                                                         .filter(item => item.type === newGalType && item.subCategory)
-                                                        .map(item => (item.subCategory as any)?.es || item.subCategory)
+                                                        .map(item => (typeof item.subCategory === 'object' ? item.subCategory?.es : item.subCategory) || '')
                                                     )).map((cat, idx) => (
                                                         <button
                                                             key={idx}
@@ -1720,9 +1720,9 @@ export const Admin: React.FC<AdminProps> = ({
                                         .filter(item => {
                                             if (!adminGallerySearch) return true;
                                             const search = adminGallerySearch.toLowerCase();
-                                            const caption = ((item.caption as any)?.es || item.caption || '').toLowerCase();
-                                            const author = ((item.author as any)?.es || item.author || '').toLowerCase();
-                                            const category = ((item.category as any)?.es || item.category || '').toLowerCase();
+                                            const caption = (typeof item.caption === 'object' ? item.caption?.es : (item.caption || '')).toLowerCase();
+                                            const author = (typeof item.author === 'object' ? item.author?.es : (item.author || '')).toLowerCase();
+                                            const category = (typeof item.category === 'object' ? item.category?.es : (item.category || '')).toLowerCase();
                                             return caption.includes(search) || author.includes(search) || category.includes(search);
                                         });
 
@@ -1762,7 +1762,7 @@ export const Admin: React.FC<AdminProps> = ({
                                                             <button onClick={() => handleDelete('gallery', item.id)} className="p-2 bg-red-500 text-white rounded-full"><Trash2 size={16} /></button>
                                                         </div>
                                                         <div className="absolute bottom-0 left-0 w-full bg-black/80 p-2 text-[10px] text-white/70 truncate">
-                                                            {(item.caption as any)?.es || item.caption}
+                                                            {(typeof item.caption === 'object' ? item.caption?.es : item.caption) || ''}
                                                         </div>
                                                     </div>
                                                 ))}
@@ -1955,7 +1955,7 @@ export const Admin: React.FC<AdminProps> = ({
                                                                     </div>
                                                                 )}
                                                                 <div>
-                                                                    <h4 className="text-maestro-light font-bold text-sm">{(item.title as any)?.es || item.title}</h4>
+                                                                    <h4 className="text-maestro-light font-bold text-sm">{(typeof item.title === 'object' ? item.title?.es : item.title) || ''}</h4>
                                                                     <span className="text-[10px] uppercase tracking-widest text-maestro-light/40">{item.source} | {item.date}</span>
                                                                 </div>
                                                             </div>

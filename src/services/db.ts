@@ -105,9 +105,9 @@ export const transformDataForLang = (data: any[], lang: Language = 'es'): any[] 
 
             const value = item[key];
 
-            // Si el valor es un objeto de localización { es, en, ru }
-            if (value && typeof value === 'object' && 'es' in value && 'en' in value && 'ru' in value) {
-                transformed[key] = value[lang] || value['es'] || "";
+            // Si el valor es un objeto de localización (tiene al menos una de las llaves de idioma)
+            if (value && typeof value === 'object' && ('es' in value || 'en' in value || 'ru' in value)) {
+                transformed[key] = value[lang] || value['es'] || value['en'] || value['ru'] || "";
                 // Si es un campo de fecha, preservar el valor 'es' para lógica de JS (new Date)
                 if (key === 'date') {
                     transformed['date_raw'] = value['es'];
