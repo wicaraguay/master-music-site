@@ -50,7 +50,13 @@ export const About: React.FC<AboutProps> = ({ lang, aboutData }) => {
                 {aboutData.sections.map((section) => {
                   if (section.type === 'text') {
                     return (
-                      <div key={section.id} dangerouslySetInnerHTML={{ __html: section.content as string }} />
+                      <div
+                        key={section.id}
+                        className="[&_h2]:text-2xl [&_h2]:md:text-3xl [&_h2]:text-maestro-gold [&_h2]:font-serif [&_h2]:mt-8 [&_h2]:mb-4
+                                   [&_h3]:text-xl [&_h3]:md:text-2xl [&_h3]:text-maestro-light [&_h3]:font-serif [&_h3]:mt-6 [&_h3]:mb-3
+                                   [&_p]:mb-4 [&_strong]:text-maestro-gold/90 [&_strong]:font-bold"
+                        dangerouslySetInnerHTML={{ __html: section.content as string }}
+                      />
                     );
                   } else if (section.type === 'image') {
                     return (

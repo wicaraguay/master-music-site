@@ -674,6 +674,29 @@ export const Admin: React.FC<AdminProps> = ({
         }
     };
 
+    const handleAboutEditorImageUpload = async (file: File): Promise<string> => {
+        try {
+            setLoading(true);
+            let uploadFile = file;
+
+            if (file.type.startsWith('image/')) {
+                setCompressing(true);
+                const compressed = await compressImage(file);
+                uploadFile = compressed as File;
+                setCompressing(false);
+            }
+
+            const url = await uploadToStorage(uploadFile, 'images/about/content/');
+            return url || '';
+        } catch (error) {
+            console.error('Error uploading about editor image:', error);
+            setCompressing(false);
+            throw error;
+        } finally {
+            setLoading(false);
+        }
+    };
+
     // --- DB HELPERS ---
     // Simplificado para el modelo de traducción dinámica.
     // Guarda los datos de forma plana (Source of Truth en Español).
@@ -1038,34 +1061,63 @@ export const Admin: React.FC<AdminProps> = ({
             setTranslating(true);
 
             // Translate main fields
-            const mainTranslations = await translateFields(
-                { bioTitle: aboutBioTitle, bioHeading: aboutBioHeading },
-                ['bioTitle', 'bioHeading']
-            );
+            let mainTranslations;
+            try {
+                mainTranslations = await translateFields(
+                    { bioTitle: aboutBioTitle, bioHeading: aboutBioHeading },
+                    ['bioTitle', 'bioHeading']
+                );
+            } catch (e) {
+                console.error("Translation failed for main fields", e);
+                mainTranslations = {
+                    bioTitle: { es: aboutBioTitle, en: aboutBioTitle, ru: aboutBioTitle },
+                    bioHeading: { es: aboutBioHeading, en: aboutBioHeading, ru: aboutBioHeading }
+                };
+            }
+
+            // Ensure we have values even if translation returned empty/undefined
+            const finalBioTitle = mainTranslations.bioTitle || { es: aboutBioTitle, en: aboutBioTitle, ru: aboutBioTitle };
+            const finalBioHeading = mainTranslations.bioHeading || { es: aboutBioHeading, en: aboutBioHeading, ru: aboutBioHeading };
 
             // Process sections
             const processedSections = await Promise.all(aboutSections.map(async (section) => {
                 if (section.type === 'text' && section.content) {
-                    // Extract spanish text from current state (it might be a string or object depending on how it's handled)
+                    // Extract spanish text from current state
                     const text = typeof section.content === 'string' ? section.content : (section.content as any).es || section.content;
 
                     // Translate content
-                    // We can reuse translateFields but need to fit the structure
-                    const contentTrans = await translateFields({ content: text }, ['content']);
+                    let contentTrans;
+                    try {
+                        contentTrans = await translateFields({ content: text }, ['content']);
+                    } catch (e) {
+                        console.error("Translation failed for section", e);
+                        contentTrans = { content: { es: text, en: text, ru: text } };
+                    }
+
+                    const finalContent = contentTrans.content || { es: text, en: text, ru: text };
+
                     return {
                         ...section,
-                        content: contentTrans.content
+                        content: finalContent
                     };
                 }
                 return section;
             }));
 
+            // Sanitize payload to remove undefined values (Firestore rejects them)
+            const cleanSections = processedSections.map(s => {
+                const clean = { ...s };
+                if (clean.type === 'text') delete clean.image;
+                if (clean.type === 'image') delete clean.content;
+                return clean;
+            });
+
             const payload: AboutData = {
                 id: 'main', // Single document for About page
                 profileImage: aboutProfileImage,
-                bioTitle: mainTranslations.bioTitle,
-                bioHeading: mainTranslations.bioHeading,
-                sections: processedSections,
+                bioTitle: finalBioTitle,
+                bioHeading: finalBioHeading,
+                sections: cleanSections,
                 updatedAt: new Date().toISOString()
             };
 
@@ -2249,6 +2301,7 @@ export const Admin: React.FC<AdminProps> = ({
                                                                 <RichTextEditor
                                                                     value={typeof section.content === 'object' ? (section.content as any).es || '' : section.content || ''}
                                                                     onChange={(val) => updateAboutSection(section.id, 'content', val)}
+                                                                    onImageUpload={handleAboutEditorImageUpload}
                                                                     minHeight="150px"
                                                                 />
                                                             </div>
