@@ -147,7 +147,10 @@ export const translations = {
       subtitle: 'Artículos, entrevistas y menciones en medios de comunicación nacionales e internacionales.',
       empty: 'No hay artículos de prensa disponibles por el momento.',
       latestPost: 'Última Publicación',
-      filterAll: 'Todos'
+      filterAll: 'Todos',
+      readMore: 'Leer Artículo Completo',
+      closeArticle: 'Cerrar Artículo',
+      galleryTitle: 'Galería Visual'
     },
     contact: {
       title: 'Contacto',
@@ -306,7 +309,10 @@ export const translations = {
       subtitle: 'Articles, interviews, and media mentions in national and international outlets.',
       empty: 'No press articles available at the moment.',
       latestPost: 'Latest Publication',
-      filterAll: 'All'
+      filterAll: 'All',
+      readMore: 'Read Full Article',
+      closeArticle: 'Close Article',
+      galleryTitle: 'Visual Gallery'
     },
     contact: {
       title: 'Contact',
@@ -465,7 +471,10 @@ export const translations = {
       subtitle: 'Статьи, интервью и упоминания в национальных и международных СМИ.',
       empty: 'На данный момент статей в прессе нет.',
       latestPost: 'Последняя публикация',
-      filterAll: 'Все'
+      filterAll: 'Все',
+      readMore: 'Читать статью полностью',
+      closeArticle: 'Закрыть статью',
+      galleryTitle: 'Визуальная галерея'
     },
     contact: {
       title: 'Контакты',

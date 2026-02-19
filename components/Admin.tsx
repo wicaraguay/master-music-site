@@ -473,6 +473,7 @@ export const Admin: React.FC<AdminProps> = ({
     const [newPressUrl, setNewPressUrl] = useState('');
     const [newPressImage, setNewPressImage] = useState('');
     const [newPressCategory, setNewPressCategory] = useState('');
+    const [newPressContent, setNewPressContent] = useState('');
     const [newPressDateISO, setNewPressDateISO] = useState(''); // YYYY-MM-DD
 
     // Pagination & Search for Gallery Management
@@ -533,6 +534,7 @@ export const Admin: React.FC<AdminProps> = ({
         setNewPressUrl('');
         setNewPressImage('');
         setNewPressCategory('');
+        setNewPressContent('');
 
         setAdminGalleryPage(1);
         setAdminBlogPage(1);
@@ -951,8 +953,8 @@ export const Admin: React.FC<AdminProps> = ({
         try {
             setTranslating(true);
             const translations_data = await translateFields(
-                { title: newPressTitle, excerpt: newPressExcerpt, category: newPressCategory },
-                ['title', 'excerpt', 'category']
+                { title: newPressTitle, excerpt: newPressExcerpt, category: newPressCategory, content: newPressContent },
+                ['title', 'excerpt', 'category', 'content']
             );
 
             const originalPress = editingId ? press.find(p => p.id === editingId) : null;
@@ -962,7 +964,8 @@ export const Admin: React.FC<AdminProps> = ({
                 {
                     title: translations_data.title,
                     excerpt: translations_data.excerpt,
-                    category: translations_data.category
+                    category: translations_data.category,
+                    content: translations_data.content
                 },
                 {
                     source: newPressSource,
@@ -991,6 +994,7 @@ export const Admin: React.FC<AdminProps> = ({
         setNewPressUrl(item.url);
         setNewPressImage(item.image || '');
         setNewPressCategory((item.category as any)?.es || item.category || '');
+        setNewPressContent((item.content as any)?.es || item.content || '');
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
@@ -1927,7 +1931,18 @@ export const Admin: React.FC<AdminProps> = ({
                                                 onChange={setNewPressExcerpt}
                                                 onImageUpload={handlePressEditorImageUpload}
                                                 placeholder="Escribe el resumen o extracto aquí..."
-                                                minHeight="200px"
+                                                minHeight="150px"
+                                            />
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <label className="block text-[10px] font-bold text-maestro-gold uppercase tracking-[0.2em]">Contenido completo del artículo</label>
+                                            <RichTextEditor
+                                                value={newPressContent}
+                                                onChange={setNewPressContent}
+                                                onImageUpload={handlePressEditorImageUpload}
+                                                placeholder="Escribe el contenido completo del artículo aquí..."
+                                                minHeight="300px"
                                             />
                                         </div>
 

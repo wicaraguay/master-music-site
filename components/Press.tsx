@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { FadeIn } from './FadeIn';
-import { ExternalLink, Newspaper, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ExternalLink, Newspaper, Calendar, ChevronLeft, ChevronRight, X, ImageIcon } from 'lucide-react';
 import { Language, PressItem } from '../types';
 import { translations } from '../translations';
+import '../src/styles/rich-text-editor.css';
 
 interface PressProps {
     lang: Language;
@@ -15,6 +16,31 @@ export const Press: React.FC<PressProps> = ({ lang, items }) => {
     const t = translations[lang].press;
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
+    const [selectedItem, setSelectedItem] = useState<PressItem | null>(null);
+
+    const openItem = (item: PressItem) => {
+        setSelectedItem(item);
+        document.body.style.overflow = 'hidden';
+    };
+
+    const closeItem = () => {
+        setSelectedItem(null);
+        document.body.style.overflow = 'auto';
+    };
+
+    // Helper to parse dates for display if they are ISO
+    const formatDate = (dateStr: string) => {
+        if (!dateStr) return '';
+        if (!dateStr.includes('T') && !dateStr.includes('-')) return dateStr;
+
+        try {
+            const date = new Date(dateStr);
+            if (isNaN(date.getTime())) return dateStr;
+            return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+        } catch (e) {
+            return dateStr;
+        }
+    };
 
     // Extract unique categories for the current language
     const categories = Array.from(new Set(items.map(item => {
@@ -125,36 +151,40 @@ export const Press: React.FC<PressProps> = ({ lang, items }) => {
                 </div>
 
                 {/* Press Feed */}
-                <div className="grid grid-cols-1 gap-12 max-w-5xl mx-auto">
+                <div className="space-y-12 max-w-4xl mx-auto">
                     {items.length === 0 ? (
-                        <div className="text-center text-maestro-light/30 py-20 italic font-serif text-xl border border-dashed border-white/10 rounded-lg backdrop-blur-sm bg-black/20">
+                        <div className="text-center text-maestro-light/40 py-10 border border-dashed border-white/5 rounded-sm">
                             {t.empty}
                         </div>
                     ) : (
                         paginatedItems.map((item, index) => (
                             <FadeIn key={item.id} delay={index * 100}>
-                                <div className="group relative bg-maestro-dark/40 backdrop-blur-md border border-white/5 hover:border-maestro-gold/50 transition-all duration-500 rounded-sm overflow-hidden flex flex-col md:flex-row shadow-2xl">
+                                <div
+                                    onClick={() => openItem(item)}
+                                    className="group border-b border-white/5 pb-12 hover:border-maestro-gold/30 transition-colors flex flex-col md:flex-row gap-8 items-start cursor-pointer"
+                                >
                                     {/* Image Container */}
-                                    <div className="w-full md:w-72 h-64 md:h-auto overflow-hidden flex-shrink-0 relative">
-                                        <img
-                                            src={item.image}
-                                            alt={((item.title as any)[lang] || (item.title as any).es || item.title) as string}
-                                            className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 grayscale-0 md:grayscale md:group-hover:grayscale-0"
-                                        />
-                                        <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent pointer-events-none" />
+                                    <div className="md:w-64 w-full flex-shrink-0 space-y-4">
+                                        <div className="aspect-[16/10] overflow-hidden border border-white/5 group-hover:border-maestro-gold/30 transition-all rounded-sm shadow-xl relative">
+                                            <img
+                                                src={item.image}
+                                                alt={((item.title as any)[lang] || (item.title as any).es || item.title) as string}
+                                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                            />
+                                            {item.id === latestCreatedId && (
+                                                <div className="absolute top-0 left-0 bg-maestro-gold text-black text-[9px] font-bold px-2 py-1 uppercase tracking-tighter">
+                                                    {(t as any).latestPost}
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
 
                                     {/* Content */}
-                                    <div className="p-8 md:p-10 flex flex-col justify-center flex-grow">
+                                    <div className="flex-grow">
                                         <div className="flex flex-wrap items-center gap-4 mb-4">
                                             <span className="text-[10px] uppercase tracking-widest text-maestro-gold font-bold bg-maestro-gold/10 px-3 py-1 rounded-full border border-maestro-gold/20">
                                                 {(item.category as any)[lang] || (item.category as any).es || item.category}
                                             </span>
-                                            {item.id === latestCreatedId && (
-                                                <span className="bg-maestro-gold text-maestro-dark text-[9px] font-bold px-3 py-1 uppercase tracking-widest rounded-full shadow-[0_0_15px_rgba(212,175,55,0.4)] border border-maestro-gold group-hover:bg-white group-hover:border-white transition-all duration-300">
-                                                    {(t as any).latestPost}
-                                                </span>
-                                            )}
                                             <span className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-maestro-light/40">
                                                 <Calendar size={12} /> {item.date}
                                             </span>
@@ -168,20 +198,16 @@ export const Press: React.FC<PressProps> = ({ lang, items }) => {
                                         </h3>
 
                                         <div
-                                            className="text-maestro-light/70 font-light leading-relaxed mb-8 italic font-serif blog-content"
+                                            className="text-maestro-light/60 font-light leading-relaxed mb-6 italic font-serif line-clamp-3"
                                             dangerouslySetInnerHTML={{ __html: (item.excerpt as any)[lang] || (item.excerpt as any).es || item.excerpt }}
                                         />
 
-                                        <a
-                                            href={item.url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="inline-flex items-center gap-3 text-[10px] uppercase tracking-[0.2em] font-bold text-maestro-gold hover:text-white transition-all group/link self-start"
+                                        <button
+                                            className="flex items-center gap-2 text-xs uppercase tracking-widest text-maestro-light/50 group-hover:text-maestro-gold transition-all"
                                         >
-                                            <span>{lang === 'es' ? 'Leer Artículo' : lang === 'en' ? 'Read Article' : 'Читать статью'}</span>
-                                            <div className="w-8 h-px bg-maestro-gold/30 group-hover/link:w-12 group-hover/link:bg-white transition-all" />
-                                            <ExternalLink size={14} className="group-hover/link:translate-x-1 transition-transform" />
-                                        </a>
+                                            <span>{(t as any).readMore || (lang === 'es' ? 'Leer Artículo' : 'Read Article')}</span>
+                                            <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                                        </button>
                                     </div>
                                 </div>
                             </FadeIn>
@@ -230,6 +256,102 @@ export const Press: React.FC<PressProps> = ({ lang, items }) => {
                     </p>
                 </div>
             </div>
+
+            {/* Full Screen Article Modal */}
+            {selectedItem && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-0 md:p-6 overflow-hidden">
+                    <div
+                        className="absolute inset-0 bg-black/95 backdrop-blur-xl transition-opacity animate-in fade-in duration-500"
+                        onClick={closeItem}
+                    />
+
+                    <div className="relative bg-[#0a0a0a] border border-white/10 w-full h-full md:h-auto md:max-w-6xl md:max-h-[95vh] overflow-y-auto rounded-none md:rounded-lg shadow-[0_0_100px_rgba(0,0,0,1)] animate-in zoom-in-95 slide-in-from-bottom-5 duration-500 scroll-smooth">
+
+                        <button
+                            onClick={closeItem}
+                            className="fixed top-8 right-8 text-maestro-light/30 hover:text-maestro-gold transition-all z-[110] bg-black/50 p-3 rounded-full border border-white/10 hover:border-maestro-gold/50 backdrop-blur-md group"
+                        >
+                            <X size={24} className="group-hover:rotate-90 transition-transform duration-500" />
+                        </button>
+
+                        <div className="relative">
+                            {/* Modal Hero Header */}
+                            <div className="relative h-[40vh] md:h-[60vh] w-full overflow-hidden">
+                                {selectedItem.image ? (
+                                    <img
+                                        src={selectedItem.image}
+                                        alt={((selectedItem.title as any)[lang] || (selectedItem.title as any).es || selectedItem.title) as string}
+                                        className="w-full h-full object-cover"
+                                    />
+                                ) : (
+                                    <div className="w-full h-full bg-white/5 flex items-center justify-center">
+                                        <ImageIcon className="text-white/5" size={100} />
+                                    </div>
+                                )}
+                                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/40 to-transparent" />
+
+                                <div className="absolute bottom-0 left-0 w-full p-8 md:p-20 text-center md:text-left">
+                                    <FadeIn>
+                                        <div className="flex flex-wrap items-center gap-4 mb-8 justify-center md:justify-start">
+                                            <span className="px-5 py-2 bg-maestro-gold/10 text-maestro-gold border border-maestro-gold/20 text-[10px] uppercase tracking-[0.3em] font-bold rounded-full shadow-2xl">
+                                                {selectedItem.date}
+                                            </span>
+                                            <span className="px-5 py-2 bg-white/5 text-maestro-light/60 border border-white/10 text-[10px] uppercase tracking-[0.3em] font-bold rounded-full">
+                                                {selectedItem.source}
+                                            </span>
+                                        </div>
+                                        <h2 className="text-4xl md:text-7xl font-serif text-maestro-light leading-tight max-w-5xl shadow-black drop-shadow-2xl">
+                                            {((selectedItem.title as any)[lang] || (selectedItem.title as any).es || selectedItem.title) as string}
+                                        </h2>
+                                    </FadeIn>
+                                </div>
+                            </div>
+
+                            <div className="p-8 md:px-20 md:pb-32 -mt-10 relative z-10">
+                                <div className="bg-[#0a0a0a] rounded-t-3xl md:rounded-t-none p-4 md:p-0">
+                                    {/* Subtitle/Excerpt */}
+                                    <div
+                                        className="max-w-4xl mx-auto mb-16 italic font-serif text-xl border-l-2 border-maestro-gold pl-8 py-4 bg-maestro-gold/[0.02] text-maestro-light/70 leading-relaxed"
+                                        dangerouslySetInnerHTML={{ __html: ((selectedItem.excerpt as any)[lang] || (selectedItem.excerpt as any).es || selectedItem.excerpt) as string }}
+                                    />
+
+                                    {/* Main Content Body */}
+                                    {selectedItem.content ? (
+                                        <div
+                                            className="blog-content text-maestro-light/80 font-light leading-[2.2] text-xl max-w-4xl mx-auto"
+                                            dangerouslySetInnerHTML={{ __html: ((selectedItem.content as any)[lang] || (selectedItem.content as any).es || selectedItem.content) as string }}
+                                        />
+                                    ) : (
+                                        <div className="text-center py-10">
+                                            <a
+                                                href={selectedItem.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="inline-flex items-center gap-3 px-8 py-4 bg-maestro-gold text-maestro-dark font-bold uppercase tracking-widest text-xs hover:bg-white transition-all shadow-xl"
+                                            >
+                                                Ir a la fuente original <ExternalLink size={16} />
+                                            </a>
+                                        </div>
+                                    )}
+
+                                    {/* Footer / Exit */}
+                                    <div className="mt-10 text-center">
+                                        <div className="w-12 h-px bg-maestro-gold mx-auto mb-6 opacity-30" />
+                                        <div className="flex flex-col items-center gap-8">
+                                            <button
+                                                onClick={closeItem}
+                                                className="text-white/40 hover:text-maestro-gold uppercase tracking-[0.4em] text-xs font-bold transition-all hover:tracking-[0.6em]"
+                                            >
+                                                {(t as any).closeArticle || 'Cerrar'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </section>
     );
 };

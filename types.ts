@@ -99,6 +99,7 @@ export interface PressItem {
   date: string;
   dateISO?: string; // YYYY-MM-DD for calendar selection
   excerpt: LocalizedString;
+  content: LocalizedString;
   url: string;
   image?: string;
   category: LocalizedString;
