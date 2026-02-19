@@ -5,6 +5,7 @@ import {
     addDoc,
     updateDoc,
     deleteDoc,
+    setDoc,
     doc,
     query,
     onSnapshot
@@ -12,7 +13,7 @@ import {
 import { ExperienceItem, ResearchPaper, Performance, BlogPost, Resource, GalleryItem, Language } from "../../types";
 
 // Generic types
-type CollectionName = 'experience' | 'research' | 'performances' | 'posts' | 'resources' | 'gallery' | 'press' | 'messages';
+type CollectionName = 'experience' | 'research' | 'performances' | 'posts' | 'resources' | 'gallery' | 'press' | 'messages' | 'about';
 
 // Helper to get collection reference
 const getColRef = (colName: CollectionName) => collection(db, colName);
@@ -35,6 +36,11 @@ export const updateItem = async (colName: CollectionName, id: string, data: any)
 export const deleteItem = async (colName: CollectionName, id: string) => {
     const docRef = doc(db, colName, id);
     return await deleteDoc(docRef);
+};
+
+export const setItem = async (colName: CollectionName, id: string, data: any) => {
+    const docRef = doc(db, colName, id);
+    return await setDoc(docRef, data, { merge: true });
 };
 
 // -- REAL-TIME LISTENERS --

@@ -5,9 +5,9 @@ import {
     LayoutDashboard, Image as ImageIcon, X, Briefcase, BookOpen, Calendar, MapPin, Video, PlayCircle, Edit, Save, RotateCcw, Database,
     ChevronDown, ArrowRight, Mail
 } from 'lucide-react';
-import { BlogPost, Resource, ExperienceItem, ResearchPaper, Performance, GalleryItem, Language, ContactMessage, PressItem } from '../types';
+import { BlogPost, Resource, ExperienceItem, ResearchPaper, Performance, GalleryItem, Language, ContactMessage, PressItem, AboutData, AboutSection } from '../types';
 import { translations } from '../translations';
-import { addItem, updateItem, deleteItem as deleteDbItem } from '../src/services/db';
+import { addItem, updateItem, deleteItem as deleteDbItem, setItem } from '../src/services/db';
 import { signIn, logout } from '../src/services/auth';
 import { uploadToStorage } from '../src/services/storage';
 import { translateFields, generateSmartSummary } from '../src/services/translationService';
@@ -30,6 +30,7 @@ interface AdminProps {
     gallery: GalleryItem[]; setGallery: (items: GalleryItem[]) => void;
     press: PressItem[]; setPress: (items: PressItem[]) => void;
     messages: ContactMessage[]; setMessages: (messages: ContactMessage[]) => void;
+    aboutData: AboutData | null;
 }
 
 interface AdminCalendarProps {
@@ -407,7 +408,7 @@ const ExperienceCalendar: React.FC<ExperienceCalendarProps> = ({
 
 export const Admin: React.FC<AdminProps> = ({
     isAuthenticated, onLogin, userEmail, lang,
-    posts, resources, experience, research, performances, gallery, press, messages
+    posts, resources, experience, research, performances, gallery, press, messages, aboutData
 }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -416,7 +417,7 @@ export const Admin: React.FC<AdminProps> = ({
     const [translating, setTranslating] = useState(false);
     const [compressing, setCompressing] = useState(false);
 
-    type Tab = 'blog' | 'resources' | 'experience' | 'research' | 'performances' | 'gallery' | 'press' | 'messages';
+    type Tab = 'blog' | 'resources' | 'experience' | 'research' | 'performances' | 'gallery' | 'press' | 'messages' | 'about';
     const [activeTab, setActiveTab] = useState<Tab>('blog');
 
     // Track which item ID is being edited. Null means "Creating New".
@@ -476,6 +477,12 @@ export const Admin: React.FC<AdminProps> = ({
     const [newPressContent, setNewPressContent] = useState('');
     const [newPressDateISO, setNewPressDateISO] = useState(''); // YYYY-MM-DD
 
+    // About
+    const [aboutProfileImage, setAboutProfileImage] = useState('');
+    const [aboutBioTitle, setAboutBioTitle] = useState('');
+    const [aboutBioHeading, setAboutBioHeading] = useState('');
+    const [aboutSections, setAboutSections] = useState<AboutSection[]>([]);
+
     // Pagination & Search for Gallery Management
     const [adminGalleryPage, setAdminGalleryPage] = useState(1);
     const [adminBlogPage, setAdminBlogPage] = useState(1);
@@ -530,11 +537,25 @@ export const Admin: React.FC<AdminProps> = ({
         setNewPressSource('');
         setNewPressDate('');
         setNewPressDateISO('');
+        setNewPressDateISO('');
         setNewPressExcerpt('');
         setNewPressUrl('');
         setNewPressImage('');
         setNewPressCategory('');
         setNewPressContent('');
+
+        // Reset About form to current data or empty
+        if (aboutData) {
+            setAboutProfileImage(aboutData.profileImage || '');
+            setAboutBioTitle((typeof aboutData.bioTitle === 'object' ? aboutData.bioTitle?.es : aboutData.bioTitle) || '');
+            setAboutBioHeading((typeof aboutData.bioHeading === 'object' ? aboutData.bioHeading?.es : aboutData.bioHeading) || '');
+            setAboutSections(aboutData.sections || []);
+        } else {
+            setAboutProfileImage('');
+            setAboutBioTitle('');
+            setAboutBioHeading('');
+            setAboutSections([]);
+        }
 
         setAdminGalleryPage(1);
         setAdminBlogPage(1);
@@ -543,6 +564,13 @@ export const Admin: React.FC<AdminProps> = ({
 
     const changeTab = (tab: Tab) => {
         resetForms();
+        // Special case for About: Load data when switching to tab
+        if (tab === 'about' && aboutData) {
+            setAboutProfileImage(aboutData.profileImage || '');
+            setAboutBioTitle((typeof aboutData.bioTitle === 'object' ? aboutData.bioTitle?.es : aboutData.bioTitle) || '');
+            setAboutBioHeading((typeof aboutData.bioHeading === 'object' ? aboutData.bioHeading?.es : aboutData.bioHeading) || '');
+            setAboutSections(aboutData.sections || []);
+        }
         setActiveTab(tab);
     };
 
@@ -658,7 +686,9 @@ export const Admin: React.FC<AdminProps> = ({
                 updatedAt: new Date().toISOString()
             };
 
-            if (id) {
+            if (colName === 'about') {
+                await setItem(colName, id || 'main', payload);
+            } else if (id) {
                 await updateItem(colName, id, payload);
             } else {
                 await addItem(colName, payload);
@@ -1001,6 +1031,88 @@ export const Admin: React.FC<AdminProps> = ({
 
 
 
+    // --- ABOUT HANDLERS ---
+    const handleSaveAbout = async () => {
+        try {
+            setLoading(true);
+            setTranslating(true);
+
+            // Translate main fields
+            const mainTranslations = await translateFields(
+                { bioTitle: aboutBioTitle, bioHeading: aboutBioHeading },
+                ['bioTitle', 'bioHeading']
+            );
+
+            // Process sections
+            const processedSections = await Promise.all(aboutSections.map(async (section) => {
+                if (section.type === 'text' && section.content) {
+                    // Extract spanish text from current state (it might be a string or object depending on how it's handled)
+                    const text = typeof section.content === 'string' ? section.content : (section.content as any).es || section.content;
+
+                    // Translate content
+                    // We can reuse translateFields but need to fit the structure
+                    const contentTrans = await translateFields({ content: text }, ['content']);
+                    return {
+                        ...section,
+                        content: contentTrans.content
+                    };
+                }
+                return section;
+            }));
+
+            const payload: AboutData = {
+                id: 'main', // Single document for About page
+                profileImage: aboutProfileImage,
+                bioTitle: mainTranslations.bioTitle,
+                bioHeading: mainTranslations.bioHeading,
+                sections: processedSections,
+                updatedAt: new Date().toISOString()
+            };
+
+            await saveToDb('about', 'main', payload);
+            alert('Sección Sobre Mí actualizada correctamente');
+
+        } catch (error) {
+            console.error("Error saving about data:", error);
+            alert("Error al guardar la configuración de Sobre Mí.");
+        } finally {
+            setLoading(false);
+            setTranslating(false);
+        }
+    };
+
+    const addAboutSection = (type: 'text' | 'image') => {
+        setAboutSections([...aboutSections, {
+            id: Date.now().toString(),
+            type,
+            content: type === 'text' ? { es: '', en: '', ru: '' } : undefined,
+            image: type === 'image' ? '' : undefined,
+            order: aboutSections.length
+        }]);
+    };
+
+    const updateAboutSection = (id: string, field: string, value: any) => {
+        setAboutSections(aboutSections.map(s => {
+            if (s.id === id) {
+                return { ...s, [field]: value };
+            }
+            return s;
+        }));
+    };
+
+    const removeAboutSection = (index: number) => {
+        setAboutSections(aboutSections.filter((_, i) => i !== index));
+    };
+
+    const moveAboutSection = (index: number, direction: 'up' | 'down') => {
+        if ((direction === 'up' && index === 0) || (direction === 'down' && index === aboutSections.length - 1)) return;
+        const newSections = [...aboutSections];
+        const temp = newSections[index];
+        newSections[index] = newSections[index + (direction === 'up' ? -1 : 1)];
+        newSections[index + (direction === 'up' ? -1 : 1)] = temp;
+        setAboutSections(newSections);
+    };
+
     // --- LOGIN VIEW ---
     if (!isAuthenticated) {
         return (
@@ -1058,6 +1170,7 @@ export const Admin: React.FC<AdminProps> = ({
                             { id: 'gallery', label: 'Galería', icon: ImageIcon },
                             { id: 'press', label: 'Prensa', icon: FileText },
                             { id: 'messages', label: 'Mensajes', icon: Mail },
+                            { id: 'about', label: 'Sobre Mí', icon: Briefcase }, // Reusing Briefcase icon for now
                         ].map(tab => (
                             <button
                                 key={tab.id}
@@ -2038,6 +2151,143 @@ export const Admin: React.FC<AdminProps> = ({
                             </FadeIn>
                         )}
 
+                        {/* 9. ABOUT MANAGEMENT */}
+                        {activeTab === 'about' && (
+                            <FadeIn>
+                                <div className="flex justify-between items-center mb-6">
+                                    <h3 className="text-xl font-serif text-maestro-light flex items-center gap-2">
+                                        <Briefcase className="text-maestro-gold" size={20} />
+                                        Configuración "Sobre Mí"
+                                    </h3>
+                                    <button disabled={translating || loading} onClick={handleSaveAbout} className={`px-6 py-2 uppercase tracking-widest text-xs font-bold transition-colors ${(translating || loading) ? 'bg-gray-600 cursor-not-allowed' : 'bg-maestro-gold hover:bg-white text-maestro-dark'}`}>
+                                        {translating ? 'Traduciendo...' : (loading ? 'Guardando...' : 'Guardar Todo')}
+                                    </button>
+                                </div>
+
+                                <div className="space-y-8 mb-12">
+                                    {/* Profile Image */}
+                                    <div className="bg-maestro-dark border border-white/10 p-6 rounded-sm">
+                                        <h4 className="text-maestro-gold text-sm font-bold uppercase tracking-widest mb-4">Imagen de Perfil</h4>
+                                        <div className="flex gap-6 items-start">
+                                            <div className="w-32 aspect-[3/4] bg-black/20 border border-white/10 overflow-hidden">
+                                                {aboutProfileImage ? (
+                                                    <img src={aboutProfileImage} alt="Profile" className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center text-white/20 text-xs">Sin Imagen</div>
+                                                )}
+                                            </div>
+                                            <div className="flex-1">
+                                                <label className="block w-full bg-white/5 border border-dashed border-white/20 p-4 text-maestro-light hover:text-maestro-gold hover:border-maestro-gold/50 cursor-pointer flex flex-col items-center justify-center gap-2 transition-all">
+                                                    <UploadCloud size={24} />
+                                                    <span className="text-xs uppercase tracking-widest font-bold">Cambiar Foto</span>
+                                                    <input
+                                                        type="file"
+                                                        onChange={(e) => handleFileUpload(e, setAboutProfileImage, 'images/about/')}
+                                                        className="hidden"
+                                                        accept="image/*"
+                                                    />
+                                                </label>
+                                                {compressing && <p className="text-xs text-maestro-gold mt-2 animate-pulse">Optimizando imagen...</p>}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Main Info */}
+                                    <div className="bg-maestro-dark border border-white/10 p-6 rounded-sm space-y-4">
+                                        <h4 className="text-maestro-gold text-sm font-bold uppercase tracking-widest mb-2">Información Principal</h4>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] uppercase text-white/50">Título (Pequeño)</label>
+                                                <input
+                                                    type="text"
+                                                    value={aboutBioTitle}
+                                                    onChange={(e) => setAboutBioTitle(e.target.value)}
+                                                    placeholder="Ej: DIRECTOR DE ORQUESTA"
+                                                    className="w-full bg-black/20 border border-white/10 p-3 text-white focus:border-maestro-gold outline-none"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] uppercase text-white/50">Encabezado (Grande)</label>
+                                                <input
+                                                    type="text"
+                                                    value={aboutBioHeading}
+                                                    onChange={(e) => setAboutBioHeading(e.target.value)}
+                                                    placeholder="Ej: Diego Carrión Granda"
+                                                    className="w-full bg-black/20 border border-white/10 p-3 text-white focus:border-maestro-gold outline-none"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Sections */}
+                                    <div className="space-y-4">
+                                        <div className="flex justify-between items-center">
+                                            <h4 className="text-maestro-gold text-sm font-bold uppercase tracking-widest">Biografía (Secciones)</h4>
+                                            <div className="flex gap-2">
+                                                <button onClick={() => addAboutSection('text')} className="text-[10px] uppercase font-bold bg-white/10 hover:bg-white/20 px-3 py-1 flex items-center gap-1 transition-colors">
+                                                    <PlusCircle size={12} /> Texto
+                                                </button>
+                                                <button onClick={() => addAboutSection('image')} className="text-[10px] uppercase font-bold bg-white/10 hover:bg-white/20 px-3 py-1 flex items-center gap-1 transition-colors">
+                                                    <ImageIcon size={12} /> Imagen
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-4">
+                                            {aboutSections.map((section, idx) => (
+                                                <div key={section.id} className="bg-maestro-dark border border-white/10 p-4 relative group">
+                                                    <div className="absolute right-2 top-2 flex gap-1 opacity-50 group-hover:opacity-100 transition-opacity z-10">
+                                                        <button onClick={() => moveAboutSection(idx, 'up')} disabled={idx === 0} className="p-1 hover:text-maestro-gold disabled:opacity-20 bg-black/40 rounded"><ArrowRight size={14} className="-rotate-90" /></button>
+                                                        <button onClick={() => moveAboutSection(idx, 'down')} disabled={idx === aboutSections.length - 1} className="p-1 hover:text-maestro-gold disabled:opacity-20 bg-black/40 rounded"><ArrowRight size={14} className="rotate-90" /></button>
+                                                        <button onClick={() => removeAboutSection(idx)} className="p-1 hover:text-red-500 text-red-500/50 bg-black/40 rounded"><Trash2 size={14} /></button>
+                                                    </div>
+
+                                                    <div className="">
+                                                        {section.type === 'text' ? (
+                                                            <div>
+                                                                <span className="text-[10px] uppercase text-white/30 block mb-2">Bloque de Texto</span>
+                                                                <RichTextEditor
+                                                                    value={typeof section.content === 'object' ? (section.content as any).es || '' : section.content || ''}
+                                                                    onChange={(val) => updateAboutSection(section.id, 'content', val)}
+                                                                    minHeight="150px"
+                                                                />
+                                                            </div>
+                                                        ) : (
+                                                            <div>
+                                                                <span className="text-[10px] uppercase text-white/30 block mb-2">Bloque de Imagen</span>
+                                                                <div className="flex gap-4 items-center">
+                                                                    <div className="w-24 aspect-video bg-black/20 border border-white/10 overflow-hidden">
+                                                                        {section.image ? (
+                                                                            <img src={section.image} alt="Section" className="w-full h-full object-cover" />
+                                                                        ) : (
+                                                                            <div className="flex items-center justify-center w-full h-full text-[9px]">Sin Img</div>
+                                                                        )}
+                                                                    </div>
+                                                                    <label className="px-4 py-2 bg-white/5 border border-white/10 hover:border-maestro-gold cursor-pointer text-xs uppercase transition-colors">
+                                                                        Subir Imagen
+                                                                        <input
+                                                                            type="file"
+                                                                            onChange={(e) => handleFileUpload(e, (url) => updateAboutSection(section.id, 'image', url), `images/about/${section.id}`)}
+                                                                            className="hidden"
+                                                                            accept="image/*"
+                                                                        />
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                            {aboutSections.length === 0 && (
+                                                <div className="text-center py-8 border border-dashed border-white/10 text-white/30 text-xs italic">
+                                                    No hay secciones. Añade texto o imágenes para construir la biografía.
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </FadeIn>
+                        )}
                     </div>
                 </div>
             </div >

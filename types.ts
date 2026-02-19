@@ -63,6 +63,23 @@ export interface BlogPost {
   updatedAt?: string;
 }
 
+export interface AboutSection {
+  id: string;
+  type: 'text' | 'image';
+  content?: LocalizedString; // For text sections
+  image?: string; // For image sections
+  order: number;
+}
+
+export interface AboutData {
+  id: string;
+  profileImage: string;
+  bioTitle: LocalizedString;
+  bioHeading: LocalizedString;
+  sections: AboutSection[];
+  updatedAt?: string;
+}
+
 export interface Resource {
   id: string;
   title: LocalizedString;

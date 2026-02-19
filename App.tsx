@@ -56,6 +56,7 @@ function App() {
   const [rawGallery, setRawGallery] = useState<any[]>([]);
   const [rawPress, setRawPress] = useState<any[]>([]);
   const [rawMessages, setRawMessages] = useState<any[]>([]);
+  const [rawAbout, setRawAbout] = useState<any[]>([]);
 
   // Transformed data for display (current language)
   const [posts, setPosts] = useState<BlogPost[]>([]);
@@ -66,6 +67,7 @@ function App() {
   const [gallery, setGallery] = useState<GalleryItem[]>([]);
   const [press, setPress] = useState<PressItem[]>([]);
   const [messages, setMessages] = useState<ContactMessage[]>([]);
+  const [aboutData, setAboutData] = useState<any>(null);
 
   // Auto-detect Language
   useEffect(() => {
@@ -94,7 +96,8 @@ function App() {
       subscribeToCollection('performances', setRawPerformances),
       subscribeToCollection('gallery', setRawGallery),
       subscribeToCollection('press', setRawPress),
-      subscribeToCollection('messages', setRawMessages)
+      subscribeToCollection('messages', setRawMessages),
+      subscribeToCollection('about', setRawAbout)
     ];
 
     return () => unsubs.forEach(unsub => unsub());
@@ -110,7 +113,28 @@ function App() {
     setGallery(transformDataForLang(rawGallery, lang));
     setPress(transformDataForLang(rawPress, lang));
     setMessages(rawMessages); // Messages don't need transformation
-  }, [rawPosts, rawResources, rawExperience, rawResearch, rawPerformances, rawGallery, rawPress, rawMessages, lang]);
+
+    // About data is a single object, but stored as a collection item
+    if (rawAbout.length > 0) {
+      const transformedAbout = transformDataForLang(rawAbout, lang)[0];
+      // Sections also need to be transformed if they contain LocalizedString
+      if (transformedAbout && transformedAbout.sections) {
+        transformedAbout.sections = transformedAbout.sections.map((section: any) => {
+          if (section.type === 'text' && section.content) {
+            // transformDataForLang does shallow transformation, but sections are nested
+            // The transformDataForLang logic might need to handle this or we do it here
+            const content = section.content;
+            return {
+              ...section,
+              content: content[lang] || content['es'] || content['en'] || ''
+            };
+          }
+          return section;
+        });
+      }
+      setAboutData(transformedAbout);
+    }
+  }, [rawPosts, rawResources, rawExperience, rawResearch, rawPerformances, rawGallery, rawPress, rawMessages, rawAbout, lang]);
 
   // Scroll to top
   useEffect(() => {
@@ -122,7 +146,7 @@ function App() {
       case Section.HOME:
         return <Home onNavigate={setCurrentSection} lang={lang} experienceItems={experience} performanceItems={performances} />;
       case Section.ABOUT:
-        return <About lang={lang} />;
+        return <About lang={lang} aboutData={aboutData} />;
       case Section.EXPERIENCE:
         return <Experience items={experience} lang={lang} />;
       case Section.RESEARCH:
@@ -154,6 +178,7 @@ function App() {
             gallery={rawGallery} setGallery={setRawGallery}
             press={rawPress} setPress={setRawPress}
             messages={rawMessages} setMessages={setRawMessages}
+            aboutData={rawAbout.length > 0 ? rawAbout[0] : null}
           />
         );
       default:
