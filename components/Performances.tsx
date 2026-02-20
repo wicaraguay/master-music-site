@@ -11,7 +11,7 @@ interface PerformancesProps {
 
 export const Performances: React.FC<PerformancesProps> = ({ items, lang }) => {
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [activeFilter, setActiveFilter] = useState<'all' | 'upcoming' | 'past'>('all');
+  const [activeFilter, setActiveFilter] = useState<'upcoming' | 'past'>('upcoming');
   const t = translations[lang].performances;
 
   const today = new Date();
@@ -64,28 +64,21 @@ export const Performances: React.FC<PerformancesProps> = ({ items, lang }) => {
     return perf.status;
   };
 
-  const getLatestCreatedId = () => {
-    if (!items || items.length === 0) return null;
-    return [...items].sort((a, b) => {
-      const valA = (a as any).createdAt || a.dateISO || 0;
-      const valB = (b as any).createdAt || b.dateISO || 0;
-      if (valA < valB) return 1;
-      if (valA > valB) return -1;
-      return 0;
-    })[0]?.id;
-  };
 
-  const latestCreatedId = getLatestCreatedId();
 
   const filteredItems = items
-    .filter(item => {
-      if (activeFilter === 'all') return true;
-      return getDynamicStatus(item) === activeFilter;
-    })
+    .filter(item => getDynamicStatus(item) === activeFilter)
     .sort((a, b) => {
-      // Strict Date Ascending Sort (Oldest to Newest)
-      if (a.dateISO < b.dateISO) return -1;
-      if (a.dateISO > b.dateISO) return 1;
+      // If upcoming: Ascending (soonest first)
+      if (activeFilter === 'upcoming') {
+        if (a.dateISO < b.dateISO) return -1;
+        if (a.dateISO > b.dateISO) return 1;
+      }
+      // If past: Descending (most recent first)
+      else {
+        if (a.dateISO < b.dateISO) return 1;
+        if (a.dateISO > b.dateISO) return -1;
+      }
       return 0;
     });
 
@@ -115,7 +108,6 @@ export const Performances: React.FC<PerformancesProps> = ({ items, lang }) => {
         {/* Filter Tabs */}
         <div className="flex justify-center gap-4 mb-12">
           {[
-            { id: 'all', label: t.filterAll },
             { id: 'upcoming', label: t.filterUpcoming },
             { id: 'past', label: t.filterPast }
           ].map((tab) => (
@@ -201,11 +193,7 @@ export const Performances: React.FC<PerformancesProps> = ({ items, lang }) => {
                         <span className={`text-[10px] items-center gap-1 uppercase tracking-widest font-bold ${getDynamicStatus(event) === 'upcoming' ? 'text-maestro-gold' : 'text-maestro-light/30'}`}>
                           {getDynamicStatus(event) === 'upcoming' ? t.statusUpcoming : t.statusPast}
                         </span>
-                        {event.id === latestCreatedId && (
-                          <span className="bg-maestro-gold text-maestro-dark text-[9px] font-bold px-3 py-1 uppercase tracking-widest rounded-full shadow-[0_0_15px_rgba(212,175,55,0.4)] border border-maestro-gold group-hover:bg-white group-hover:border-white transition-all duration-300">
-                            {(t as any).latestPost}
-                          </span>
-                        )}
+
                         <span className={`text-xs uppercase tracking-widest px-3 py-1 border rounded transition-colors ${isExpanded ? 'border-maestro-gold text-maestro-gold' : 'border-white/10 text-maestro-light/40'}`}>
                           {event.role}
                         </span>

@@ -17,11 +17,11 @@ export const About: React.FC<AboutProps> = ({ lang, aboutData }) => {
   const profileImage = aboutData?.profileImage || "https://picsum.photos/800/1200";
 
   return (
-    <section className="py-24 px-6 bg-maestro-dark relative overflow-hidden">
+    <section className="pt-20 pb-16 md:py-24 px-6 bg-maestro-dark relative overflow-hidden">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-20 items-start">
 
         {/* Image Side - Smaller and Decorated */}
-        <FadeIn className="relative sticky top-24 md:col-span-5 lg:col-span-4">
+        <FadeIn className="relative md:sticky md:top-24 md:col-span-5 lg:col-span-4">
           <div className="relative group">
             {/* Minimalist Decoration: Gold Border Offset */}
             <div className="absolute top-4 -left-4 w-full h-full border border-maestro-gold/30 rounded-sm -z-10 transition-transform duration-500 group-hover:-translate-x-1 group-hover:-translate-y-1" />

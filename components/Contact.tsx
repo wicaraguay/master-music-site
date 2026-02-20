@@ -177,7 +177,7 @@ export const Contact: React.FC<ContactProps> = ({ lang }) => {
                                 <div className="flex-1">
                                     <h4 className="font-serif text-xl">{t.phone}</h4>
                                     <div className="flex flex-wrap items-center gap-3 mt-1">
-                                        <p className="text-maestro-light/60 font-light">+79 179 013 345</p>
+                                        <p className="text-maestro-light/60 font-light">+7 917 901 33 45</p>
                                         <div className="flex gap-2">
                                             <a href="https://wa.me/79179013345" target="_blank" rel="noopener noreferrer" className="text-maestro-gold hover:text-white transition-colors bg-white/5 p-1 rounded hover:bg-maestro-gold/20" title="WhatsApp">
                                                 <WhatsAppIcon size={16} />
