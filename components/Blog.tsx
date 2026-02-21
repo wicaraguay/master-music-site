@@ -86,12 +86,12 @@ export const Blog: React.FC<BlogProps> = ({ posts, lang }) => {
         <section className="relative py-24 px-6 bg-maestro-dark min-h-screen overflow-hidden">
             {/* Background Image - Adjusted for a subtle 'clarita' effect */}
             <div
-                className="absolute inset-0 z-0 bg-cover bg-center bg-fixed opacity-35"
+                className="absolute inset-0 z-0 bg-cover bg-center bg-fixed opacity-50 transition-opacity duration-1000"
                 style={{ backgroundImage: 'url("/images/page-blog.webp")' }}
             />
             {/* Delicate gradient overlays to ensure readability and the 'clarita' look */}
-            <div className="absolute inset-0 z-0 bg-gradient-to-b from-maestro-dark/95 via-transparent to-maestro-dark/95" />
-            <div className="absolute inset-0 z-0 bg-black/10" />
+            <div className="absolute inset-0 z-0 bg-gradient-to-b from-maestro-dark/85 via-transparent to-maestro-dark/90" />
+            <div className="absolute inset-0 z-0 bg-white/5" />
 
             <div className="max-w-4xl mx-auto relative z-10">
                 <div className="text-center mb-16 relative">
