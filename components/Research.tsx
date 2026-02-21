@@ -1,6 +1,6 @@
 import React from 'react';
 import { FadeIn } from './FadeIn';
-import { BookOpen, FileText } from 'lucide-react';
+import { FileText, Download, ExternalLink } from 'lucide-react';
 import { ResearchPaper, Language } from '../types';
 import { translations } from '../translations';
 
@@ -11,6 +11,13 @@ interface ResearchProps {
 
 export const Research: React.FC<ResearchProps> = ({ items, lang }) => {
   const t = translations[lang].research;
+
+  // Sorting items by year (descending)
+  const sortedItems = [...items].sort((a, b) => {
+    const yearA = parseInt(a.year) || 0;
+    const yearB = parseInt(b.year) || 0;
+    return yearB - yearA;
+  });
 
   return (
     <section className="relative py-24 px-6 bg-maestro-dark overflow-hidden min-h-screen">
@@ -37,32 +44,59 @@ export const Research: React.FC<ResearchProps> = ({ items, lang }) => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {items.map((paper, idx) => (
+        {/* Square Grid Layout */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {sortedItems.map((paper, idx) => (
             <FadeIn key={paper.id} delay={idx * 100}>
-              <div className="bg-maestro-dark/40 backdrop-blur-md border border-white/5 p-8 hover:bg-maestro-dark/60 hover:border-maestro-gold/50 transition-all duration-500 group h-full flex flex-col shadow-2xl">
-                <div className="mb-6 flex justify-between items-start">
-                  <div className="p-3 bg-maestro-dark/60 rounded border border-white/10 group-hover:border-maestro-gold group-hover:text-maestro-gold transition-colors">
-                    <FileText size={24} />
-                  </div>
-                  <span className="text-4xl font-serif text-white/5 group-hover:text-maestro-gold/20 transition-colors">0{idx + 1}</span>
-                </div>
-
-                <h3 className="text-xl font-bold text-maestro-light mb-2 group-hover:text-maestro-gold transition-colors font-serif">
-                  {paper.title}
-                </h3>
-                <p className="text-sm text-maestro-gold/80 mb-4 font-mono tracking-wider">{paper.journal} — {paper.year}</p>
-
-                <p
-                  className="blog-content text-maestro-light/70 text-sm leading-relaxed mb-6 flex-grow font-serif italic"
-                  dangerouslySetInnerHTML={{ __html: paper.abstract }}
+              <div
+                className="group relative aspect-square bg-maestro-dark/40 overflow-hidden border border-white/10 hover:border-maestro-gold/50 transition-all duration-700 cursor-pointer shadow-2xl"
+                onClick={() => paper.pdfUrl && window.open(paper.pdfUrl, '_blank')}
+              >
+                {/* PDF Preview Image */}
+                <div
+                  className="absolute inset-0 bg-cover bg-center transition-transform duration-[1.5s] group-hover:scale-110"
+                  style={{ backgroundImage: `url('${paper.previewImage || '/images/section-text.webp'}')` }}
                 />
 
-                <button className="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] font-bold text-maestro-gold hover:text-white transition-all group/link mt-auto">
-                  <span>{t.read}</span>
-                  <div className="w-6 h-px bg-maestro-gold/30 group-hover/link:w-10 group-hover/link:bg-white transition-all" />
-                  <BookOpen size={14} className="group-hover/link:translate-x-1 transition-transform" />
-                </button>
+                {/* Elegant Glassmorphism Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-60 group-hover:opacity-90 transition-opacity duration-500" />
+
+                {/* Content Overlay */}
+                <div className="absolute inset-0 p-8 flex flex-col justify-end transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-start">
+                      <span className="text-[10px] text-maestro-gold/80 font-mono tracking-[0.2em] uppercase transition-colors group-hover:text-maestro-gold">
+                        {paper.journal} — {paper.year}
+                      </span>
+                      {paper.articleLanguage && (
+                        <span className="text-[9px] px-2 py-0.5 bg-maestro-gold/10 border border-maestro-gold/30 text-maestro-gold font-bold font-mono uppercase rounded-sm shadow-lg whitespace-nowrap">
+                          {t.languageLabel}: {paper.articleLanguage === 'multilingual' ? 'MULTI' : paper.articleLanguage.toUpperCase()}
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="text-lg md:text-xl font-serif text-white leading-tight group-hover:text-maestro-gold transition-colors duration-500">
+                      {paper.title}
+                    </h3>
+
+                    {/* Read More Indicator */}
+                    <div className="pt-4 flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-700 delay-200">
+                      <div className="h-px w-8 bg-maestro-gold" />
+                      <span className="text-[9px] uppercase tracking-[0.3em] font-bold text-white/70">
+                        {paper.linkType === 'external' ? t.readExternal : t.readPdf}
+                      </span>
+                      {paper.linkType === 'external' ? (
+                        <ExternalLink size={14} className="text-maestro-gold" />
+                      ) : (
+                        <Download size={14} className="text-maestro-gold" />
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Number Badge */}
+                <div className="absolute top-4 right-4 text-2xl font-serif text-white/10 group-hover:text-maestro-gold/20 transition-colors">
+                  0{idx + 1}
+                </div>
               </div>
             </FadeIn>
           ))}

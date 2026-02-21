@@ -88,7 +88,10 @@ export const translations = {
       badge: 'Academia',
       title: 'Investigación',
       quote: '"La investigación es la brújula que guía la interpretación."',
-      read: 'Leer Publicación'
+      read: 'Leer Publicación',
+      readPdf: 'Descargar PDF',
+      readExternal: 'Ver en Revista',
+      languageLabel: 'Idioma'
     },
     performances: {
       titlePrefix: 'Agenda de',
@@ -250,7 +253,10 @@ export const translations = {
       badge: 'Academia',
       title: 'Research',
       quote: '"Research is the compass that guides interpretation."',
-      read: 'Read Publication'
+      read: 'Read Publication',
+      readPdf: 'Download PDF',
+      readExternal: 'View Journal',
+      languageLabel: 'Language'
     },
     performances: {
       titlePrefix: 'Agenda of',
@@ -412,7 +418,10 @@ export const translations = {
       badge: 'Академия',
       title: 'Исследования',
       quote: '"Исследование — это компас, который направляет интерпретацию."',
-      read: 'Читать публикацию'
+      read: 'Читать публикацию',
+      readPdf: 'Скачать PDF',
+      readExternal: 'Открыть в журнале',
+      languageLabel: 'Язык'
     },
     performances: {
       titlePrefix: 'Афиша',

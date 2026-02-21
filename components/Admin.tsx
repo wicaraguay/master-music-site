@@ -3,7 +3,7 @@ import { FadeIn } from './FadeIn';
 import {
     Lock, LogOut, FileText, Music, UploadCloud, Trash2, PlusCircle,
     LayoutDashboard, Image as ImageIcon, X, Briefcase, BookOpen, Calendar, MapPin, Video, PlayCircle, Edit, Save, RotateCcw, Database,
-    ChevronDown, ArrowRight, Mail
+    ChevronDown, ArrowRight, Mail, ExternalLink
 } from 'lucide-react';
 import { BlogPost, Resource, ExperienceItem, ResearchPaper, Performance, GalleryItem, Language, ContactMessage, PressItem, AboutData, AboutSection } from '../types';
 import { translations } from '../translations';
@@ -447,6 +447,10 @@ export const Admin: React.FC<AdminProps> = ({
     const [newResJournal, setNewResJournal] = useState('');
     const [newResYear, setNewResYear] = useState('');
     const [newResAbstract, setNewResAbstract] = useState('');
+    const [newResPaperPdfUrl, setNewResPaperPdfUrl] = useState('');
+    const [newResPaperPreviewImage, setNewResPaperPreviewImage] = useState('');
+    const [newResPaperLang, setNewResPaperLang] = useState('es');
+    const [newResPaperLinkType, setNewResPaperLinkType] = useState<'pdf' | 'external'>('pdf');
 
     const [newPerfDate, setNewPerfDate] = useState('');
     const [newPerfDateISO, setNewPerfDateISO] = useState(''); // YYYY-MM-DD
@@ -525,6 +529,7 @@ export const Admin: React.FC<AdminProps> = ({
         setNewExpInst(''); setNewExpDesc('');
         // Research
         setNewResPaperTitle(''); setNewResJournal(''); setNewResYear(''); setNewResAbstract('');
+        setNewResPaperPdfUrl(''); setNewResPaperPreviewImage(''); setNewResPaperLang('es'); setNewResPaperLinkType('pdf');
         // Perf
         setNewPerfDate(''); setNewPerfDateISO(''); setNewPerfTitle(''); setNewPerfLoc(''); setNewPerfRole(''); setNewPerfDesc(''); setNewPerfImages([]);
         // Gal
@@ -853,13 +858,13 @@ export const Admin: React.FC<AdminProps> = ({
         try {
             setTranslating(true);
             const translations = await translateFields(
-                { title: newResPaperTitle, abstract: newResAbstract },
-                ['title', 'abstract']
+                { title: newResPaperTitle },
+                ['title']
             );
 
             await saveToDb('research', editingId,
-                { title: translations.title, abstract: translations.abstract },
-                { journal: newResJournal, year: newResYear }
+                { title: translations.title },
+                { journal: newResJournal, year: newResYear, pdfUrl: newResPaperPdfUrl, previewImage: newResPaperPreviewImage, articleLanguage: newResPaperLang, linkType: newResPaperLinkType }
             );
         } catch (error) {
             console.error("Error saving research:", error);
@@ -875,6 +880,10 @@ export const Admin: React.FC<AdminProps> = ({
         setNewResJournal(res.journal);
         setNewResYear(res.year);
         setNewResAbstract(res.abstract?.es || res.abstract || '');
+        setNewResPaperPdfUrl(res.pdfUrl || '');
+        setNewResPaperPreviewImage(res.previewImage || '');
+        setNewResPaperLang(res.articleLanguage || 'es');
+        setNewResPaperLinkType(res.linkType || 'pdf');
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
@@ -1523,21 +1532,106 @@ export const Admin: React.FC<AdminProps> = ({
                                     {editingId && <button onClick={resetForms} className="text-xs text-red-400 flex items-center gap-1 hover:text-red-300"><RotateCcw size={12} /> Cancelar Edición</button>}
                                 </div>
                                 <div className="space-y-4 mb-12 border-b border-white/10 pb-12">
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                         <input type="text" value={newResPaperTitle} onChange={(e) => setNewResPaperTitle(e.target.value)} placeholder="Título Paper" className="w-full bg-maestro-dark border border-white/10 p-3 text-white" />
                                         <input type="text" value={newResYear} onChange={(e) => setNewResYear(e.target.value)} placeholder="Año" className="w-full bg-maestro-dark border border-white/10 p-3 text-white" />
+
+                                        {/* Article Language Selection */}
+                                        <select
+                                            value={newResPaperLang}
+                                            onChange={(e) => setNewResPaperLang(e.target.value)}
+                                            className="w-full bg-maestro-dark border border-white/10 p-3 text-white outline-none focus:border-maestro-gold transition-colors"
+                                        >
+                                            <option value="es">Español (ES)</option>
+                                            <option value="en">English (EN)</option>
+                                            <option value="ru">Русский (RU)</option>
+                                            <option value="multilingual">Multilingüe / Otros</option>
+                                        </select>
                                     </div>
                                     <input type="text" value={newResJournal} onChange={(e) => setNewResJournal(e.target.value)} placeholder="Revista / Journal" className="w-full bg-maestro-dark border border-white/10 p-3 text-white" />
-                                    <RichTextEditor
-                                        value={newResAbstract}
-                                        onChange={setNewResAbstract}
-                                        placeholder="Abstract de la investigación..."
-                                        minHeight="250px"
-                                    />
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-black/20 p-6 border border-white/5 rounded-sm">
+                                        {/* Link Type Selector */}
+                                        <div className="space-y-4">
+                                            <label className="block text-[10px] uppercase text-maestro-gold tracking-widest font-bold">Tipo de Recurso</label>
+                                            <div className="flex gap-2">
+                                                <button
+                                                    onClick={() => setNewResPaperLinkType('pdf')}
+                                                    className={`flex-1 flex items-center justify-center gap-2 p-3 text-xs font-bold transition-all border ${newResPaperLinkType === 'pdf' ? 'bg-maestro-gold text-maestro-dark border-maestro-gold shadow-[0_0_15px_rgba(212,175,55,0.3)]' : 'bg-maestro-dark border-white/10 text-white/50 hover:border-white/30'}`}
+                                                >
+                                                    <UploadCloud size={16} /> ARCHIVO PDF
+                                                </button>
+                                                <button
+                                                    onClick={() => setNewResPaperLinkType('external')}
+                                                    className={`flex-1 flex items-center justify-center gap-2 p-3 text-xs font-bold transition-all border ${newResPaperLinkType === 'external' ? 'bg-maestro-gold text-maestro-dark border-maestro-gold shadow-[0_0_15px_rgba(212,175,55,0.3)]' : 'bg-maestro-dark border-white/10 text-white/50 hover:border-white/30'}`}
+                                                >
+                                                    <ExternalLink size={16} /> LINK EXTERNO
+                                                </button>
+                                            </div>
+
+                                            {/* Link Input (Conditional) */}
+                                            {newResPaperLinkType === 'pdf' ? (
+                                                <div className="space-y-2">
+                                                    <label className="flex items-center justify-center gap-2 cursor-pointer bg-maestro-dark border border-white/10 p-3 text-white/50 hover:text-white hover:border-maestro-gold transition-colors w-full rounded-sm">
+                                                        <UploadCloud size={20} />
+                                                        <span className="text-xs">{newResPaperPdfUrl ? 'PDF Cargado' : 'Subir Artículo (PDF solamente)'}</span>
+                                                        <input
+                                                            type="file"
+                                                            accept=".pdf,application/pdf"
+                                                            onChange={async (e) => {
+                                                                const file = e.target.files?.[0];
+                                                                if (file && file.type !== 'application/pdf') {
+                                                                    alert('Por favor, sube solo archivos en formato PDF.');
+                                                                    e.target.value = '';
+                                                                    return;
+                                                                }
+                                                                handleFileUpload(e, setNewResPaperPdfUrl, 'research/pdfs/');
+                                                            }}
+                                                            className="hidden"
+                                                        />
+                                                    </label>
+                                                    {newResPaperPdfUrl && <p className="text-[10px] text-maestro-gold italic break-all">✓ {newResPaperPdfUrl}</p>}
+                                                </div>
+                                            ) : (
+                                                <div className="space-y-2">
+                                                    <input
+                                                        type="text"
+                                                        value={newResPaperPdfUrl}
+                                                        onChange={(e) => setNewResPaperPdfUrl(e.target.value)}
+                                                        placeholder="Pegar URL de la revista (https://...)"
+                                                        className="w-full bg-maestro-dark border border-white/10 p-3 text-white text-xs placeholder:opacity-30"
+                                                    />
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Preview Image Upload */}
+                                        <div className="space-y-4">
+                                            <label className="block text-[10px] uppercase text-maestro-gold tracking-widest font-bold">Imagen de Portada</label>
+                                            <div className="flex gap-4 items-start">
+                                                <label className="flex-1 flex items-center justify-center gap-2 cursor-pointer bg-maestro-dark border border-white/10 p-3 text-white/50 hover:text-white hover:border-maestro-gold transition-colors rounded-sm h-[46px]">
+                                                    <ImageIcon size={20} />
+                                                    <span className="text-xs">{newResPaperPreviewImage ? 'Cambiar Imagen' : 'Subir Miniatura'}</span>
+                                                    <input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        onChange={(e) => handleFileUpload(e, setNewResPaperPreviewImage, 'research/previews/')}
+                                                        className="hidden"
+                                                    />
+                                                </label>
+                                                {newResPaperPreviewImage && (
+                                                    <div className="w-16 h-16 bg-black/20 rounded border border-white/10 overflow-hidden shrink-0">
+                                                        <img src={newResPaperPreviewImage} alt="Preview" className="w-full h-full object-cover" />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     {translating && (
                                         <div className="flex items-center gap-3 text-maestro-gold text-sm animate-pulse mb-4">
                                             <Database size={16} className="animate-spin" />
-                                            <span>Traduciendo investigación...</span>
+                                            <span>Traduciendo título...</span>
                                         </div>
                                     )}
                                     <button disabled={translating || loading} onClick={handleSaveResearch} className={`w-full md:w-auto px-6 py-2 uppercase tracking-widest text-xs font-bold transition-colors ${(translating || loading) ? 'bg-gray-600 cursor-not-allowed' : (editingId ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-maestro-gold hover:bg-white text-maestro-dark')}`}>

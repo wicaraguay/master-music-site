@@ -49,6 +49,10 @@ export interface ResearchPaper {
   journal: string; // Journals usually don't translates their names
   year: string;
   abstract: LocalizedString;
+  pdfUrl?: string;
+  previewImage?: string;
+  articleLanguage?: string;
+  linkType?: 'pdf' | 'external';
 }
 
 export interface BlogPost {
