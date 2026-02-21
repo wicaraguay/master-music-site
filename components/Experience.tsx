@@ -42,18 +42,18 @@ export const Experience: React.FC<ExperienceProps> = ({ items, lang }) => {
                 <div className="bg-maestro-dark/40 backdrop-blur-md border border-white/5 p-8 rounded-sm shadow-2xl group-hover:bg-maestro-dark/60 group-hover:border-maestro-gold/30 transition-all duration-500">
                   <div className="flex flex-col md:flex-row md:items-baseline md:justify-between mb-4">
                     <h3 className="text-2xl font-serif text-maestro-light group-hover:text-maestro-gold transition-colors">
-                      {exp.role}
+                      {(exp.role as any)[lang] || (exp.role as any).es || exp.role}
                     </h3>
-                    <span className="text-maestro-gold font-mono text-sm tracking-widest font-bold mt-1 md:mt-0">{exp.year}</span>
+                    <span className="text-maestro-gold font-mono text-sm tracking-widest font-bold mt-1 md:mt-0">{(exp.year as any)[lang] || (exp.year as any).es || exp.year}</span>
                   </div>
 
                   <h4 className="text-lg text-maestro-light/80 font-serif italic mb-4 flex items-center gap-3">
-                    <Briefcase size={18} className="text-maestro-gold/60" /> {exp.institution}
+                    <Briefcase size={18} className="text-maestro-gold/60" /> {(exp.institution as any)[lang] || (exp.institution as any).es || exp.institution}
                   </h4>
 
                   <p
                     className="blog-content text-maestro-light/70 font-light leading-relaxed font-serif"
-                    dangerouslySetInnerHTML={{ __html: exp.description }}
+                    dangerouslySetInnerHTML={{ __html: (exp.description as any)[lang] || (exp.description as any).es || exp.description }}
                   />
                 </div>
               </div>

@@ -151,7 +151,7 @@ export const Performances: React.FC<PerformancesProps> = ({ items, lang }) => {
                         className={`
                             w-full h-full object-cover transition-all duration-1000
                             ${isExpanded
-                            ? 'scale-105 opacity-50 grayscale-0'
+                            ? 'scale-105 opacity-20 grayscale-0'
                             : getDynamicStatus(event) === 'past'
                               ? 'scale-100 opacity-10 grayscale'
                               : 'scale-100 opacity-20 grayscale group-hover:opacity-30'}
@@ -172,18 +172,18 @@ export const Performances: React.FC<PerformancesProps> = ({ items, lang }) => {
                     <div className="md:w-1/4 text-center md:text-left mb-4 md:mb-0 border-r border-white/10 pr-6 w-full">
                       <div className={`flex items-center gap-2 justify-center md:justify-start font-bold tracking-widest transition-colors ${isExpanded ? 'text-maestro-gold' : 'text-maestro-gold/80'}`}>
                         <Calendar size={18} />
-                        <span>{event.date}</span>
+                        <span>{(event.date as any)[lang] || (event.date as any).es || event.date}</span>
                       </div>
                     </div>
 
                     {/* Main Info */}
                     <div className="md:w-2/4 text-center md:text-left md:pl-6 w-full">
                       <h3 className="text-2xl font-serif text-maestro-light mb-1 group-hover:text-white transition-colors">
-                        {event.title}
+                        {(event.title as any)[lang] || (event.title as any).es || event.title}
                       </h3>
                       <div className="flex items-center justify-center md:justify-start gap-2 text-sm text-maestro-light/60">
                         <MapPin size={14} />
-                        {event.location}
+                        {(event.location as any)[lang] || (event.location as any).es || event.location}
                       </div>
                     </div>
 
@@ -195,7 +195,7 @@ export const Performances: React.FC<PerformancesProps> = ({ items, lang }) => {
                         </span>
 
                         <span className={`text-xs uppercase tracking-widest px-3 py-1 border rounded transition-colors ${isExpanded ? 'border-maestro-gold text-maestro-gold' : 'border-white/10 text-maestro-light/40'}`}>
-                          {event.role}
+                          {(event.role as any)[lang] || (event.role as any).es || event.role}
                         </span>
                       </div>
                       <div className={`transition-transform duration-500 ${isExpanded ? 'rotate-180 text-maestro-gold' : 'text-maestro-light/20'}`}>
@@ -207,17 +207,20 @@ export const Performances: React.FC<PerformancesProps> = ({ items, lang }) => {
                   {/* Expanded Content */}
                   <div
                     className={`
-                      relative z-10 overflow-hidden transition-all duration-700 ease-in-out
-                      ${isExpanded ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}
+                      relative z-10 transition-all duration-700 ease-in-out
+                      ${isExpanded ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}
                     `}
                   >
-                    <div className="p-6 pt-0 md:pl-[25%] text-maestro-light/80 font-light leading-relaxed border-t border-white/5 mt-2 mx-6">
-                      <div className="pt-6 flex gap-4">
+                    <div className="p-8 md:p-12 text-maestro-light/90 font-light leading-relaxed border border-maestro-gold/10 mt-6 mx-4 md:mx-auto max-w-4xl bg-black/90 backdrop-blur-xl rounded-sm shadow-2xl relative overflow-hidden">
+                      {/* Subtle gold accent line at top */}
+                      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-maestro-gold/30 to-transparent" />
+
+                      <div className="flex gap-4 relative z-10">
                         <Music className="text-maestro-gold flex-shrink-0 mt-1" size={20} />
-                        <div>
+                        <div className="flex-1 min-w-0">
                           <p
                             className="blog-content mb-4"
-                            dangerouslySetInnerHTML={{ __html: event.description }}
+                            dangerouslySetInnerHTML={{ __html: (event.description as any)[lang] || (event.description as any).es || event.description }}
                           />
 
                           {/* Event Images Gallery */}

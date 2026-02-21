@@ -12,8 +12,8 @@ export const About: React.FC<AboutProps> = ({ lang, aboutData }) => {
   const t = translations[lang].about;
 
   // Use dynamic data if available, otherwise fallback to translations/defaults
-  const bioTitle = aboutData?.bioTitle || t.bioTitle;
-  const bioHeading = aboutData?.bioHeading || t.bioHeading;
+  const bioTitle = typeof aboutData?.bioTitle === 'object' ? (aboutData.bioTitle as any)[lang] || (aboutData.bioTitle as any).es : (aboutData?.bioTitle || t.bioTitle);
+  const bioHeading = typeof aboutData?.bioHeading === 'object' ? (aboutData.bioHeading as any)[lang] || (aboutData.bioHeading as any).es : (aboutData?.bioHeading || t.bioHeading);
   const profileImage = aboutData?.profileImage || "https://picsum.photos/800/1200";
 
   return (
@@ -66,7 +66,7 @@ export const About: React.FC<AboutProps> = ({ lang, aboutData }) => {
                                    [&_ul]:list-none [&_ul]:pl-4 [&_ul]:mb-4
                                    [&_li]:relative [&_li]:pl-5 [&_li]:mb-2
                                    [&_li::before]:content-['•'] [&_li::before]:text-maestro-gold [&_li::before]:absolute [&_li::before]:left-0 [&_li::before]:font-bold"
-                        dangerouslySetInnerHTML={{ __html: section.content as string }}
+                        dangerouslySetInnerHTML={{ __html: typeof section.content === 'object' ? (section.content as any)[lang] || (section.content as any).es : (section.content || '') }}
                       />
                     );
                   } else if (section.type === 'image') {

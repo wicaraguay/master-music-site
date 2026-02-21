@@ -192,7 +192,7 @@ export const Gallery: React.FC<GalleryProps> = ({ items, lang }) => {
                         ? (item.thumbnail || '/images/audio-section.webp')
                         : (item.type === 'video' ? (item.thumbnail || getVideoThumbnailUrl(item.src)) : item.src)
                     }
-                    alt={(typeof item.category === 'object' ? item.category?.es : item.category) || ''}
+                    alt={(typeof item.category === 'object' ? (item.category as any)[lang] || (item.category as any).es : item.category) || ''}
                     className="w-full h-full object-cover transition-all duration-1000 transform group-hover:scale-110 grayscale hover:grayscale-0"
                     loading="lazy"
                   />
@@ -215,11 +215,11 @@ export const Gallery: React.FC<GalleryProps> = ({ items, lang }) => {
                 <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col items-center justify-center p-6 text-center">
                   <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 w-full">
                     <span className="text-maestro-gold text-[10px] uppercase tracking-[0.3em] font-bold mb-2 block">
-                      {(typeof item.category === 'object' ? item.category?.es : item.category) || ''}
+                      {(typeof item.category === 'object' ? (item.category as any)[lang] || (item.category as any).es : item.category) || ''}
                     </span>
                     {item.author && (
                       <p className="text-white/60 text-xs uppercase tracking-widest mb-2 font-medium">
-                        {(typeof item.author === 'object' ? item.author?.es : item.author) || ''}
+                        {(typeof item.author === 'object' ? (item.author as any)[lang] || (item.author as any).es : item.author) || ''}
                       </p>
                     )}
                     <div className="h-px w-12 bg-maestro-gold/30 mx-auto mb-4" />
@@ -289,7 +289,7 @@ export const Gallery: React.FC<GalleryProps> = ({ items, lang }) => {
               {displayedItems[selectedImageIndex].type === 'image' ? (
                 <img
                   src={displayedItems[selectedImageIndex].src}
-                  alt={(typeof displayedItems[selectedImageIndex].category === 'object' ? (displayedItems[selectedImageIndex].category as any)?.es : displayedItems[selectedImageIndex].category) || ''}
+                  alt={(typeof displayedItems[selectedImageIndex].category === 'object' ? (displayedItems[selectedImageIndex].category as any)[lang] || (displayedItems[selectedImageIndex].category as any).es : displayedItems[selectedImageIndex].category) || ''}
                   className="max-h-[70vh] w-auto object-contain shadow-2xl border border-white/5"
                 />
               ) : displayedItems[selectedImageIndex].type === 'video' ? (
@@ -298,7 +298,7 @@ export const Gallery: React.FC<GalleryProps> = ({ items, lang }) => {
                     width="100%"
                     height="100%"
                     src={getVideoEmbedUrl(displayedItems[selectedImageIndex].src)}
-                    title={(typeof displayedItems[selectedImageIndex].category === 'object' ? (displayedItems[selectedImageIndex].category as any)?.es : displayedItems[selectedImageIndex].category) || ''}
+                    title={(typeof displayedItems[selectedImageIndex].category === 'object' ? (displayedItems[selectedImageIndex].category as any)[lang] || (displayedItems[selectedImageIndex].category as any).es : displayedItems[selectedImageIndex].category) || ''}
                     frameBorder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     referrerPolicy="strict-origin-when-cross-origin"
@@ -323,12 +323,12 @@ export const Gallery: React.FC<GalleryProps> = ({ items, lang }) => {
               {/* Information Section */}
               <div className="mt-8 text-center w-full max-w-2xl bg-white/5 p-8 rounded-lg border border-white/10 backdrop-blur-sm">
                 <span className="text-maestro-gold text-xs uppercase tracking-[0.4em] font-bold block mb-3">
-                  {(typeof displayedItems[selectedImageIndex].category === 'object' ? (displayedItems[selectedImageIndex].category as any)?.es : displayedItems[selectedImageIndex].category) || ''}
+                  {(typeof displayedItems[selectedImageIndex].category === 'object' ? (displayedItems[selectedImageIndex].category as any)[lang] || (displayedItems[selectedImageIndex].category as any).es : displayedItems[selectedImageIndex].category) || ''}
                 </span>
 
                 {displayedItems[selectedImageIndex].author && (
                   <h4 className="text-white/60 text-sm uppercase tracking-[0.2em] font-medium mb-4">
-                    {(typeof displayedItems[selectedImageIndex].author === 'object' ? (displayedItems[selectedImageIndex].author as any)?.es : displayedItems[selectedImageIndex].author) || ''}
+                    {(typeof displayedItems[selectedImageIndex].author === 'object' ? (displayedItems[selectedImageIndex].author as any)[lang] || (displayedItems[selectedImageIndex].author as any).es : displayedItems[selectedImageIndex].author) || ''}
                   </h4>
                 )}
 
@@ -337,10 +337,10 @@ export const Gallery: React.FC<GalleryProps> = ({ items, lang }) => {
                 {/* Description - Collapsible if long */}
                 <div className="relative">
                   <p className={`text-white/80 font-serif italic text-lg md:text-xl leading-relaxed transition-all duration-500 overflow-hidden ${isDescriptionExpanded ? 'max-h-[1000px]' : 'max-h-[80px]'}`}>
-                    "{(typeof displayedItems[selectedImageIndex].caption === 'object' ? (displayedItems[selectedImageIndex].caption as any)?.es : displayedItems[selectedImageIndex].caption) || ''}"
+                    "{(typeof displayedItems[selectedImageIndex].caption === 'object' ? (displayedItems[selectedImageIndex].caption as any)[lang] || (displayedItems[selectedImageIndex].caption as any).es : displayedItems[selectedImageIndex].caption) || ''}"
                   </p>
 
-                  {((typeof displayedItems[selectedImageIndex].caption === 'object' ? (displayedItems[selectedImageIndex].caption as any)?.es : displayedItems[selectedImageIndex].caption) || '').length > 100 && (
+                  {((typeof displayedItems[selectedImageIndex].caption === 'object' ? (displayedItems[selectedImageIndex].caption as any)[lang] || (displayedItems[selectedImageIndex].caption as any).es : displayedItems[selectedImageIndex].caption) || '').length > 100 && (
                     <button
                       onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
                       className="mt-4 text-maestro-gold text-[10px] uppercase tracking-widest font-bold hover:text-white transition-colors flex items-center gap-2 mx-auto border border-maestro-gold/30 px-4 py-2 rounded-full hover:bg-maestro-gold/10"

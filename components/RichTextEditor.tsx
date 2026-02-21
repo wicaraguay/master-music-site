@@ -191,7 +191,20 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
             // We pass the font directly to avoid state closure race conditions
             handleInput(font);
         } else {
-            execCommand('fontName', font);
+            if (font === 'inherit') {
+                // When resetting to default, we remove the font-family style
+                // This is more reliable than execCommand('fontName', 'inherit') which is inconsistent
+                const range = selection.getRangeAt(0);
+                const span = document.createElement('span');
+                span.style.fontFamily = ''; // Clear explicit font
+                range.surroundContents(span);
+
+                // Optional: Flatten nested spans if they exist to keep HTML clean
+                // But browsers usually handle font resetting better via CSS removal
+                execCommand('fontName', 'inherit');
+            } else {
+                execCommand('fontName', font);
+            }
         }
     };
 

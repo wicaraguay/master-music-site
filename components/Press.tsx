@@ -350,20 +350,24 @@ export const Press: React.FC<PressProps> = ({ lang, items }) => {
                                     />
 
                                     {/* Main Content Body */}
-                                    {selectedItem.content ? (
+                                    {selectedItem.content && (
                                         <div
-                                            className="blog-content text-maestro-light/80 font-light leading-[2.2] text-xl max-w-4xl mx-auto"
+                                            className="blog-content text-maestro-light/80 font-light leading-[2.2] text-xl max-w-4xl mx-auto mb-16"
                                             dangerouslySetInnerHTML={{ __html: ((selectedItem.content as any)[lang] || (selectedItem.content as any).es || selectedItem.content) as string }}
                                         />
-                                    ) : (
+                                    )}
+
+                                    {/* External Link Section */}
+                                    {selectedItem.url && (
                                         <div className="text-center py-10">
                                             <a
                                                 href={selectedItem.url}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="inline-flex items-center gap-3 px-8 py-4 bg-maestro-gold text-maestro-dark font-bold uppercase tracking-widest text-xs hover:bg-white transition-all shadow-xl"
+                                                className="inline-flex items-center gap-3 px-10 py-5 bg-maestro-gold text-maestro-dark font-bold uppercase tracking-[0.2em] text-[10px] hover:bg-white transition-all shadow-2xl rounded-sm"
                                             >
-                                                Ir a la fuente original <ExternalLink size={16} />
+                                                {lang === 'es' ? 'Ir a la fuente original' : lang === 'ru' ? 'Перейти к первоисточнику' : 'Go to original source'}
+                                                <ExternalLink size={16} />
                                             </a>
                                         </div>
                                     )}

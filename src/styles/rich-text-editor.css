@@ -93,8 +93,8 @@
     outline: none;
     overflow-y: auto;
     max-height: 600px;
-    overflow-wrap: anywhere;
-    word-break: break-all;
+    overflow-wrap: break-word;
+    word-break: normal;
 }
 
 .editor-content:empty:before {
@@ -170,6 +170,12 @@
     margin: 4px 0;
 }
 
+.editor-content li p,
+.blog-content li p {
+    margin: 0 !important;
+    display: inline;
+}
+
 /* Scrollbar */
 .editor-content::-webkit-scrollbar {
     width: 8px;
@@ -219,8 +225,8 @@
 .blog-content p {
     margin: 16px 0;
     line-height: 1.8;
-    overflow-wrap: anywhere;
-    word-break: break-all;
+    overflow-wrap: break-word;
+    word-break: normal;
 }
 
 .blog-content a {
@@ -253,27 +259,13 @@
 }
 
 .blog-content ul {
-    list-style: none; /* Disable default marker to prevent duplicates */
+    list-style-type: disc;
 }
 
-.blog-content ol {
-    list-style-type: decimal;
-}
-
-.blog-content li {
-    margin: 8px 0;
-    line-height: 1.6;
-    position: relative; /* Context for absolute positioning if needed, though we use inline flow here */
-}
-
-/* Custom Bullet for Unordered Lists */
-.blog-content ul li::before {
-    content: "•";
+.blog-content ul li::marker,
+.blog-content ol li::marker {
     color: #eab308;
     font-weight: bold;
-    display: inline-block;
-    width: 1em;
-    margin-left: -1em;
 }
 
 /* Number color for Ordered Lists */

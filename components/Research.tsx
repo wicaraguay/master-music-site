@@ -59,7 +59,8 @@ export const Research: React.FC<ResearchProps> = ({ items, lang }) => {
                 />
 
                 {/* Elegant Glassmorphism Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-60 group-hover:opacity-90 transition-opacity duration-500" />
+                <div className="absolute inset-0 bg-black/55 group-hover:bg-black/35 transition-colors duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-90 group-hover:opacity-100 transition-opacity duration-500" />
 
                 {/* Content Overlay */}
                 <div className="absolute inset-0 p-8 flex flex-col justify-end transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
@@ -75,7 +76,7 @@ export const Research: React.FC<ResearchProps> = ({ items, lang }) => {
                       )}
                     </div>
                     <h3 className="text-lg md:text-xl font-serif text-white leading-tight group-hover:text-maestro-gold transition-colors duration-500">
-                      {paper.title}
+                      {(paper.title as any)[lang] || (paper.title as any).es || paper.title}
                     </h3>
 
                     {/* Read More Indicator */}

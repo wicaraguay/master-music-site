@@ -32,7 +32,7 @@ export const translations = {
       ctaContact: 'Contacto',
       aboutTitle: 'Sobre Mí',
       aboutHeading: 'No soy perfecto, pero sí perfectible.',
-      aboutText1: 'Esta cualidad me define: dinámico, en cada concierto descubro nuevas formas de interpretar y hacer vibrar al público. Con mis alumnos aprendo que enseñar y afianza el conocimiento. Estrenar obras es ver nacer un ente vivo que crece y vuela en el tiempo y con el tiempo, resonando en la eternidad.',
+      aboutText1: 'Esta cualidad me define: dinámico, en cada concierto descubro nuevas formas de interpretar y hacer vibrar al público. Con mis alumnos aprendo que enseñar se afianza el conocimiento. Estrenar obras es ver nacer un ente vivo que crece y vuela en el tiempo y con el tiempo, resonando así en la eternidad.',
       aboutText2: 'Mi investigación doctoral profundiza en las partituras olvidadas, trayendo a la luz obras maestras que merecen ser escuchadas nuevamente, interpretadas con una sensibilidad moderna.',
       readBio: 'Leer Biografía Completa',
       focusTitle: 'Panorama Profesional',
@@ -163,7 +163,8 @@ export const translations = {
       phone: 'Teléfono',
       message: 'Mensaje',
       send: 'Enviar Mensaje',
-      follow: 'Sígueme en redes'
+      follow: 'Sígueme en redes',
+      channels: 'Canales Oficiales'
     },
     admin: {
       title: 'Panel de Administración',
@@ -185,7 +186,9 @@ export const translations = {
       months: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
       days: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
       viewDetails: 'Ver Detalles'
-    }
+    },
+    footerRole: 'Director de Ópera y Orquesta',
+    copyright: 'Todos los derechos reservados'
   },
   en: {
     nav: {
@@ -212,7 +215,7 @@ export const translations = {
       ctaContact: 'Contact',
       aboutTitle: 'About Me',
       aboutHeading: 'I am not perfect, but I am perfectible.',
-      aboutText1: 'This quality defines me: dynamic, in every concert I discover new ways to interpret and move the audience. With my students, I learn that teaching strengthens knowledge. Premiering works is witnessing the birth of a living entity that grows and flies through and with time, resonating in eternity.',
+      aboutText1: 'This quality defines me: dynamic, in every concert I discover new ways to interpret and move the audience. With my students, I learn that through teaching, knowledge takes root. Premiering works is witnessing the birth of a living entity that grows and flies through and with time, thus resonating in eternity.',
       aboutText2: 'My doctoral research delves into forgotten scores, bringing to light masterpieces that deserve to be heard again, performed with modern sensitivity.',
       readBio: 'Read Full Biography',
       focusTitle: 'Professional Outlook',
@@ -328,7 +331,8 @@ export const translations = {
       phone: 'Phone',
       message: 'Message',
       send: 'Send Message',
-      follow: 'Follow me'
+      follow: 'Follow me',
+      channels: 'Official Channels'
     },
     admin: {
       title: 'Admin Panel',
@@ -350,7 +354,9 @@ export const translations = {
       months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
       days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
       viewDetails: 'View Details'
-    }
+    },
+    footerRole: 'Opera & Orchestra Conductor',
+    copyright: 'All rights reserved'
   },
   ru: {
     nav: {
@@ -377,7 +383,7 @@ export const translations = {
       ctaContact: 'Контакты',
       aboutTitle: 'Обо мне',
       aboutHeading: 'Я не совершенен, но я совершенствуем.',
-      aboutText1: 'Это качество определяет меня: динамичный, в каждом концерте я открываю новые формы интерпретации и заставляю публику вибрировать. Вместе со своими учениками я узнаю, что преподавание укрепляет знания. Премьера произведений — это рождение живого существа, которое растет и летит сквозь время и со временем, резонируя в вечности.',
+      aboutText1: 'Это качество определяет меня: динамичный, в каждом концерте я открываю новые формы интерпретации и заставляю публику вибрировать. Вместе со своими учениками я узнаю, как в преподавании закрепляются знания. Премьера произведений — это рождение живого существа, которое растет и летит сквозь время и со временем, резонируя таким образом в вечности.',
       aboutText2: 'Мое докторское исследование посвящено забытым партитурам, возвращая к жизни шедевры, которые заслуживают того, чтобы быть услышанными снова, исполненные с современной чуткостью.',
       readBio: 'Читать полную биографию',
       focusTitle: 'Профессиональный обзор',
@@ -493,7 +499,8 @@ export const translations = {
       phone: 'Телефон',
       message: 'Сообщение',
       send: 'Отправить сообщение',
-      follow: 'Следите за мной'
+      follow: 'Следите за мной',
+      channels: 'Официальные каналы'
     },
     admin: {
       title: 'Панель администратора',
@@ -515,7 +522,9 @@ export const translations = {
       months: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
       days: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
       viewDetails: 'Подробнее'
-    }
+    },
+    footerRole: 'Дирижер оперы и оркестра',
+    copyright: 'Все права защищены'
   }
 } as const;
 

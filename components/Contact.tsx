@@ -1,6 +1,6 @@
 import React from 'react';
 import { FadeIn } from './FadeIn';
-import { Mail, Phone, Instagram, Facebook } from 'lucide-react';
+import { Mail, Phone, Instagram, Facebook, Youtube } from 'lucide-react';
 import { Language } from '../types';
 import { translations } from '../translations';
 
@@ -49,6 +49,54 @@ const TelegramIcon = ({ size = 20 }: { size?: number }) => (
     >
         <path d="m22 2-7 20-4-9-9-4Z" />
         <path d="M22 2 11 13" />
+    </svg>
+);
+
+const MaxIcon = ({ size = 20 }: { size?: number }) => (
+    <svg
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+    >
+        <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
+    </svg>
+);
+
+const RutubeIcon = ({ size = 20 }: { size?: number }) => (
+    <svg
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+    >
+        <path d="M12 21.996C6.478 21.996 2 17.518 2 11.998C2 6.477 6.478 2 12.002 2C17.522 2 22 6.477 22 11.998C22 17.518 17.522 21.996 12.002 21.996ZM12.002 4.1C7.643 4.1 4.103 7.639 4.103 11.998C4.103 16.356 7.643 19.896 12.002 19.896C16.36 19.896 19.9 16.356 19.9 11.998C19.9 7.639 16.36 4.1 12.002 4.1ZM13.842 12.723H10.5V14.887H8.816V8.92H13.842C14.888 8.92 15.738 9.77 15.738 10.816C15.738 11.861 14.888 12.711 13.842 12.711V12.723ZM10.5 10.511V11.132H13.842C14.014 11.132 14.152 10.993 14.152 10.822C14.152 10.65 14.014 10.511 13.842 10.511H10.5Z" />
+    </svg>
+);
+
+const SoundCloudIcon = ({ size = 20 }: { size?: number }) => (
+    <svg
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+    >
+        <path d="M17.5 19c.5 0 1-.1 1.5-.3.5-.2 1-.5 1.4-.9.4-.4.7-.8.9-1.4.2-.5.3-1 .3-1.5 0-1.1-.4-2.1-1.2-2.8-.8-.8-1.8-1.2-2.9-1.2H17v-.1c0-1.2-.4-2.2-1.2-3-.8-.8-1.8-1.2-3-1.2-1.1 0-2.1.4-2.9 1.1-.8.8-1.2 1.8-1.2 2.9V11h-.1c-.9 0-1.7.3-2.3.9-.6.6-.9 1.4-.9 2.3 0 .9.3 1.7.9 2.3.6.6 1.4.9 2.3.9h11z" />
+        <path d="M9 19v-5" />
+        <path d="M6 18v-3" />
+        <path d="M12 19v-8" />
     </svg>
 );
 
@@ -182,9 +230,6 @@ export const Contact: React.FC<ContactProps> = ({ lang }) => {
                                             <a href="https://wa.me/79179013345" target="_blank" rel="noopener noreferrer" className="text-maestro-gold hover:text-white transition-colors bg-white/5 p-1 rounded hover:bg-maestro-gold/20" title="WhatsApp">
                                                 <WhatsAppIcon size={16} />
                                             </a>
-                                            <a href="https://t.me/+79179013345" target="_blank" rel="noopener noreferrer" className="text-maestro-gold hover:text-white transition-colors bg-white/5 p-1 rounded hover:bg-maestro-gold/20" title="Telegram">
-                                                <TelegramIcon size={16} />
-                                            </a>
                                         </div>
                                     </div>
                                 </div>
@@ -193,22 +238,67 @@ export const Contact: React.FC<ContactProps> = ({ lang }) => {
 
                         <div className="pt-8 border-t border-white/10">
                             <h4 className="text-sm uppercase tracking-widest text-maestro-light/50 mb-4">{t.follow}</h4>
-                            <div className="flex gap-4">
-                                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 border border-white/20 rounded-full flex items-center justify-center text-maestro-light hover:border-maestro-gold hover:text-maestro-gold transition-all hover:scale-110">
-                                    <Instagram size={20} />
-                                </a>
-                                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 border border-white/20 rounded-full flex items-center justify-center text-maestro-light hover:border-maestro-gold hover:text-maestro-gold transition-all hover:scale-110">
-                                    <Facebook size={20} />
-                                </a>
-                                <a href="https://wa.me/79179013345" target="_blank" rel="noopener noreferrer" className="w-10 h-10 border border-white/20 rounded-full flex items-center justify-center text-maestro-light hover:border-maestro-gold hover:text-maestro-gold transition-all hover:scale-110">
-                                    <WhatsAppIcon size={20} />
-                                </a>
-                                <a href="https://t.me/+79179013345" target="_blank" rel="noopener noreferrer" className="w-10 h-10 border border-white/20 rounded-full flex items-center justify-center text-maestro-light hover:border-maestro-gold hover:text-maestro-gold transition-all hover:scale-110">
-                                    <TelegramIcon size={20} />
-                                </a>
-                                <a href="https://vk.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 border border-white/20 rounded-full flex items-center justify-center text-maestro-light hover:border-maestro-gold hover:text-maestro-gold transition-all hover:scale-110">
-                                    <VkIcon size={20} />
-                                </a>
+                            <div className="flex flex-wrap gap-6">
+                                <div className="flex flex-col items-center gap-2 group">
+                                    <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 border border-white/20 rounded-full flex items-center justify-center text-maestro-gold group-hover:border-maestro-light group-hover:text-maestro-light transition-all group-hover:scale-110">
+                                        <Facebook size={20} />
+                                    </a>
+                                    <span className="text-[10px] uppercase tracking-widest text-maestro-light/40 group-hover:text-maestro-gold transition-colors">Facebook</span>
+                                </div>
+                                <div className="flex flex-col items-center gap-2 group">
+                                    <a href="https://vk.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 border border-white/20 rounded-full flex items-center justify-center text-maestro-gold group-hover:border-maestro-light group-hover:text-maestro-light transition-all group-hover:scale-110">
+                                        <VkIcon size={20} />
+                                    </a>
+                                    <span className="text-[10px] uppercase tracking-widest text-maestro-light/40 group-hover:text-maestro-gold transition-colors">Vk</span>
+                                </div>
+                                <div className="flex flex-col items-center gap-2 group">
+                                    <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 border border-white/20 rounded-full flex items-center justify-center text-maestro-gold group-hover:border-maestro-light group-hover:text-maestro-light transition-all group-hover:scale-110">
+                                        <Instagram size={20} />
+                                    </a>
+                                    <span className="text-[10px] uppercase tracking-widest text-maestro-light/40 group-hover:text-maestro-gold transition-colors">Instagram</span>
+                                </div>
+                                <div className="flex flex-col items-center gap-2 group">
+                                    <a href="https://wa.me/79179013345" target="_blank" rel="noopener noreferrer" className="w-10 h-10 border border-white/20 rounded-full flex items-center justify-center text-maestro-gold group-hover:border-maestro-light group-hover:text-maestro-light transition-all group-hover:scale-110">
+                                        <WhatsAppIcon size={20} />
+                                    </a>
+                                    <span className="text-[10px] uppercase tracking-widest text-maestro-light/40 group-hover:text-maestro-gold transition-colors">WhatsApp</span>
+                                </div>
+                                <div className="flex flex-col items-center gap-2 group">
+                                    <a href="#" target="_blank" rel="noopener noreferrer" className="w-10 h-10 border border-white/20 rounded-full flex items-center justify-center text-maestro-gold group-hover:border-maestro-light group-hover:text-maestro-light transition-all group-hover:scale-110">
+                                        <MaxIcon size={20} />
+                                    </a>
+                                    <span className="text-[10px] uppercase tracking-widest text-maestro-light/40 group-hover:text-maestro-gold transition-colors">Max</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="pt-8 border-t border-white/10">
+                            <h4 className="text-sm uppercase tracking-widest text-maestro-light/50 mb-4">{(t as any).channels || 'Canales Oficiales'}</h4>
+                            <div className="flex flex-wrap gap-6">
+                                <div className="flex flex-col items-center gap-2 group">
+                                    <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 border border-white/20 rounded-full flex items-center justify-center text-maestro-gold group-hover:border-maestro-light group-hover:text-maestro-light transition-all group-hover:scale-110">
+                                        <Youtube size={20} />
+                                    </a>
+                                    <span className="text-[10px] uppercase tracking-widest text-maestro-light/40 group-hover:text-maestro-gold transition-colors">YouTube</span>
+                                </div>
+                                <div className="flex flex-col items-center gap-2 group">
+                                    <a href="https://rutube.ru" target="_blank" rel="noopener noreferrer" className="w-10 h-10 border border-white/20 rounded-full flex items-center justify-center text-maestro-gold group-hover:border-maestro-light group-hover:text-maestro-light transition-all group-hover:scale-110">
+                                        <RutubeIcon size={20} />
+                                    </a>
+                                    <span className="text-[10px] uppercase tracking-widest text-maestro-light/40 group-hover:text-maestro-gold transition-colors">Rutube</span>
+                                </div>
+                                <div className="flex flex-col items-center gap-2 group">
+                                    <a href="https://soundcloud.com/yoiorchestra?utm_source=mobi&utm_campaign=social_sharing" target="_blank" rel="noopener noreferrer" className="w-10 h-10 border border-white/20 rounded-full flex items-center justify-center text-maestro-gold group-hover:border-maestro-light group-hover:text-maestro-light transition-all group-hover:scale-110">
+                                        <SoundCloudIcon size={20} />
+                                    </a>
+                                    <span className="text-[10px] uppercase tracking-widest text-maestro-light/40 group-hover:text-maestro-gold transition-colors">SoundCloud</span>
+                                </div>
+                                <div className="flex flex-col items-center gap-2 group">
+                                    <a href="https://t.me/+79179013345" target="_blank" rel="noopener noreferrer" className="w-10 h-10 border border-white/20 rounded-full flex items-center justify-center text-maestro-gold group-hover:border-maestro-light group-hover:text-maestro-light transition-all group-hover:scale-110">
+                                        <TelegramIcon size={20} />
+                                    </a>
+                                    <span className="text-[10px] uppercase tracking-widest text-maestro-light/40 group-hover:text-maestro-gold transition-colors">Telegram</span>
+                                </div>
                             </div>
                         </div>
                     </FadeIn>

@@ -809,15 +809,18 @@ export const Admin: React.FC<AdminProps> = ({
 
     const startEditResource = (res: any) => {
         setEditingId(res.id);
-        setNewResTitle(res.title?.es || res.title || '');
-        setNewResDesc(res.description?.es || res.description || '');
+        setNewResTitle((res.title as any)?.es || (typeof res.title === 'string' ? res.title : ''));
+        setNewResDesc((res.description as any)?.es || (typeof res.description === 'string' ? res.description : ''));
         setNewResType(res.type);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     // --- EXPERIENCE HANDLERS ---
     const handleSaveExperience = async () => {
-        if (!newExpRole) return;
+        if (!newExpRole || newExpRole.includes('[object Object]') || newExpInst.includes('[object Object]') || newExpYear.includes('[object Object]')) {
+            alert("Error: El contenido contiene texto inválido ([object Object]). Por favor corrígelo.");
+            return;
+        }
         try {
             setTranslating(true);
             const translations = await translateFields(
@@ -844,17 +847,20 @@ export const Admin: React.FC<AdminProps> = ({
 
     const startEditExperience = (exp: any) => {
         setEditingId(exp.id);
-        setNewExpYear(exp.year?.es || exp.year || '');
+        setNewExpYear((exp.year as any)?.es || (typeof exp.year === 'string' ? exp.year : ''));
         setNewExpDateISO(exp.dateISO || '');
-        setNewExpRole(exp.role?.es || exp.role || '');
-        setNewExpInst(exp.institution?.es || exp.institution || '');
-        setNewExpDesc(exp.description?.es || exp.description || '');
+        setNewExpRole((exp.role as any)?.es || (typeof exp.role === 'string' ? exp.role : ''));
+        setNewExpInst((exp.institution as any)?.es || (typeof exp.institution === 'string' ? exp.institution : ''));
+        setNewExpDesc((exp.description as any)?.es || (typeof exp.description === 'string' ? exp.description : ''));
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     // --- RESEARCH HANDLERS ---
     const handleSaveResearch = async () => {
-        if (!newResPaperTitle) return;
+        if (!newResPaperTitle || newResPaperTitle.includes('[object Object]')) {
+            alert("Error: El contenido contiene texto inválido ([object Object]).");
+            return;
+        }
         try {
             setTranslating(true);
             const translations = await translateFields(
@@ -876,10 +882,10 @@ export const Admin: React.FC<AdminProps> = ({
 
     const startEditResearch = (res: any) => {
         setEditingId(res.id);
-        setNewResPaperTitle(res.title?.es || res.title || '');
+        setNewResPaperTitle((res.title as any)?.es || (typeof res.title === 'string' ? res.title : ''));
         setNewResJournal(res.journal);
         setNewResYear(res.year);
-        setNewResAbstract(res.abstract?.es || res.abstract || '');
+        setNewResAbstract((res.abstract as any)?.es || (typeof res.abstract === 'string' ? res.abstract : ''));
         setNewResPaperPdfUrl(res.pdfUrl || '');
         setNewResPaperPreviewImage(res.previewImage || '');
         setNewResPaperLang(res.articleLanguage || 'es');
@@ -919,7 +925,10 @@ export const Admin: React.FC<AdminProps> = ({
     };
 
     const handleSavePerformance = async () => {
-        if (!newPerfTitle) return;
+        if (!newPerfTitle || newPerfTitle.includes('[object Object]') || newPerfLoc.includes('[object Object]') || newPerfRole.includes('[object Object]')) {
+            alert("Error: El contenido contiene texto inválido ([object Object]).");
+            return;
+        }
         try {
             setTranslating(true);
             const translations = await translateFields(
@@ -953,12 +962,12 @@ export const Admin: React.FC<AdminProps> = ({
 
     const startEditPerformance = (perf: any) => {
         setEditingId(perf.id);
-        setNewPerfDate(perf.date?.es || perf.date || '');
+        setNewPerfDate((perf.date as any)?.es || (typeof perf.date === 'string' ? perf.date : ''));
         setNewPerfDateISO(perf.dateISO || '');
-        setNewPerfTitle(perf.title?.es || perf.title || '');
-        setNewPerfLoc(perf.location?.es || perf.location || '');
-        setNewPerfRole(perf.role?.es || perf.role || '');
-        setNewPerfDesc(perf.description?.es || perf.description || '');
+        setNewPerfTitle((perf.title as any)?.es || (typeof perf.title === 'string' ? perf.title : ''));
+        setNewPerfLoc((perf.location as any)?.es || (typeof perf.location === 'string' ? perf.location : ''));
+        setNewPerfRole((perf.role as any)?.es || (typeof perf.role === 'string' ? perf.role : ''));
+        setNewPerfDesc((perf.description as any)?.es || (typeof perf.description === 'string' ? perf.description : ''));
         setNewPerfImages(perf.images || []);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
@@ -967,7 +976,10 @@ export const Admin: React.FC<AdminProps> = ({
 
     // --- GALLERY HANDLERS ---
     const handleSaveGallery = async () => {
-        if (!newGalSrc) return;
+        if (!newGalSrc || (newGalCap && newGalCap.includes('[object Object]')) || (newGalCat && newGalCat.includes('[object Object]'))) {
+            alert("Error: El contenido contiene texto inválido ([object Object]).");
+            return;
+        }
         try {
             setTranslating(true);
             const translations_data = await translateFields(
@@ -1002,16 +1014,19 @@ export const Admin: React.FC<AdminProps> = ({
         setAdminGalleryTab(item.type);
         setNewGalSrc(item.src);
         setNewGalThumbnail(item.thumbnail || '');
-        setNewGalCat((item.category as any)?.es || item.category || '');
-        setNewGalSubCat((item.subCategory as any)?.es || item.subCategory || '');
-        setNewGalAuthor((item.author as any)?.es || item.author || '');
-        setNewGalCap((item.caption as any)?.es || item.caption || '');
+        setNewGalCat((item.category as any)?.es || (typeof item.category === 'string' ? item.category : ''));
+        setNewGalSubCat((item.subCategory as any)?.es || (typeof item.subCategory === 'string' ? item.subCategory : ''));
+        setNewGalAuthor((item.author as any)?.es || (typeof item.author === 'string' ? item.author : ''));
+        setNewGalCap((item.caption as any)?.es || (typeof item.caption === 'string' ? item.caption : ''));
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     // --- PRESS HANDLERS ---
     const handleSavePress = async () => {
-        if (!newPressTitle) return;
+        if (!newPressTitle || newPressTitle.includes('[object Object]') || newPressCategory.includes('[object Object]')) {
+            alert("Error: El contenido contiene texto inválido ([object Object]).");
+            return;
+        }
         try {
             setTranslating(true);
             const translations_data = await translateFields(
@@ -1048,15 +1063,15 @@ export const Admin: React.FC<AdminProps> = ({
 
     const startEditPress = (item: PressItem) => {
         setEditingId(item.id);
-        setNewPressTitle((item.title as any)?.es || item.title || '');
+        setNewPressTitle((item.title as any)?.es || (typeof item.title === 'string' ? item.title : ''));
         setNewPressSource(item.source);
         setNewPressDate(item.date);
         setNewPressDateISO(item.dateISO || '');
-        setNewPressExcerpt((item.excerpt as any)?.es || item.excerpt || '');
+        setNewPressExcerpt((item.excerpt as any)?.es || (typeof item.excerpt === 'string' ? item.excerpt : ''));
         setNewPressUrl(item.url);
         setNewPressImage(item.image || '');
-        setNewPressCategory((item.category as any)?.es || item.category || '');
-        setNewPressContent((item.content as any)?.es || item.content || '');
+        setNewPressCategory((item.category as any)?.es || (typeof item.category === 'string' ? item.category : ''));
+        setNewPressContent((item.content as any)?.es || (typeof item.content === 'string' ? item.content : ''));
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
@@ -1065,6 +1080,10 @@ export const Admin: React.FC<AdminProps> = ({
 
     // --- ABOUT HANDLERS ---
     const handleSaveAbout = async () => {
+        if (aboutBioTitle.includes('[object Object]') || aboutBioHeading.includes('[object Object]')) {
+            alert("Error: El contenido contiene texto inválido ([object Object]).");
+            return;
+        }
         try {
             setLoading(true);
             setTranslating(true);
