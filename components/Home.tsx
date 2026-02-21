@@ -163,7 +163,12 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
                     <div className="bg-maestro-dark border border-maestro-gold/40 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden">
                       {(event.images?.[0] || event.image) && (
                         <div className="h-24 w-full relative">
-                          <img src={event.images?.[0] || event.image} alt={event.title} className="w-full h-full object-cover" />
+                          <img
+                            src={event.images?.[0] || event.image}
+                            alt={event.title}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                          />
                           <div className="absolute inset-0 bg-gradient-to-t from-maestro-dark to-transparent" />
                         </div>
                       )}
@@ -357,6 +362,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, experienceItems, p
             src="/images/section-header2.webp"
             alt="Fondo Seccíon Sobre Mí"
             className="w-full h-full object-cover opacity-80 grayscale mix-blend-overlay"
+            loading="lazy"
           />
           {/* Top Fade to match Hero's Bottom Fade */}
           <div className="absolute inset-0 bg-gradient-to-b from-maestro-dark via-transparent to-transparent h-48" />

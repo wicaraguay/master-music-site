@@ -19,8 +19,8 @@ export const compressImage = async (
         return file;
     }
 
-    // Skip very small files (less than 200KB)
-    if (file.size < 200 * 1024) {
+    // Skip very small files (less than 50KB)
+    if (file.size < 50 * 1024) {
         return file;
     }
 
@@ -65,23 +65,26 @@ export const compressImage = async (
                     (blob) => {
                         if (blob) {
                             // Create a new File from blob to preserve original name (mostly)
-                            const compressedFile = new File([blob], file.name, {
-                                type: 'image/jpeg',
+                            // Change extension to .webp
+                            const newFileName = file.name.replace(/\.[^/.]+$/, "") + ".webp";
+                            const compressedFile = new File([blob], newFileName, {
+                                type: 'image/webp',
                                 lastModified: Date.now(),
                             });
 
-                            // Only return compressed if it's actually smaller
+                            // Only return compressed if it's actually smaller or if we want to force webp
                             if (compressedFile.size < file.size) {
                                 console.log(`Image compressed: ${(file.size / 1024).toFixed(2)}KB -> ${(compressedFile.size / 1024).toFixed(2)}KB`);
                                 resolve(compressedFile);
                             } else {
-                                resolve(file);
+                                // Even if not smaller, webp is often better for the browser
+                                resolve(compressedFile);
                             }
                         } else {
                             resolve(file);
                         }
                     },
-                    'image/jpeg',
+                    'image/webp',
                     quality
                 );
             };

@@ -34,6 +34,7 @@ export const About: React.FC<AboutProps> = ({ lang, aboutData }) => {
                 src={profileImage}
                 alt={bioHeading}
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 grayscale hover:grayscale-0"
+                loading="lazy"
               />
               {/* Inner fine border */}
               <div className="absolute inset-0 border border-white/10 m-3 rounded-sm pointer-events-none" />
@@ -71,7 +72,7 @@ export const About: React.FC<AboutProps> = ({ lang, aboutData }) => {
                   } else if (section.type === 'image') {
                     return (
                       <div key={section.id} className="my-8">
-                        <img src={section.image} alt="Biography" className="w-full rounded-sm border border-white/10" />
+                        <img src={section.image} alt="Biography" className="w-full rounded-sm border border-white/10" loading="lazy" />
                       </div>
                     );
                   }
