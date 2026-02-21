@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { FadeIn } from './FadeIn';
-import { ExternalLink, Newspaper, Calendar, ChevronLeft, ChevronRight, X, ImageIcon } from 'lucide-react';
+import { ExternalLink, Newspaper, Calendar, ChevronLeft, ChevronRight, X, ImageIcon, Link as LinkIcon, Check } from 'lucide-react';
 import { Language, PressItem } from '../types';
 import { translations } from '../translations';
 import '../src/styles/rich-text-editor.css';
@@ -13,26 +14,54 @@ interface PressProps {
 const ITEMS_PER_PAGE = 8;
 
 export const Press: React.FC<PressProps> = ({ lang, items }) => {
+    const { id } = useParams<{ id: string }>();
+    const navigate = useNavigate();
     const t = translations[lang].press;
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
     const [selectedItem, setSelectedItem] = useState<PressItem | null>(null);
+    const [copied, setCopied] = useState(false);
 
+    // Open an item by navigating to its URL
     const openItem = (item: PressItem) => {
-        setSelectedItem(item);
+        navigate(`/press/${item.id}`);
         document.body.style.overflow = 'hidden';
     };
 
+    // Close the item — go back to /press list
     const closeItem = () => {
-        setSelectedItem(null);
+        navigate('/press');
         document.body.style.overflow = 'auto';
+    };
+
+    // When items load or URL id changes, find and open the item
+    useEffect(() => {
+        if (id && items.length > 0) {
+            const found = items.find(p => p.id === id);
+            if (found) {
+                setSelectedItem(found);
+                document.body.style.overflow = 'hidden';
+            } else {
+                navigate('/press', { replace: true });
+            }
+        } else {
+            setSelectedItem(null);
+            document.body.style.overflow = 'auto';
+        }
+    }, [id, items]);
+
+    // Copy current URL to clipboard
+    const copyLink = () => {
+        navigator.clipboard.writeText(window.location.href).then(() => {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2500);
+        });
     };
 
     // Helper to parse dates for display if they are ISO
     const formatDate = (dateStr: string) => {
         if (!dateStr) return '';
         if (!dateStr.includes('T') && !dateStr.includes('-')) return dateStr;
-
         try {
             const date = new Date(dateStr);
             if (isNaN(date.getTime())) return dateStr;
@@ -48,8 +77,6 @@ export const Press: React.FC<PressProps> = ({ lang, items }) => {
         return (cat[lang] || cat.es || cat) as string;
     }))).filter(Boolean).sort() as string[];
 
-
-
     // Filter items by category
     const filteredItems = items.filter(item => {
         if (selectedCategory === 'all') return true;
@@ -57,64 +84,34 @@ export const Press: React.FC<PressProps> = ({ lang, items }) => {
         return cat === selectedCategory;
     });
 
-    // Helper to parse date string (DD MMM YYYY) for sorting
+    // Helper to parse date string for sorting
     const getSortableDate = (item: PressItem): number => {
-        // 1. PRIORITIZE: Parse the visible text string "DD MMM YYYY"
-        // This ensures "What You See Is What You Get" sorting
         const dateStr = item.date;
         if (dateStr) {
             try {
-                // Split by any whitespace to handle multiple spaces or tabs
                 const parts = dateStr.trim().split(/\s+/);
-                // Handle cases where separator might be '-' or '/' if user typed that
-                // but the regex above only handles whitespace.
-                // If parts length is 1, maybe they used '-'?
                 const cleanParts = parts.length === 1 && parts[0].includes('-') ? parts[0].split('-') :
                     parts.length === 1 && parts[0].includes('/') ? parts[0].split('/') : parts;
-
                 if (cleanParts.length >= 3) {
                     const day = parseInt(cleanParts[0]);
                     const monthStr = cleanParts[1].toLowerCase().replace('.', '');
                     const year = parseInt(cleanParts[2]);
-
                     if (!isNaN(day) && !isNaN(year)) {
                         const months: Record<string, number> = {
-                            // Spanish
                             'ene': 0, 'feb': 1, 'mar': 2, 'abr': 3, 'may': 4, 'jun': 5, 'jul': 6, 'ago': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dic': 11,
-                            // English
-                            'jan': 0, 'apr': 3, 'aug': 7, 'dec': 11,
-                            // Common abbreviations
-                            'sept': 8
+                            'jan': 0, 'apr': 3, 'aug': 7, 'dec': 11, 'sept': 8
                         };
-
                         const month = months[monthStr.substring(0, 3)];
-                        // Only return if we found a valid month index
-                        if (month !== undefined) {
-                            return new Date(year, month, day).getTime();
-                        }
+                        if (month !== undefined) return new Date(year, month, day).getTime();
                     }
                 }
-            } catch (e) {
-                console.warn('Date parse error', e);
-            }
+            } catch (e) { console.warn('Date parse error', e); }
         }
-
-        // 2. Fallback to dateISO if parsing failed
-        if (item.dateISO && !isNaN(new Date(item.dateISO).getTime())) {
-            return new Date(item.dateISO).getTime();
-        }
-
-        // 3. Final fallback
+        if (item.dateISO && !isNaN(new Date(item.dateISO).getTime())) return new Date(item.dateISO).getTime();
         return (item.createdAt ? new Date(item.createdAt).getTime() : 0);
     };
 
-    // Sort items: Strict Date Descending (Newest to Oldest) using robust parser
-    const sortedItems = [...filteredItems].sort((a, b) => {
-        const dateA = getSortableDate(a);
-        const dateB = getSortableDate(b);
-        return dateB - dateA;
-    });
-
+    const sortedItems = [...filteredItems].sort((a, b) => getSortableDate(b) - getSortableDate(a));
     const totalPages = Math.ceil(sortedItems.length / ITEMS_PER_PAGE);
     const paginatedItems = sortedItems.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
@@ -130,13 +127,12 @@ export const Press: React.FC<PressProps> = ({ lang, items }) => {
 
     return (
         <section className="relative py-24 px-6 bg-maestro-dark min-h-screen overflow-hidden">
-            {/* Background Image with Cinematic Overlay (Fixed/Parallax) */}
+            {/* Background Image */}
             <div className="absolute inset-0 z-0 select-none pointer-events-none">
                 <div
                     className="absolute inset-0 bg-cover bg-center bg-fixed opacity-65"
                     style={{ backgroundImage: "url('/images/page-press.webp')" }}
                 />
-                {/* Gradients to merge with edges and maintain readability */}
                 <div className="absolute inset-0 bg-gradient-to-b from-maestro-dark/95 via-transparent to-maestro-dark/90 z-1"></div>
                 <div className="absolute inset-0 bg-gradient-to-r from-maestro-dark/40 via-transparent to-maestro-dark/40 z-1"></div>
                 <div className="absolute inset-0 bg-black/20 z-1" />
@@ -209,7 +205,6 @@ export const Press: React.FC<PressProps> = ({ lang, items }) => {
                                                 alt={((item.title as any)[lang] || (item.title as any).es || item.title) as string}
                                                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                             />
-
                                         </div>
                                     </div>
 
@@ -236,9 +231,7 @@ export const Press: React.FC<PressProps> = ({ lang, items }) => {
                                             dangerouslySetInnerHTML={{ __html: (item.excerpt as any)[lang] || (item.excerpt as any).es || item.excerpt }}
                                         />
 
-                                        <button
-                                            className="flex items-center gap-2 text-xs uppercase tracking-widest text-maestro-light/50 group-hover:text-maestro-gold transition-all"
-                                        >
+                                        <button className="flex items-center gap-2 text-xs uppercase tracking-widest text-maestro-light/50 group-hover:text-maestro-gold transition-all">
                                             <span>{(t as any).readMore || (lang === 'es' ? 'Leer Artículo' : 'Read Article')}</span>
                                             <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
                                         </button>
@@ -375,7 +368,18 @@ export const Press: React.FC<PressProps> = ({ lang, items }) => {
                                     {/* Footer / Exit */}
                                     <div className="mt-10 text-center">
                                         <div className="w-12 h-px bg-maestro-gold mx-auto mb-6 opacity-30" />
-                                        <div className="flex flex-col items-center gap-8">
+                                        <div className="flex flex-col items-center gap-6">
+                                            {/* Copy Link Button */}
+                                            <button
+                                                onClick={copyLink}
+                                                className="flex items-center gap-2 text-[10px] uppercase tracking-widest border border-white/10 px-5 py-3 text-maestro-light/40 hover:text-maestro-gold hover:border-maestro-gold/40 transition-all rounded-sm"
+                                            >
+                                                {copied ? <Check size={13} className="text-maestro-gold" /> : <LinkIcon size={13} />}
+                                                {copied
+                                                    ? (lang === 'es' ? '¡Enlace copiado!' : lang === 'ru' ? 'Ссылка скопирована!' : 'Link copied!')
+                                                    : (lang === 'es' ? 'Copiar enlace del artículo' : lang === 'ru' ? 'Копировать ссылку' : 'Copy article link')
+                                                }
+                                            </button>
                                             <button
                                                 onClick={closeItem}
                                                 className="text-white/40 hover:text-maestro-gold uppercase tracking-[0.4em] text-xs font-bold transition-all hover:tracking-[0.6em]"

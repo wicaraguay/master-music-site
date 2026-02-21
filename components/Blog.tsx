@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { FadeIn } from './FadeIn';
-import { Calendar, ChevronRight, X, ImageIcon } from 'lucide-react';
+import { Calendar, ChevronRight, X, ImageIcon, Link as LinkIcon, Check } from 'lucide-react';
 import { BlogPost, Language } from '../types';
 import { translations } from '../translations';
 import '../src/styles/rich-text-editor.css';
@@ -11,30 +12,56 @@ interface BlogProps {
 }
 
 export const Blog: React.FC<BlogProps> = ({ posts, lang }) => {
+    const { id } = useParams<{ id: string }>();
+    const navigate = useNavigate();
     const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
+    const [copied, setCopied] = useState(false);
     const t = translations[lang].blog;
 
+    // Open a post by navigating to its URL
     const openPost = (post: BlogPost) => {
-        setSelectedPost(post);
+        navigate(`/blog/${post.id}`);
         document.body.style.overflow = 'hidden';
     };
 
+    // Close the post — go back to /blog list
     const closePost = () => {
-        setSelectedPost(null);
+        navigate('/blog');
         document.body.style.overflow = 'auto';
+    };
+
+    // When posts load or URL id changes, find and open the post
+    useEffect(() => {
+        if (id && posts.length > 0) {
+            const found = posts.find(p => p.id === id);
+            if (found) {
+                setSelectedPost(found);
+                document.body.style.overflow = 'hidden';
+            } else {
+                // ID not found — redirect to blog list
+                navigate('/blog', { replace: true });
+            }
+        } else {
+            setSelectedPost(null);
+            document.body.style.overflow = 'auto';
+        }
+    }, [id, posts]);
+
+    // Copy current URL to clipboard
+    const copyLink = () => {
+        navigator.clipboard.writeText(window.location.href).then(() => {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2500);
+        });
     };
 
     // Helper to parse both ISO and D/M/YYYY dates reliably
     const parseDate = (dateStr: string) => {
         if (!dateStr) return 0;
-
-        // Check if it's ISO format
         if (dateStr.includes('T')) {
             const date = new Date(dateStr);
             return isNaN(date.getTime()) ? 0 : date.getTime();
         }
-
-        // Handle legacy D/M/YYYY format
         try {
             const [day, month, year] = dateStr.split('/').map(Number);
             if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
@@ -49,19 +76,10 @@ export const Blog: React.FC<BlogProps> = ({ posts, lang }) => {
     // Elegant date formatter for display
     const formatDate = (dateStr: string) => {
         if (!dateStr) return '';
-
-        // If it's legacy format, keep it as is (already uppercase in DB usually)
         if (!dateStr.includes('T')) return dateStr;
-
-        // If it's ISO, format it elegantly
         const date = new Date(dateStr);
         if (isNaN(date.getTime())) return dateStr;
-
-        const day = date.getDate().toString();
-        const month = (date.getMonth() + 1).toString();
-        const year = date.getFullYear();
-
-        return `${day}/${month}/${year}`;
+        return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
     };
 
     // Find the latest post by creation date for the badge
@@ -75,7 +93,7 @@ export const Blog: React.FC<BlogProps> = ({ posts, lang }) => {
     };
     const latestPostId = getLatestCreatedBlogId();
 
-    // Sort posts: Newest first (using precise internal timestamps), but latest created always at top
+    // Sort posts: Newest first, latest created always at top
     const sortedPosts = [...posts].sort((a, b) => {
         if (a.id === latestPostId) return -1;
         if (b.id === latestPostId) return 1;
@@ -84,12 +102,11 @@ export const Blog: React.FC<BlogProps> = ({ posts, lang }) => {
 
     return (
         <section className="relative py-24 px-6 bg-maestro-dark min-h-screen overflow-hidden">
-            {/* Background Image - Adjusted for a subtle 'clarita' effect */}
+            {/* Background Image */}
             <div
                 className="absolute inset-0 z-0 bg-cover bg-center bg-fixed opacity-50 transition-opacity duration-1000"
                 style={{ backgroundImage: 'url("/images/page-blog.webp")' }}
             />
-            {/* Delicate gradient overlays to ensure readability and the 'clarita' look */}
             <div className="absolute inset-0 z-0 bg-gradient-to-b from-maestro-dark/85 via-transparent to-maestro-dark/90" />
             <div className="absolute inset-0 z-0 bg-white/5" />
 
@@ -266,12 +283,25 @@ export const Blog: React.FC<BlogProps> = ({ posts, lang }) => {
                                     {/* Footer / Exit */}
                                     <div className="mt-32 text-center">
                                         <div className="w-12 h-px bg-maestro-gold mx-auto mb-10 opacity-50" />
-                                        <button
-                                            onClick={closePost}
-                                            className="text-white/40 hover:text-maestro-gold uppercase tracking-[0.4em] text-xs font-bold transition-all hover:tracking-[0.6em]"
-                                        >
-                                            {t.closeArticle}
-                                        </button>
+                                        <div className="flex flex-col items-center gap-6">
+                                            {/* Copy Link Button */}
+                                            <button
+                                                onClick={copyLink}
+                                                className="flex items-center gap-2 text-[10px] uppercase tracking-widest border border-white/10 px-5 py-3 text-maestro-light/40 hover:text-maestro-gold hover:border-maestro-gold/40 transition-all rounded-sm"
+                                            >
+                                                {copied ? <Check size={13} className="text-maestro-gold" /> : <LinkIcon size={13} />}
+                                                {copied
+                                                    ? (lang === 'es' ? '¡Enlace copiado!' : lang === 'ru' ? 'Ссылка скопирована!' : 'Link copied!')
+                                                    : (lang === 'es' ? 'Copiar enlace del artículo' : lang === 'ru' ? 'Копировать ссылку' : 'Copy article link')
+                                                }
+                                            </button>
+                                            <button
+                                                onClick={closePost}
+                                                className="text-white/40 hover:text-maestro-gold uppercase tracking-[0.4em] text-xs font-bold transition-all hover:tracking-[0.6em]"
+                                            >
+                                                {t.closeArticle}
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
