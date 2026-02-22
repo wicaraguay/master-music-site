@@ -5,7 +5,7 @@ import {
     LayoutDashboard, Image as ImageIcon, X, Briefcase, BookOpen, Calendar, MapPin, Video, PlayCircle, Edit, Save, RotateCcw, Database,
     ChevronDown, ArrowRight, Mail, ExternalLink
 } from 'lucide-react';
-import { BlogPost, Resource, ExperienceItem, ResearchPaper, Performance, GalleryItem, Language, ContactMessage, PressItem, AboutData, AboutSection } from '../types';
+import { BlogPost, Resource, ExperienceItem, ResearchPaper, Performance, GalleryItem, Language, ContactMessage, PressItem, AboutData, AboutSection, LocalizedString } from '../types';
 import { translations } from '../translations';
 import { addItem, updateItem, deleteItem as deleteDbItem, setItem } from '../src/services/db';
 import { signIn, logout } from '../src/services/auth';
@@ -739,26 +739,70 @@ export const Admin: React.FC<AdminProps> = ({
     // --- BLOG HANDLERS ---
     const removeImage = (index: number) => { setNewPostImages(newPostImages.filter((_, i) => i !== index)); };
 
+    /**
+     * Returns true if a stored field is a proper LocalizedString with a real English translation.
+     * Catches cases where Gemini failed silently and stored the Spanish text in all languages.
+     */
+    const isProperlyTranslated = (stored: any): boolean => {
+        if (!stored || typeof stored !== 'object') return false;
+        const hasAllKeys = stored.es !== undefined && stored.en !== undefined && stored.ru !== undefined;
+        if (!hasAllKeys) return false;
+        // If en equals es, the translation failed silently
+        const enDiffersFromEs = stored.en.trim() !== stored.es.trim();
+        const ruDiffersFromEs = stored.ru.trim() !== stored.es.trim();
+        return enDiffersFromEs && ruDiffersFromEs;
+    };
+
+
     const handleSavePost = async () => {
         if (!newPostTitle) return;
         try {
             setTranslating(true);
-            const smartSummary = await generateSmartSummary(newPostContent);
-
-            const translations = await translateFields(
-                { title: newPostTitle, content: newPostContent },
-                ['title', 'content']
-            );
-
-            // Al editar, mantenemos la fecha original. Si es nuevo, usamos la fecha y hora actual.
             const originalPost = editingId ? posts.find(p => p.id === editingId) : null;
+
+            // --- Smart Translation Cache ---
+            // Compare current editor text (always Spanish) with what's stored in Firestore.
+            const storedTitle = originalPost?.title;
+            const storedContent = originalPost?.content;
+            const storedTitleEs = typeof storedTitle === 'object' ? (storedTitle as any)?.es : storedTitle;
+            const storedContentEs = typeof storedContent === 'object' ? (storedContent as any)?.es : storedContent;
+
+            // A field needs translation if:
+            // (a) new post, (b) never translated (plain string), (c) text changed, OR (d) bad translation (en===es)
+            const titleNeedsTranslation = !originalPost || !isProperlyTranslated(storedTitle) || storedTitleEs !== newPostTitle;
+            const contentNeedsTranslation = !originalPost || !isProperlyTranslated(storedContent) || storedContentEs !== newPostContent;
+
+            let finalTitle: LocalizedString;
+            let finalContent: LocalizedString;
+            let smartSummary;
+
+            const fieldsToTranslate: Record<string, string> = {};
+            if (titleNeedsTranslation) fieldsToTranslate.title = newPostTitle;
+            if (contentNeedsTranslation) fieldsToTranslate.content = newPostContent;
+
+            if (Object.keys(fieldsToTranslate).length > 0) {
+                console.log(`[Admin/Blog] Translating changed fields: ${Object.keys(fieldsToTranslate).join(', ')}`);
+                const translated = await translateFields(fieldsToTranslate, Object.keys(fieldsToTranslate) as any);
+                finalTitle = titleNeedsTranslation ? translated.title : (storedTitle as LocalizedString);
+                finalContent = contentNeedsTranslation ? translated.content : (storedContent as LocalizedString);
+                smartSummary = contentNeedsTranslation
+                    ? await generateSmartSummary(newPostContent)
+                    : (originalPost as any)?.preview || await generateSmartSummary(newPostContent);
+            } else {
+                console.log('[Admin/Blog] No text changes detected. Reusing existing translations. 0 tokens spent.');
+                finalTitle = storedTitle as LocalizedString;
+                finalContent = storedContent as LocalizedString;
+                smartSummary = (originalPost as any)?.preview;
+            }
+            // --- End Smart Cache ---
+
             const postDate = originalPost?.date || new Date().toISOString();
             const postCreatedAt = (originalPost as any)?.createdAt || postDate;
 
             await saveToDb('posts', editingId,
                 {
-                    title: translations.title,
-                    content: translations.content,
+                    title: finalTitle,
+                    content: finalContent,
                     preview: smartSummary
                 },
                 {
@@ -1029,20 +1073,48 @@ export const Admin: React.FC<AdminProps> = ({
         }
         try {
             setTranslating(true);
-            const translations_data = await translateFields(
-                { title: newPressTitle, excerpt: newPressExcerpt, category: newPressCategory, content: newPressContent },
-                ['title', 'excerpt', 'category', 'content']
-            );
-
             const originalPress = editingId ? press.find(p => p.id === editingId) : null;
+
+            // --- Smart Translation Cache ---
+            const pressFields: Record<string, { current: string; stored: any }> = {
+                title: { current: newPressTitle, stored: originalPress?.title },
+                excerpt: { current: newPressExcerpt, stored: (originalPress as any)?.excerpt },
+                category: { current: newPressCategory, stored: (originalPress as any)?.category },
+                content: { current: newPressContent, stored: (originalPress as any)?.content },
+            };
+
+            const fieldsToTranslate: Record<string, string> = {};
+            const reuseTranslations: Record<string, LocalizedString> = {};
+
+            for (const [key, { current, stored }] of Object.entries(pressFields)) {
+                const storedEs = typeof stored === 'object' ? stored?.es : stored;
+                // Needs translation if: not translated, text changed, OR bad translation (en===es)
+                const needsTranslation = !originalPress || !isProperlyTranslated(stored) || storedEs !== current;
+                if (needsTranslation) {
+                    fieldsToTranslate[key] = current;
+                } else {
+                    reuseTranslations[key] = stored as LocalizedString;
+                }
+            }
+
+            let finalTranslations: Record<string, LocalizedString> = { ...reuseTranslations };
+            if (Object.keys(fieldsToTranslate).length > 0) {
+                console.log(`[Admin/Press] Translating changed fields: ${Object.keys(fieldsToTranslate).join(', ')}`);
+                const newTrans = await translateFields(fieldsToTranslate, Object.keys(fieldsToTranslate) as any);
+                finalTranslations = { ...finalTranslations, ...newTrans };
+            } else {
+                console.log('[Admin/Press] No text changes detected. Reusing existing translations. 0 tokens spent.');
+            }
+            // --- End Smart Cache ---
+
             const pressCreatedAt = (originalPress as any)?.createdAt || originalPress?.dateISO || new Date().toISOString();
 
             await saveToDb('press', editingId,
                 {
-                    title: translations_data.title,
-                    excerpt: translations_data.excerpt,
-                    category: translations_data.category,
-                    content: translations_data.content
+                    title: finalTranslations.title,
+                    excerpt: finalTranslations.excerpt,
+                    category: finalTranslations.category,
+                    content: finalTranslations.content
                 },
                 {
                     source: newPressSource,

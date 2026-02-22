@@ -50,34 +50,131 @@ export const translateText = async (text: string): Promise<LocalizedString> => {
     }
 };
 
+// Maximum characters per chunk before splitting (roughly 2,000 tokens)
+const CHUNK_CHAR_LIMIT = 8000;
+
+/**
+ * Splits HTML content into chunks at paragraph boundaries to avoid token limits.
+ */
+const splitIntoChunks = (html: string): string[] => {
+    if (html.length <= CHUNK_CHAR_LIMIT) return [html];
+
+    // Split after closing block tags (p, div, h1-h6, li, blockquote)
+    const parts = html.split(/(?<=<\/(?:p|div|h[1-6]|li|blockquote|section)>)/i);
+    const chunks: string[] = [];
+    let current = '';
+
+    for (const part of parts) {
+        if (current.length + part.length > CHUNK_CHAR_LIMIT && current !== '') {
+            chunks.push(current);
+            current = part;
+        } else {
+            current += part;
+        }
+    }
+    if (current) chunks.push(current);
+
+    return chunks;
+};
+
+/**
+ * Calls Gemini to translate a single piece of text (may contain HTML).
+ */
+const callGeminiSingle = async (text: string): Promise<{ en: string; ru: string }> => {
+    const prompt = `
+    Traduce el siguiente texto del español al inglés y al ruso.
+    
+    CRÍTICO - REGLAS PARA HTML:
+    - Si el texto contiene etiquetas HTML, DEBES preservarlas EXACTAMENTE como están.
+    - PRESERVA TODOS los atributos HTML (class, style, href, etc.) sin modificarlos.
+    - SOLO traduce el CONTENIDO TEXTUAL dentro de las etiquetas.
+    - Mantén la estructura HTML completamente intacta.
+    
+    IMPORTANTE: Responde ÚNICAMENTE con un objeto JSON válido.
+    Formato: {"en": "...", "ru": "..."}
+    
+    Contexto: Portafolio profesional de un Director de Orquesta. Tono formal.
+    
+    Texto:
+    ${text}
+    `;
+
+    const result = await model.generateContent(prompt);
+    const responseText = result.response.text();
+    const cleaned = responseText.replace(/```json/g, "").replace(/```/g, "").trim();
+    const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error("No JSON in Gemini single response");
+    const parsed = JSON.parse(jsonMatch[0]);
+    return { en: parsed.en || text, ru: parsed.ru || text };
+};
+
+/**
+ * Translates a potentially long HTML text field using chunking if needed.
+ */
+const translateLongField = async (text: string): Promise<LocalizedString> => {
+    const chunks = splitIntoChunks(text);
+
+    if (chunks.length === 1) {
+        const result = await callGeminiSingle(text);
+        return { es: text, ...result };
+    }
+
+    console.log(`[TranslationService] Contenido largo (${text.length} chars) → ${chunks.length} fragmentos.`);
+    const enParts: string[] = [];
+    const ruParts: string[] = [];
+
+    for (let i = 0; i < chunks.length; i++) {
+        console.log(`[TranslationService] Fragmento ${i + 1}/${chunks.length}...`);
+        const result = await callGeminiSingle(chunks[i]);
+        enParts.push(result.en);
+        ruParts.push(result.ru);
+        // Pause between chunks to respect rate limits
+        if (i < chunks.length - 1) await new Promise(r => setTimeout(r, 600));
+    }
+
+    return { es: text, en: enParts.join(''), ru: ruParts.join('') };
+};
+
 /**
  * Traduce múltiples campos de un objeto en una sola llamada a Gemini para ahorrar cuota (Rate Limit).
+ * Los campos de contenido largo (> 8,000 chars) se traducen por fragmentos automáticamente.
  */
 export const translateFields = async <T extends Record<string, any>>(
     data: T,
     fields: (keyof T)[]
 ): Promise<Record<string, LocalizedString>> => {
-    const textsToTranslate: Record<string, string> = {};
+    const shortTexts: Record<string, string> = {};
+    const longTexts: Record<string, string> = {};
     const results: Record<string, LocalizedString> = {};
 
-    // 1. Filtrar campos vacíos y preparar datos
+    // 1. Classify fields: empty → fallback, long → chunk, short → batch
     fields.forEach(field => {
         const value = data[field];
-        if (value && typeof value === 'string' && value.trim() !== "") {
-            textsToTranslate[field as string] = value;
-        } else {
-            // Si está vacío, devolvemos el valor original en todos los idiomas
+        if (!value || typeof value !== 'string' || value.trim() === "") {
             results[field as string] = { es: String(value || ""), en: String(value || ""), ru: String(value || "") };
+        } else if (value.length > CHUNK_CHAR_LIMIT) {
+            longTexts[field as string] = value;
+        } else {
+            shortTexts[field as string] = value;
         }
     });
 
-    const pendingKeys = Object.keys(textsToTranslate);
+    // 2. Translate long fields with chunking (sequential)
+    for (const key of Object.keys(longTexts)) {
+        try {
+            results[key] = await translateLongField(longTexts[key]);
+        } catch (e) {
+            console.error(`[TranslationService] Fallo en campo largo "${key}":`, e);
+            results[key] = { es: longTexts[key], en: longTexts[key], ru: longTexts[key] };
+        }
+    }
+
+    // 3. Translate short fields in a single batched Gemini call
+    const pendingKeys = Object.keys(shortTexts);
     if (pendingKeys.length === 0) return results;
 
-    // 2. Construir prompt único para todos los campos
     const prompt = `
     Traduce los siguientes campos del español al inglés y ruso.
-    
     
     CRÍTICO - REGLAS PARA HTML:
     - Si el texto contiene etiquetas HTML (como <p>, <strong>, <a>, <h1>, <span>, etc.), DEBES preservarlas EXACTAMENTE como están.
@@ -85,17 +182,13 @@ export const translateFields = async <T extends Record<string, any>>(
     - PRESERVA TODOS los estilos inline (style="font-family: ...", style="color: ...", etc.) sin modificarlos.
     - SOLO traduce el CONTENIDO TEXTUAL dentro de las etiquetas, NO traduzcas ni modifiques las etiquetas HTML mismas.
     - Mantén la estructura HTML completamente intacta.
-    - Ejemplos: 
-      * "<p>Hola <strong>mundo</strong></p>" → {"en": "<p>Hello <strong>world</strong></p>", "ru": "<p>Привет <strong>мир</strong></p>"}
-      * "<span style='font-family: Georgia'>Texto</span>" → {"en": "<span style='font-family: Georgia'>Text</span>", "ru": "<span style='font-family: Georgia'>Текст</span>"}
-    
     
     IMPORTANTE: Responde ÚNICAMENTE con un objeto JSON válido donde las llaves sean los identificadores proporcionados.
     
     Contexto: Portafolio profesional de un Director de Orquesta. Tono formal.
     
     Campos a traducir:
-    ${JSON.stringify(textsToTranslate, null, 2)}
+    ${JSON.stringify(shortTexts, null, 2)}
     
     Formato de respuesta esperado (JSON):
     {
@@ -104,39 +197,32 @@ export const translateFields = async <T extends Record<string, any>>(
     `;
 
     try {
-        console.log(`[TranslationService] Traduciendo LOTE de ${pendingKeys.length} campos...`);
+        console.log(`[TranslationService] Traduciendo LOTE de ${pendingKeys.length} campos cortos...`);
         const result = await model.generateContent(prompt);
         const responseText = result.response.text();
-
         const cleaned = responseText.replace(/```json/g, "").replace(/```/g, "").trim();
         const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
-
-        if (!jsonMatch) {
-            throw new Error("No se pudo parsear el JSON de la respuesta por lotes");
-        }
+        if (!jsonMatch) throw new Error("No se pudo parsear el JSON de la respuesta por lotes");
 
         const batchTranslations = JSON.parse(jsonMatch[0]);
-
         pendingKeys.forEach(key => {
             const trans = batchTranslations[key] || {};
             results[key] = {
-                es: textsToTranslate[key],
-                en: trans.en || textsToTranslate[key],
-                ru: trans.ru || textsToTranslate[key]
+                es: shortTexts[key],
+                en: trans.en || shortTexts[key],
+                ru: trans.ru || shortTexts[key]
             };
         });
-
-        return results;
     } catch (error) {
         console.error("[TranslationService] Fallo en traducción por lotes:", error);
-        // Fallback: devolver el texto original para lo que falta
         pendingKeys.forEach(key => {
             if (!results[key]) {
-                results[key] = { es: textsToTranslate[key], en: textsToTranslate[key], ru: textsToTranslate[key] };
+                results[key] = { es: shortTexts[key], en: shortTexts[key], ru: shortTexts[key] };
             }
         });
-        return results;
     }
+
+    return results;
 };
 /**
  * Genera un resumen inteligente y breve del contenido de un blog en tres idiomas.

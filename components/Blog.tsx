@@ -18,6 +18,16 @@ export const Blog: React.FC<BlogProps> = ({ posts, lang }) => {
     const [copied, setCopied] = useState(false);
     const t = translations[lang].blog;
 
+    // Helper to extract the correct language from a localized field
+    const loc = (field: any): string => {
+        if (!field) return '';
+        if (typeof field === 'object' && (field.es || field.en || field.ru)) {
+            return field[lang] || field.es || field.en || '';
+        }
+        return String(field);
+    };
+
+
     // Open a post by navigating to its URL
     const openPost = (post: BlogPost) => {
         navigate(`/blog/${post.id}`);
@@ -169,7 +179,7 @@ export const Blog: React.FC<BlogProps> = ({ posts, lang }) => {
                                     {/* Content */}
                                     <div className="flex-grow">
                                         <h3 className="text-3xl font-serif text-maestro-light mb-4 group-hover:text-maestro-gold transition-colors">
-                                            {post.title}
+                                            {loc(post.title)}
                                         </h3>
 
                                         {post.images && post.images.length > 0 && (
@@ -180,7 +190,7 @@ export const Blog: React.FC<BlogProps> = ({ posts, lang }) => {
                                         )}
 
                                         <p className="text-maestro-light/60 font-light leading-relaxed mb-6 whitespace-pre-line line-clamp-3 italic">
-                                            {post.preview}
+                                            {loc(post.preview)}
                                         </p>
                                         <button className="flex items-center gap-2 text-xs uppercase tracking-widest text-maestro-light/50 group-hover:text-maestro-gold transition-all">
                                             {t.readMore} <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
@@ -232,7 +242,7 @@ export const Blog: React.FC<BlogProps> = ({ posts, lang }) => {
                                             {formatDate(selectedPost.date)}
                                         </span>
                                         <h2 className="text-4xl md:text-7xl font-serif text-maestro-light leading-tight max-w-5xl shadow-black drop-shadow-2xl">
-                                            {selectedPost.title}
+                                            {loc(selectedPost.title)}
                                         </h2>
                                     </FadeIn>
                                 </div>
@@ -242,13 +252,13 @@ export const Blog: React.FC<BlogProps> = ({ posts, lang }) => {
                                 <div className="bg-[#0a0a0a] rounded-t-3xl md:rounded-t-none p-4 md:p-0">
                                     {/* Subtitle/Excerpt */}
                                     <div className="max-w-4xl mx-auto mb-16 italic font-serif text-xl border-l-2 border-maestro-gold pl-8 py-4 bg-maestro-gold/[0.02] text-maestro-light/70 leading-relaxed">
-                                        {selectedPost.preview}
+                                        {loc(selectedPost.preview)}
                                     </div>
 
                                     {/* Main Content Body */}
                                     <div
                                         className="blog-content text-maestro-light/80 font-light leading-[2.2] text-xl max-w-4xl mx-auto"
-                                        dangerouslySetInnerHTML={{ __html: selectedPost.content }}
+                                        dangerouslySetInnerHTML={{ __html: loc(selectedPost.content) }}
                                     />
 
                                     {/* Integrated Gallery */}
