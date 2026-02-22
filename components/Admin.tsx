@@ -494,6 +494,15 @@ export const Admin: React.FC<AdminProps> = ({
     const [adminGallerySearch, setAdminGallerySearch] = useState('');
     const ITEMS_PER_PAGE_ADMIN = 12;
 
+    // --- VALIDATION STATE ---
+    const [errorsPost, setErrorsPost] = useState<Record<string, string>>({});
+    const [errorsExp, setErrorsExp] = useState<Record<string, string>>({});
+    const [errorsResearch, setErrorsResearch] = useState<Record<string, string>>({});
+    const [errorsPerf, setErrorsPerf] = useState<Record<string, string>>({});
+    const [errorsGal, setErrorsGal] = useState<Record<string, string>>({});
+    const [errorsPress, setErrorsPressForm] = useState<Record<string, string>>({});
+    const [errorsAbout, setErrorsAbout] = useState<Record<string, string>>({});
+
     // --- HANDLERS ---
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -561,6 +570,15 @@ export const Admin: React.FC<AdminProps> = ({
             setAboutBioHeading('');
             setAboutSections([]);
         }
+
+        // Clear all validation errors
+        setErrorsPost({});
+        setErrorsExp({});
+        setErrorsResearch({});
+        setErrorsPerf({});
+        setErrorsGal({});
+        setErrorsPressForm({});
+        setErrorsAbout({});
 
         setAdminGalleryPage(1);
         setAdminBlogPage(1);
@@ -754,8 +772,73 @@ export const Admin: React.FC<AdminProps> = ({
     };
 
 
+    // --- VALIDATORS ---
+    const validatePost = (): boolean => {
+        const e: Record<string, string> = {};
+        if (!newPostTitle.trim()) e.title = 'El título es obligatorio.';
+        if (!newPostContent.trim()) e.content = 'El contenido es obligatorio.';
+        setErrorsPost(e);
+        return Object.keys(e).length === 0;
+    };
+
+    const validateExperience = (): boolean => {
+        const e: Record<string, string> = {};
+        if (!newExpRole.trim()) e.role = 'El rol es obligatorio.';
+        if (!newExpInst.trim()) e.institution = 'La institución es obligatoria.';
+        if (!newExpYear.trim()) e.year = 'El año es obligatorio.';
+        setErrorsExp(e);
+        return Object.keys(e).length === 0;
+    };
+
+    const validateResearch = (): boolean => {
+        const e: Record<string, string> = {};
+        if (!newResPaperTitle.trim()) e.title = 'El título es obligatorio.';
+        if (!newResJournal.trim()) e.journal = 'La revista/journal es obligatoria.';
+        if (!newResYear.trim()) e.year = 'El año es obligatorio.';
+        if (!newResPaperPdfUrl.trim()) e.pdfUrl = newResPaperLinkType === 'pdf' ? 'Debes subir el archivo PDF.' : 'El enlace externo es obligatorio.';
+        setErrorsResearch(e);
+        return Object.keys(e).length === 0;
+    };
+
+    const validatePerformance = (): boolean => {
+        const e: Record<string, string> = {};
+        if (!newPerfTitle.trim()) e.title = 'El título es obligatorio.';
+        if (!newPerfDate.trim()) e.date = 'La fecha es obligatoria.';
+        if (!newPerfDateISO.trim()) e.dateISO = 'Selecciona una fecha en el calendario.';
+        if (!newPerfLoc.trim()) e.location = 'La ubicación es obligatoria.';
+        if (!newPerfRole.trim()) e.role = 'El rol es obligatorio.';
+        setErrorsPerf(e);
+        return Object.keys(e).length === 0;
+    };
+
+    const validateGallery = (): boolean => {
+        const e: Record<string, string> = {};
+        if (!newGalSrc.trim()) e.src = 'La fuente (imagen/URL) es obligatoria.';
+        if (!newGalCat.trim()) e.category = 'El título es obligatorio.';
+        setErrorsGal(e);
+        return Object.keys(e).length === 0;
+    };
+
+    const validatePress = (): boolean => {
+        const e: Record<string, string> = {};
+        if (!newPressTitle.trim()) e.title = 'El título es obligatorio.';
+        if (!newPressSource.trim()) e.source = 'La fuente es obligatoria.';
+        if (!newPressDate.trim()) e.date = 'La fecha es obligatoria.';
+        if (!newPressDateISO.trim()) e.dateISO = 'Selecciona una fecha en el calendario.';
+        setErrorsPressForm(e);
+        return Object.keys(e).length === 0;
+    };
+
+    const validateAbout = (): boolean => {
+        const e: Record<string, string> = {};
+        if (!aboutBioTitle.trim()) e.bioTitle = 'El título bio es obligatorio.';
+        if (!aboutBioHeading.trim()) e.bioHeading = 'El encabezado bio es obligatorio.';
+        setErrorsAbout(e);
+        return Object.keys(e).length === 0;
+    };
+
     const handleSavePost = async () => {
-        if (!newPostTitle) return;
+        if (!validatePost()) return;
         try {
             setTranslating(true);
             const originalPost = editingId ? posts.find(p => p.id === editingId) : null;
@@ -861,7 +944,8 @@ export const Admin: React.FC<AdminProps> = ({
 
     // --- EXPERIENCE HANDLERS ---
     const handleSaveExperience = async () => {
-        if (!newExpRole || newExpRole.includes('[object Object]') || newExpInst.includes('[object Object]') || newExpYear.includes('[object Object]')) {
+        if (!validateExperience()) return;
+        if (newExpRole.includes('[object Object]') || newExpInst.includes('[object Object]') || newExpYear.includes('[object Object]')) {
             alert("Error: El contenido contiene texto inválido ([object Object]). Por favor corrígelo.");
             return;
         }
@@ -901,7 +985,8 @@ export const Admin: React.FC<AdminProps> = ({
 
     // --- RESEARCH HANDLERS ---
     const handleSaveResearch = async () => {
-        if (!newResPaperTitle || newResPaperTitle.includes('[object Object]')) {
+        if (!validateResearch()) return;
+        if (newResPaperTitle.includes('[object Object]')) {
             alert("Error: El contenido contiene texto inválido ([object Object]).");
             return;
         }
@@ -969,7 +1054,8 @@ export const Admin: React.FC<AdminProps> = ({
     };
 
     const handleSavePerformance = async () => {
-        if (!newPerfTitle || newPerfTitle.includes('[object Object]') || newPerfLoc.includes('[object Object]') || newPerfRole.includes('[object Object]')) {
+        if (!validatePerformance()) return;
+        if (newPerfTitle.includes('[object Object]') || newPerfLoc.includes('[object Object]') || newPerfRole.includes('[object Object]')) {
             alert("Error: El contenido contiene texto inválido ([object Object]).");
             return;
         }
@@ -1020,7 +1106,8 @@ export const Admin: React.FC<AdminProps> = ({
 
     // --- GALLERY HANDLERS ---
     const handleSaveGallery = async () => {
-        if (!newGalSrc || (newGalCap && newGalCap.includes('[object Object]')) || (newGalCat && newGalCat.includes('[object Object]'))) {
+        if (!validateGallery()) return;
+        if ((newGalCap && newGalCap.includes('[object Object]')) || (newGalCat && newGalCat.includes('[object Object]'))) {
             alert("Error: El contenido contiene texto inválido ([object Object]).");
             return;
         }
@@ -1067,7 +1154,8 @@ export const Admin: React.FC<AdminProps> = ({
 
     // --- PRESS HANDLERS ---
     const handleSavePress = async () => {
-        if (!newPressTitle || newPressTitle.includes('[object Object]') || newPressCategory.includes('[object Object]')) {
+        if (!validatePress()) return;
+        if (newPressTitle.includes('[object Object]') || newPressCategory.includes('[object Object]')) {
             alert("Error: El contenido contiene texto inválido ([object Object]).");
             return;
         }
@@ -1152,6 +1240,7 @@ export const Admin: React.FC<AdminProps> = ({
 
     // --- ABOUT HANDLERS ---
     const handleSaveAbout = async () => {
+        if (!validateAbout()) return;
         if (aboutBioTitle.includes('[object Object]') || aboutBioHeading.includes('[object Object]')) {
             alert("Error: El contenido contiene texto inválido ([object Object]).");
             return;
@@ -1349,7 +1438,10 @@ export const Admin: React.FC<AdminProps> = ({
                                 </div>
 
                                 <div className="space-y-4 mb-12 border-b border-white/10 pb-12">
-                                    <input type="text" value={newPostTitle} onChange={(e) => setNewPostTitle(e.target.value)} placeholder="Título..." className="w-full bg-maestro-dark border border-white/10 p-3 text-white focus:border-maestro-gold outline-none" />
+                                    <div>
+                                        <input type="text" value={newPostTitle} onChange={(e) => { setNewPostTitle(e.target.value); if (e.target.value.trim()) setErrorsPost(prev => ({ ...prev, title: '' })); }} placeholder="Título..." className={`w-full bg-maestro-dark border p-3 text-white focus:border-maestro-gold outline-none ${errorsPost.title ? 'border-red-500' : 'border-white/10'}`} />
+                                        {errorsPost.title && <p className="text-red-400 text-xs mt-1">{errorsPost.title}</p>}
+                                    </div>
 
                                     {/* Preview Image Field */}
                                     <div className="space-y-2">
@@ -1395,13 +1487,16 @@ export const Admin: React.FC<AdminProps> = ({
                                             <span>Optimizando imagen para la web...</span>
                                         </div>
                                     )}
-                                    <RichTextEditor
-                                        value={newPostContent}
-                                        onChange={setNewPostContent}
-                                        onImageUpload={handleEditorImageUpload}
-                                        placeholder="Contenido del artículo..."
-                                        minHeight="300px"
-                                    />
+                                    <div>
+                                        <RichTextEditor
+                                            value={newPostContent}
+                                            onChange={(v) => { setNewPostContent(v); if (v.trim()) setErrorsPost(prev => ({ ...prev, content: '' })); }}
+                                            onImageUpload={handleEditorImageUpload}
+                                            placeholder="Contenido del artículo..."
+                                            minHeight="300px"
+                                        />
+                                        {errorsPost.content && <p className="text-red-400 text-xs mt-1">{errorsPost.content}</p>}
+                                    </div>
 
                                     {/* Article Gallery Section */}
                                     <div className="space-y-4 bg-maestro-dark border border-white/10 p-4 rounded-sm">
@@ -1437,6 +1532,9 @@ export const Admin: React.FC<AdminProps> = ({
                                     <button disabled={translating || loading} onClick={handleSavePost} className={`w-full md:w-auto px-6 py-2 uppercase tracking-widest text-xs font-bold transition-colors ${(translating || loading) ? 'bg-gray-600 cursor-not-allowed' : (editingId ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-maestro-gold hover:bg-white text-maestro-dark')}`}>
                                         {translating ? 'Traduciendo...' : (loading ? 'Guardando...' : (editingId ? 'Guardar Cambios' : 'Publicar'))}
                                     </button>
+                                    {Object.values(errorsPost).some(Boolean) && (
+                                        <p className="text-red-400 text-xs flex items-center gap-1">⚠ Completa los campos obligatorios antes de guardar.</p>
+                                    )}
                                 </div>
                                 {/* List with Sorting and Pagination */}
                                 <div className="space-y-4">
@@ -1577,10 +1675,19 @@ export const Admin: React.FC<AdminProps> = ({
                                     {/* Right: The Form */}
                                     <div className="lg:col-span-2 space-y-4">
                                         <div className="grid grid-cols-2 gap-4">
-                                            <input type="text" value={newExpYear} onChange={(e) => setNewExpYear(e.target.value)} placeholder="Año (ej: 2023 - Presente o Selecciona en Calendario)" className="w-full bg-maestro-dark border border-white/10 p-3 text-white focus:border-maestro-gold outline-none" />
-                                            <input type="text" value={newExpRole} onChange={(e) => setNewExpRole(e.target.value)} placeholder="Rol (ej: Director)" className="w-full bg-maestro-dark border border-white/10 p-3 text-white focus:border-maestro-gold outline-none" />
+                                            <div>
+                                                <input type="text" value={newExpYear} onChange={(e) => { setNewExpYear(e.target.value); if (e.target.value.trim()) setErrorsExp(prev => ({ ...prev, year: '' })); }} placeholder="Año (ej: 2023 - Presente o Selecciona en Calendario)" className={`w-full bg-maestro-dark border p-3 text-white focus:border-maestro-gold outline-none ${errorsExp.year ? 'border-red-500' : 'border-white/10'}`} />
+                                                {errorsExp.year && <p className="text-red-400 text-xs mt-1">{errorsExp.year}</p>}
+                                            </div>
+                                            <div>
+                                                <input type="text" value={newExpRole} onChange={(e) => { setNewExpRole(e.target.value); if (e.target.value.trim()) setErrorsExp(prev => ({ ...prev, role: '' })); }} placeholder="Rol (ej: Director)" className={`w-full bg-maestro-dark border p-3 text-white focus:border-maestro-gold outline-none ${errorsExp.role ? 'border-red-500' : 'border-white/10'}`} />
+                                                {errorsExp.role && <p className="text-red-400 text-xs mt-1">{errorsExp.role}</p>}
+                                            </div>
                                         </div>
-                                        <input type="text" value={newExpInst} onChange={(e) => setNewExpInst(e.target.value)} placeholder="Institución" className="w-full bg-maestro-dark border border-white/10 p-3 text-white focus:border-maestro-gold outline-none" />
+                                        <div>
+                                            <input type="text" value={newExpInst} onChange={(e) => { setNewExpInst(e.target.value); if (e.target.value.trim()) setErrorsExp(prev => ({ ...prev, institution: '' })); }} placeholder="Institución" className={`w-full bg-maestro-dark border p-3 text-white focus:border-maestro-gold outline-none ${errorsExp.institution ? 'border-red-500' : 'border-white/10'}`} />
+                                            {errorsExp.institution && <p className="text-red-400 text-xs mt-1">{errorsExp.institution}</p>}
+                                        </div>
                                         <RichTextEditor
                                             value={newExpDesc}
                                             onChange={setNewExpDesc}
@@ -1596,6 +1703,9 @@ export const Admin: React.FC<AdminProps> = ({
                                         <button disabled={translating || loading} onClick={handleSaveExperience} className={`w-full md:w-auto px-6 py-2 uppercase tracking-widest text-xs font-bold transition-colors ${(translating || loading) ? 'bg-gray-600 cursor-not-allowed' : (editingId ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-maestro-gold hover:bg-white text-maestro-dark')}`}>
                                             {translating ? 'Traduciendo...' : (loading ? 'Guardando...' : (editingId ? 'Guardar Cambios' : 'Añadir'))}
                                         </button>
+                                        {Object.values(errorsExp).some(Boolean) && (
+                                            <p className="text-red-400 text-xs flex items-center gap-1">⚠ Completa los campos obligatorios antes de guardar.</p>
+                                        )}
                                     </div>
                                 </div>
                                 <div className="space-y-4">
@@ -1624,8 +1734,14 @@ export const Admin: React.FC<AdminProps> = ({
                                 </div>
                                 <div className="space-y-4 mb-12 border-b border-white/10 pb-12">
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        <input type="text" value={newResPaperTitle} onChange={(e) => setNewResPaperTitle(e.target.value)} placeholder="Título Paper" className="w-full bg-maestro-dark border border-white/10 p-3 text-white" />
-                                        <input type="text" value={newResYear} onChange={(e) => setNewResYear(e.target.value)} placeholder="Año" className="w-full bg-maestro-dark border border-white/10 p-3 text-white" />
+                                        <div>
+                                            <input type="text" value={newResPaperTitle} onChange={(e) => { setNewResPaperTitle(e.target.value); if (e.target.value.trim()) setErrorsResearch(prev => ({ ...prev, title: '' })); }} placeholder="Título Paper" className={`w-full bg-maestro-dark border p-3 text-white ${errorsResearch.title ? 'border-red-500' : 'border-white/10'}`} />
+                                            {errorsResearch.title && <p className="text-red-400 text-xs mt-1">{errorsResearch.title}</p>}
+                                        </div>
+                                        <div>
+                                            <input type="text" value={newResYear} onChange={(e) => { setNewResYear(e.target.value); if (e.target.value.trim()) setErrorsResearch(prev => ({ ...prev, year: '' })); }} placeholder="Año" className={`w-full bg-maestro-dark border p-3 text-white ${errorsResearch.year ? 'border-red-500' : 'border-white/10'}`} />
+                                            {errorsResearch.year && <p className="text-red-400 text-xs mt-1">{errorsResearch.year}</p>}
+                                        </div>
 
                                         {/* Article Language Selection */}
                                         <select
@@ -1639,7 +1755,10 @@ export const Admin: React.FC<AdminProps> = ({
                                             <option value="multilingual">Multilingüe / Otros</option>
                                         </select>
                                     </div>
-                                    <input type="text" value={newResJournal} onChange={(e) => setNewResJournal(e.target.value)} placeholder="Revista / Journal" className="w-full bg-maestro-dark border border-white/10 p-3 text-white" />
+                                    <div>
+                                        <input type="text" value={newResJournal} onChange={(e) => { setNewResJournal(e.target.value); if (e.target.value.trim()) setErrorsResearch(prev => ({ ...prev, journal: '' })); }} placeholder="Revista / Journal" className={`w-full bg-maestro-dark border p-3 text-white ${errorsResearch.journal ? 'border-red-500' : 'border-white/10'}`} />
+                                        {errorsResearch.journal && <p className="text-red-400 text-xs mt-1">{errorsResearch.journal}</p>}
+                                    </div>
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-black/20 p-6 border border-white/5 rounded-sm">
                                         {/* Link Type Selector */}
@@ -1688,10 +1807,11 @@ export const Admin: React.FC<AdminProps> = ({
                                                     <input
                                                         type="text"
                                                         value={newResPaperPdfUrl}
-                                                        onChange={(e) => setNewResPaperPdfUrl(e.target.value)}
+                                                        onChange={(e) => { setNewResPaperPdfUrl(e.target.value); if (e.target.value.trim()) setErrorsResearch(prev => ({ ...prev, pdfUrl: '' })); }}
                                                         placeholder="Pegar URL de la revista (https://...)"
-                                                        className="w-full bg-maestro-dark border border-white/10 p-3 text-white text-xs placeholder:opacity-30"
+                                                        className={`w-full bg-maestro-dark border p-3 text-white text-xs placeholder:opacity-30 ${errorsResearch.pdfUrl ? 'border-red-500' : 'border-white/10'}`}
                                                     />
+                                                    {errorsResearch.pdfUrl && <p className="text-red-400 text-xs mt-1">{errorsResearch.pdfUrl}</p>}
                                                 </div>
                                             )}
                                         </div>
@@ -1725,9 +1845,15 @@ export const Admin: React.FC<AdminProps> = ({
                                             <span>Traduciendo título...</span>
                                         </div>
                                     )}
+                                    {errorsResearch.pdfUrl && newResPaperLinkType === 'pdf' && (
+                                        <p className="text-red-400 text-xs">{errorsResearch.pdfUrl}</p>
+                                    )}
                                     <button disabled={translating || loading} onClick={handleSaveResearch} className={`w-full md:w-auto px-6 py-2 uppercase tracking-widest text-xs font-bold transition-colors ${(translating || loading) ? 'bg-gray-600 cursor-not-allowed' : (editingId ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-maestro-gold hover:bg-white text-maestro-dark')}`}>
                                         {translating ? 'Traduciendo...' : (loading ? 'Guardando...' : (editingId ? 'Guardar Cambios' : 'Añadir'))}
                                     </button>
+                                    {Object.values(errorsResearch).some(Boolean) && (
+                                        <p className="text-red-400 text-xs flex items-center gap-1">⚠ Completa los campos obligatorios antes de guardar.</p>
+                                    )}
                                 </div>
                                 <div className="space-y-4">
                                     {research.map(res => (
@@ -1768,8 +1894,15 @@ export const Admin: React.FC<AdminProps> = ({
                                     {/* Right: The Form */}
                                     <div className="lg:col-span-2 space-y-4">
                                         <div className="grid grid-cols-2 gap-4">
-                                            <input type="text" value={newPerfTitle} onChange={(e) => setNewPerfTitle(e.target.value)} placeholder="Título Concierto" className="w-full bg-maestro-dark border border-white/10 p-3 text-white focus:border-maestro-gold outline-none" />
-                                            <input type="text" value={newPerfDate} onChange={(e) => setNewPerfDate(e.target.value)} placeholder="Fecha (DD MMM YYYY)" className="w-full bg-maestro-dark border border-white/10 p-3 text-white focus:border-maestro-gold outline-none" />
+                                            <div>
+                                                <input type="text" value={newPerfTitle} onChange={(e) => { setNewPerfTitle(e.target.value); if (e.target.value.trim()) setErrorsPerf(prev => ({ ...prev, title: '' })); }} placeholder="Título Concierto" className={`w-full bg-maestro-dark border p-3 text-white focus:border-maestro-gold outline-none ${errorsPerf.title ? 'border-red-500' : 'border-white/10'}`} />
+                                                {errorsPerf.title && <p className="text-red-400 text-xs mt-1">{errorsPerf.title}</p>}
+                                            </div>
+                                            <div>
+                                                <input type="text" value={newPerfDate} onChange={(e) => { setNewPerfDate(e.target.value); if (e.target.value.trim()) setErrorsPerf(prev => ({ ...prev, date: '' })); }} placeholder="Fecha (DD MMM YYYY)" className={`w-full bg-maestro-dark border p-3 text-white focus:border-maestro-gold outline-none ${errorsPerf.date ? 'border-red-500' : 'border-white/10'}`} />
+                                                {errorsPerf.date && <p className="text-red-400 text-xs mt-1">{errorsPerf.date}</p>}
+                                                {errorsPerf.dateISO && <p className="text-red-400 text-xs mt-1">{errorsPerf.dateISO}</p>}
+                                            </div>
                                         </div>
                                         <div className="bg-maestro-dark border border-white/10 p-4">
                                             <label className="block text-[10px] uppercase text-maestro-light/50 mb-3 tracking-widest font-bold">Imágenes del Evento (Información del sitio)</label>
@@ -1802,8 +1935,14 @@ export const Admin: React.FC<AdminProps> = ({
                                             )}
                                         </div>
                                         <div className="grid grid-cols-2 gap-4">
-                                            <input type="text" value={newPerfLoc} onChange={(e) => setNewPerfLoc(e.target.value)} placeholder="Ubicación" className="w-full bg-maestro-dark border border-white/10 p-3 text-white focus:border-maestro-gold outline-none" />
-                                            <input type="text" value={newPerfRole} onChange={(e) => setNewPerfRole(e.target.value)} placeholder="Rol" className="w-full bg-maestro-dark border border-white/10 p-3 text-white focus:border-maestro-gold outline-none" />
+                                            <div>
+                                                <input type="text" value={newPerfLoc} onChange={(e) => { setNewPerfLoc(e.target.value); if (e.target.value.trim()) setErrorsPerf(prev => ({ ...prev, location: '' })); }} placeholder="Ubicación" className={`w-full bg-maestro-dark border p-3 text-white focus:border-maestro-gold outline-none ${errorsPerf.location ? 'border-red-500' : 'border-white/10'}`} />
+                                                {errorsPerf.location && <p className="text-red-400 text-xs mt-1">{errorsPerf.location}</p>}
+                                            </div>
+                                            <div>
+                                                <input type="text" value={newPerfRole} onChange={(e) => { setNewPerfRole(e.target.value); if (e.target.value.trim()) setErrorsPerf(prev => ({ ...prev, role: '' })); }} placeholder="Rol" className={`w-full bg-maestro-dark border p-3 text-white focus:border-maestro-gold outline-none ${errorsPerf.role ? 'border-red-500' : 'border-white/10'}`} />
+                                                {errorsPerf.role && <p className="text-red-400 text-xs mt-1">{errorsPerf.role}</p>}
+                                            </div>
                                         </div>
                                         <RichTextEditor
                                             value={newPerfDesc}
@@ -1820,6 +1959,9 @@ export const Admin: React.FC<AdminProps> = ({
                                         <button disabled={translating || loading} onClick={handleSavePerformance} className={`w-full md:w-auto px-6 py-2 uppercase tracking-widest text-xs font-bold transition-colors ${(translating || loading) ? 'bg-gray-600 cursor-not-allowed' : (editingId ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-maestro-gold hover:bg-white text-maestro-dark')}`}>
                                             {translating ? 'Traduciendo...' : (loading ? 'Guardando...' : (editingId ? 'Guardar Cambios' : 'Programar'))}
                                         </button>
+                                        {Object.values(errorsPerf).some(Boolean) && (
+                                            <p className="text-red-400 text-xs flex items-center gap-1">⚠ Completa los campos obligatorios antes de guardar.</p>
+                                        )}
                                     </div>
                                 </div>
                                 <div className="space-y-4">
@@ -1931,33 +2073,36 @@ export const Admin: React.FC<AdminProps> = ({
                                             <Music size={16} /> Audio
                                         </button>
                                     </div>
-                                    <div className="flex gap-2">
-                                        {newGalType === 'image' ? (
-                                            <div className="flex-grow">
-                                                <label className="flex items-center justify-center gap-2 cursor-pointer bg-maestro-dark border border-white/10 p-3 text-white/50 hover:text-white hover:border-maestro-gold transition-colors w-full">
-                                                    <UploadCloud size={20} />
-                                                    <span className="text-sm">{newGalSrc ? 'Imagen Seleccionada (Click para cambiar)' : 'Subir Imagen desde Dispositivo'}</span>
-                                                    <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, setNewGalSrc, 'images/gallery/')} className="hidden" />
-                                                </label>
-                                                {newGalSrc && <p className="text-[10px] text-maestro-gold mt-1 text-center">✓ Imagen cargada en memoria</p>}
-                                            </div>
-                                        ) : newGalType === 'video' ? (
-                                            <input
-                                                type="text"
-                                                value={newGalSrc}
-                                                onChange={(e) => setNewGalSrc(e.target.value)}
-                                                placeholder="Enlace de YouTube (ej: https://www.youtube.com/watch?v=...)"
-                                                className="flex-grow bg-maestro-dark border border-white/10 p-3 text-white"
-                                            />
-                                        ) : (
-                                            <input
-                                                type="text"
-                                                value={newGalSrc}
-                                                onChange={(e) => setNewGalSrc(e.target.value)}
-                                                placeholder="Enlace de SoundCloud (ej: https://soundcloud.com/...)"
-                                                className="flex-grow bg-maestro-dark border border-white/10 p-3 text-white"
-                                            />
-                                        )}
+                                    <div className="flex flex-col gap-1">
+                                        <div className="flex gap-2">
+                                            {newGalType === 'image' ? (
+                                                <div className="flex-grow">
+                                                    <label className={`flex items-center justify-center gap-2 cursor-pointer bg-maestro-dark border p-3 text-white/50 hover:text-white hover:border-maestro-gold transition-colors w-full ${errorsGal.src ? 'border-red-500' : 'border-white/10'}`}>
+                                                        <UploadCloud size={20} />
+                                                        <span className="text-sm">{newGalSrc ? 'Imagen Seleccionada (Click para cambiar)' : 'Subir Imagen desde Dispositivo'}</span>
+                                                        <input type="file" accept="image/*" onChange={(e) => { handleFileUpload(e, setNewGalSrc, 'images/gallery/'); setErrorsGal(prev => ({ ...prev, src: '' })); }} className="hidden" />
+                                                    </label>
+                                                    {newGalSrc && <p className="text-[10px] text-maestro-gold mt-1 text-center">✓ Imagen cargada en memoria</p>}
+                                                </div>
+                                            ) : newGalType === 'video' ? (
+                                                <input
+                                                    type="text"
+                                                    value={newGalSrc}
+                                                    onChange={(e) => { setNewGalSrc(e.target.value); if (e.target.value.trim()) setErrorsGal(prev => ({ ...prev, src: '' })); }}
+                                                    placeholder="Enlace de YouTube (ej: https://www.youtube.com/watch?v=...)"
+                                                    className={`flex-grow bg-maestro-dark border p-3 text-white ${errorsGal.src ? 'border-red-500' : 'border-white/10'}`}
+                                                />
+                                            ) : (
+                                                <input
+                                                    type="text"
+                                                    value={newGalSrc}
+                                                    onChange={(e) => { setNewGalSrc(e.target.value); if (e.target.value.trim()) setErrorsGal(prev => ({ ...prev, src: '' })); }}
+                                                    placeholder="Enlace de SoundCloud (ej: https://soundcloud.com/...)"
+                                                    className={`flex-grow bg-maestro-dark border p-3 text-white ${errorsGal.src ? 'border-red-500' : 'border-white/10'}`}
+                                                />
+                                            )}
+                                        </div>
+                                        {errorsGal.src && <p className="text-red-400 text-xs">{errorsGal.src}</p>}
                                     </div>
 
                                     {newGalType === 'audio' && newGalSrc && (
@@ -1977,13 +2122,16 @@ export const Admin: React.FC<AdminProps> = ({
                                     )}
                                     <div className="space-y-4">
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <input
-                                                type="text"
-                                                value={newGalCat}
-                                                onChange={(e) => setNewGalCat(e.target.value)}
-                                                placeholder="Título (ej: Sinfonía No. 5)"
-                                                className="w-full bg-maestro-dark border border-white/10 p-3 text-white"
-                                            />
+                                            <div>
+                                                <input
+                                                    type="text"
+                                                    value={newGalCat}
+                                                    onChange={(e) => { setNewGalCat(e.target.value); if (e.target.value.trim()) setErrorsGal(prev => ({ ...prev, category: '' })); }}
+                                                    placeholder="Título (ej: Sinfonía No. 5)"
+                                                    className={`w-full bg-maestro-dark border p-3 text-white ${errorsGal.category ? 'border-red-500' : 'border-white/10'}`}
+                                                />
+                                                {errorsGal.category && <p className="text-red-400 text-xs mt-1">{errorsGal.category}</p>}
+                                            </div>
                                             <div className="space-y-2">
                                                 <input
                                                     type="text"
@@ -2036,6 +2184,9 @@ export const Admin: React.FC<AdminProps> = ({
                                     <button disabled={translating || loading} onClick={handleSaveGallery} className={`w-full md:w-auto px-6 py-2 uppercase tracking-widest text-xs font-bold transition-colors ${(translating || loading) ? 'bg-gray-600 cursor-not-allowed' : (editingId ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-maestro-gold hover:bg-white text-maestro-dark')}`}>
                                         {translating ? 'Traduciendo...' : (loading ? 'Guardando...' : (editingId ? 'Guardar Cambios' : 'Añadir'))}
                                     </button>
+                                    {Object.values(errorsGal).some(Boolean) && (
+                                        <p className="text-red-400 text-xs flex items-center gap-1">⚠ Completa los campos obligatorios antes de guardar.</p>
+                                    )}
                                 </div>
 
                                 {/* Gallery Filter Tabs */}
@@ -2184,29 +2335,39 @@ export const Admin: React.FC<AdminProps> = ({
 
                                     {/* Right: The Form */}
                                     <div className="lg:col-span-2 space-y-4">
-                                        <input
-                                            type="text"
-                                            value={newPressTitle}
-                                            onChange={(e) => setNewPressTitle(e.target.value)}
-                                            placeholder="Título del artículo..."
-                                            className="w-full bg-maestro-dark border border-white/10 p-3 text-white focus:border-maestro-gold outline-none"
-                                        />
+                                        <div>
+                                            <input
+                                                type="text"
+                                                value={newPressTitle}
+                                                onChange={(e) => { setNewPressTitle(e.target.value); if (e.target.value.trim()) setErrorsPressForm(prev => ({ ...prev, title: '' })); }}
+                                                placeholder="Título del artículo..."
+                                                className={`w-full bg-maestro-dark border p-3 text-white focus:border-maestro-gold outline-none ${errorsPress.title ? 'border-red-500' : 'border-white/10'}`}
+                                            />
+                                            {errorsPress.title && <p className="text-red-400 text-xs mt-1">{errorsPress.title}</p>}
+                                        </div>
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <input
-                                                type="text"
-                                                value={newPressSource}
-                                                onChange={(e) => setNewPressSource(e.target.value)}
-                                                placeholder="Fuente (ej: El Universo, BBC)"
-                                                className="w-full bg-maestro-dark border border-white/10 p-3 text-white focus:border-maestro-gold outline-none"
-                                            />
-                                            <input
-                                                type="text"
-                                                value={newPressDate}
-                                                onChange={(e) => setNewPressDate(e.target.value)}
-                                                placeholder="Fecha (ej: 15 May 2023)"
-                                                className="w-full bg-maestro-dark border border-white/10 p-3 text-white focus:border-maestro-gold outline-none"
-                                            />
+                                            <div>
+                                                <input
+                                                    type="text"
+                                                    value={newPressSource}
+                                                    onChange={(e) => { setNewPressSource(e.target.value); if (e.target.value.trim()) setErrorsPressForm(prev => ({ ...prev, source: '' })); }}
+                                                    placeholder="Fuente (ej: El Universo, BBC)"
+                                                    className={`w-full bg-maestro-dark border p-3 text-white focus:border-maestro-gold outline-none ${errorsPress.source ? 'border-red-500' : 'border-white/10'}`}
+                                                />
+                                                {errorsPress.source && <p className="text-red-400 text-xs mt-1">{errorsPress.source}</p>}
+                                            </div>
+                                            <div>
+                                                <input
+                                                    type="text"
+                                                    value={newPressDate}
+                                                    onChange={(e) => { setNewPressDate(e.target.value); if (e.target.value.trim()) setErrorsPressForm(prev => ({ ...prev, date: '' })); }}
+                                                    placeholder="Fecha (ej: 15 May 2023)"
+                                                    className={`w-full bg-maestro-dark border p-3 text-white focus:border-maestro-gold outline-none ${errorsPress.date ? 'border-red-500' : 'border-white/10'}`}
+                                                />
+                                                {errorsPress.date && <p className="text-red-400 text-xs mt-1">{errorsPress.date}</p>}
+                                                {errorsPress.dateISO && <p className="text-red-400 text-xs mt-1">{errorsPress.dateISO}</p>}
+                                            </div>
                                         </div>
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -2310,6 +2471,9 @@ export const Admin: React.FC<AdminProps> = ({
                                         >
                                             {translating ? 'Traduciendo...' : (loading ? 'Guardando...' : (editingId ? 'Guardar Cambios' : 'Añadir'))}
                                         </button>
+                                        {Object.values(errorsPress).some(Boolean) && (
+                                            <p className="text-red-400 text-xs flex items-center gap-1">⚠ Completa los campos obligatorios antes de guardar.</p>
+                                        )}
                                     </div>
                                 </div>
 
@@ -2396,9 +2560,14 @@ export const Admin: React.FC<AdminProps> = ({
                                         <Briefcase className="text-maestro-gold" size={20} />
                                         Configuración "Sobre Mí"
                                     </h3>
-                                    <button disabled={translating || loading} onClick={handleSaveAbout} className={`px-6 py-2 uppercase tracking-widest text-xs font-bold transition-colors ${(translating || loading) ? 'bg-gray-600 cursor-not-allowed' : 'bg-maestro-gold hover:bg-white text-maestro-dark'}`}>
-                                        {translating ? 'Traduciendo...' : (loading ? 'Guardando...' : 'Guardar Todo')}
-                                    </button>
+                                    <div className="flex flex-col items-end gap-2">
+                                        <button disabled={translating || loading} onClick={handleSaveAbout} className={`px-6 py-2 uppercase tracking-widest text-xs font-bold transition-colors ${(translating || loading) ? 'bg-gray-600 cursor-not-allowed' : 'bg-maestro-gold hover:bg-white text-maestro-dark'}`}>
+                                            {translating ? 'Traduciendo...' : (loading ? 'Guardando...' : 'Guardar Todo')}
+                                        </button>
+                                        {Object.values(errorsAbout).some(Boolean) && (
+                                            <p className="text-red-400 text-xs flex items-center gap-1">⚠ Completa los campos obligatorios antes de guardar.</p>
+                                        )}
+                                    </div>
                                 </div>
 
                                 <div className="space-y-8 mb-12">
@@ -2438,20 +2607,22 @@ export const Admin: React.FC<AdminProps> = ({
                                                 <input
                                                     type="text"
                                                     value={aboutBioTitle}
-                                                    onChange={(e) => setAboutBioTitle(e.target.value)}
+                                                    onChange={(e) => { setAboutBioTitle(e.target.value); if (e.target.value.trim()) setErrorsAbout(prev => ({ ...prev, bioTitle: '' })); }}
                                                     placeholder="Ej: DIRECTOR DE ORQUESTA"
-                                                    className="w-full bg-black/20 border border-white/10 p-3 text-white focus:border-maestro-gold outline-none"
+                                                    className={`w-full bg-black/20 border p-3 text-white focus:border-maestro-gold outline-none ${errorsAbout.bioTitle ? 'border-red-500' : 'border-white/10'}`}
                                                 />
+                                                {errorsAbout.bioTitle && <p className="text-red-400 text-xs mt-1">{errorsAbout.bioTitle}</p>}
                                             </div>
                                             <div className="space-y-2">
                                                 <label className="text-[10px] uppercase text-white/50">Encabezado (Grande)</label>
                                                 <input
                                                     type="text"
                                                     value={aboutBioHeading}
-                                                    onChange={(e) => setAboutBioHeading(e.target.value)}
+                                                    onChange={(e) => { setAboutBioHeading(e.target.value); if (e.target.value.trim()) setErrorsAbout(prev => ({ ...prev, bioHeading: '' })); }}
                                                     placeholder="Ej: Diego Carrión Granda"
-                                                    className="w-full bg-black/20 border border-white/10 p-3 text-white focus:border-maestro-gold outline-none"
+                                                    className={`w-full bg-black/20 border p-3 text-white focus:border-maestro-gold outline-none ${errorsAbout.bioHeading ? 'border-red-500' : 'border-white/10'}`}
                                                 />
+                                                {errorsAbout.bioHeading && <p className="text-red-400 text-xs mt-1">{errorsAbout.bioHeading}</p>}
                                             </div>
                                         </div>
                                     </div>
