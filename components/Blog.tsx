@@ -104,7 +104,7 @@ export const Blog: React.FC<BlogProps> = ({ posts, lang }) => {
         <section className="relative py-24 px-6 bg-maestro-dark min-h-screen overflow-hidden">
             {/* Background Image */}
             <div
-                className="absolute inset-0 z-0 bg-cover bg-center bg-fixed opacity-50 transition-opacity duration-1000"
+                className="absolute inset-0 z-0 bg-cover bg-top bg-fixed opacity-50 transition-opacity duration-1000"
                 style={{ backgroundImage: 'url("/images/page-blog.webp")' }}
             />
             <div className="absolute inset-0 z-0 bg-gradient-to-b from-maestro-dark/85 via-transparent to-maestro-dark/90" />

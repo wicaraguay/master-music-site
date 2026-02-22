@@ -321,7 +321,7 @@ export const Gallery: React.FC<GalleryProps> = ({ items, lang }) => {
               )}
 
               {/* Information Section */}
-              <div className="mt-8 text-center w-full max-w-2xl bg-white/5 p-8 rounded-lg border border-white/10 backdrop-blur-sm">
+              <div className="mt-8 text-center w-full max-w-2xl bg-black/60 p-8 rounded-lg border border-white/10 backdrop-blur-sm">
                 <span className="text-maestro-gold text-xs uppercase tracking-[0.4em] font-bold block mb-3">
                   {(typeof displayedItems[selectedImageIndex].category === 'object' ? (displayedItems[selectedImageIndex].category as any)[lang] || (displayedItems[selectedImageIndex].category as any).es : displayedItems[selectedImageIndex].category) || ''}
                 </span>
