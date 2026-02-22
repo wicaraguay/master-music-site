@@ -184,13 +184,32 @@ export const Navigation: React.FC<NavigationProps> = ({ currentSection, onNaviga
             </button>
           </div>
 
-          {/* Mobile Toggle */}
-          <button
-            className="lg:hidden text-maestro-light hover:text-maestro-gold transition-colors"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
-          </button>
+          {/* Mobile: Language switcher + Hamburger */}
+          <div className="flex items-center gap-3 lg:hidden">
+            {/* Compact language buttons next to hamburger */}
+            <div className="flex items-center gap-1">
+              {(['es', 'en', 'ru'] as Language[]).map(l => (
+                <button
+                  key={l}
+                  onClick={() => setLang(l)}
+                  className={`text-[9px] uppercase tracking-[0.15em] px-2 py-1 rounded-sm transition-all duration-300 ${lang === l
+                    ? 'text-maestro-gold border border-maestro-gold/40 bg-maestro-gold/10'
+                    : 'text-maestro-light/40 hover:text-maestro-light/70'
+                    }`}
+                >
+                  {l === 'es' ? 'ES' : l === 'en' ? 'EN' : 'РУ'}
+                </button>
+              ))}
+            </div>
+
+            {/* Hamburger */}
+            <button
+              className="text-maestro-light hover:text-maestro-gold transition-colors"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+            </button>
+          </div>
         </div>
       </nav>
 
@@ -229,28 +248,6 @@ export const Navigation: React.FC<NavigationProps> = ({ currentSection, onNaviga
             </div>
 
             <div className="px-8 pb-12 flex flex-col flex-grow overflow-y-auto">
-              {/* Mobile Language Switcher */}
-              <div
-                className="flex gap-4 mb-10 transition-all duration-700 delay-100 transform"
-                style={{
-                  opacity: isMobileMenuOpen ? 1 : 0,
-                  transform: isMobileMenuOpen ? 'translateY(0)' : 'translateY(20px)'
-                }}
-              >
-                {(['es', 'en', 'ru'] as Language[]).map((l, index) => (
-                  <button
-                    key={l}
-                    onClick={() => setLang(l)}
-                    className={`text-[10px] uppercase tracking-[0.2em] relative py-2 ${lang === l ? 'text-maestro-gold font-bold' : 'text-maestro-light/40'} `}
-                  >
-                    {l === 'es' ? 'Esp' : l === 'en' ? 'Eng' : 'Рус'}
-                    {lang === l && (
-                      <span className="absolute bottom-0 left-0 w-full h-0.5 bg-maestro-gold" />
-                    )}
-                  </button>
-                ))}
-              </div>
-
               <div className="flex flex-col space-y-6">
                 {navStructure.map((item, index) => {
                   const isActive = item.id === 'trayectoria' ? isTrayectoriaActive : item.id === 'gallery-submenu' ? isGalleryActive : (item.id as Section) === currentSection;

@@ -187,7 +187,7 @@ export const translations = {
       days: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
       viewDetails: 'Ver Detalles'
     },
-    footerRole: 'Director de Ópera y Orquesta',
+    footerRole: 'Director de Ópera y Orquesta Sinfónica',
     copyright: 'Todos los derechos reservados'
   },
   en: {
@@ -355,7 +355,7 @@ export const translations = {
       days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
       viewDetails: 'View Details'
     },
-    footerRole: 'Opera & Orchestra Conductor',
+    footerRole: 'Opera & Symphony Orchestra Conductor',
     copyright: 'All rights reserved'
   },
   ru: {
@@ -523,7 +523,7 @@ export const translations = {
       days: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
       viewDetails: 'Подробнее'
     },
-    footerRole: 'Дирижер оперы и оркестра',
+    footerRole: 'Дирижер оперы и симфонического оркестра',
     copyright: 'Все права защищены'
   }
 } as const;
